@@ -1,0 +1,45 @@
+import Puss
+import Foundation
+
+{% for type in types.based.Model %}
+extension {{ type.name }} : ConcreteModel {
+    static let pussCollection = Puss.database["{{type.name|lowercase}}"]
+
+    func pussSerialize() -> Document {
+        var doc: Document = ["_id": self.id]
+
+        {% for variable in type.variables %}
+        // {{ variable.name }}: {{ variable.typeName }} ({{ variable.typeName.unwrappedTypeName }})
+        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" %}
+        doc["{{variable.name}}"] = self.{{variable.name}}
+        {% endif %}
+        {% endfor %}
+
+        return doc
+    }
+
+    convenience init(fromDocument source: Document) throws {
+        // Extract all properties
+        {% for variable in type.variables %}
+        {% if variable.typeName.isOptional %}
+        let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
+        {% else %}
+        let {{variable.name}}Value: {{variable.typeName}} = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
+        {% endif %}
+        {% endfor %}
+
+        self.init(
+            {% for parameter in type.initializers.0.parameters %}
+            {{ parameter.argumentLabel }}: {{ parameter.name}}Value
+            {% endfor %}
+        )
+
+        {% for variable in type.variables %}
+        self.{{variable.name}} = {{variable.name}}Value
+        {% endfor %}
+
+        //{{type.initializers.0}}
+
+    }
+}
+{% endfor %}
