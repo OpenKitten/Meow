@@ -22,6 +22,31 @@ final class User : Model {
 
 Puss relies on [Sourcery](https://github.com/krzysztofzablocki/Sourcery) for code generation.
 
+### Preparation
+
+#### One-time
+
+1. Add Puss to your Package.swift:
+	
+	```swift
+	import PackageDescription
+	
+	let package = Package(
+	    name: "PussTest",
+	    dependencies: [
+	        .Package(url: "https://github.com/Obbut/Puss.git", Version(0,0,0))
+	    ]
+	)
+	```
+
+2. Make sure [Sourcery](https://github.com/krzysztofzablocki/Sourcery) is installed.
+
+#### When making changes to your models
+
+While working on your project, run Sourcery in daemon mode so it updates your generated code:
+
+`sourcery Sources Packages/Puss-* Sources/Puss.generated.swift --watch`
+
 ### Usage
 
 1. Define your models as shown above.
