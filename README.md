@@ -22,9 +22,9 @@ final class User : Model {
 
 Puss relies on [Sourcery](https://github.com/krzysztofzablocki/Sourcery) for code generation.
 
-### Preparation
+## Preparation
 
-#### One-time
+### One-time
 
 1. Add Puss to your Package.swift:
 	
@@ -41,13 +41,13 @@ Puss relies on [Sourcery](https://github.com/krzysztofzablocki/Sourcery) for cod
 
 2. Make sure [Sourcery](https://github.com/krzysztofzablocki/Sourcery) is installed.
 
-#### When making changes to your models
+### When making changes to your models
 
 While working on your project, run Sourcery in daemon mode so it updates your generated code:
 
 `sourcery Sources Packages/Puss-* Sources/Puss.generated.swift --watch`
 
-### Usage
+## Usage
 
 1. Define your models as shown above.
 2. Initialize Puss before using it:
@@ -68,3 +68,23 @@ While working on your project, run Sourcery in daemon mode so it updates your ge
        print("Found user with email: \(user.email)")
 	}
    ```
+   
+## Documentation
+
+<details>
+<summary>Model requirements</summary>
+
+- Every model is a **final** class
+- Every model must have a property `id` of type ObjectId
+</details>
+
+<details>
+<summary>Initializers and nonoptional properties</summary>
+
+In the initialization process, Puss always uses the first defined initializer. It will match the argument names (not the labels) to the instance variable names, and pass the variables as arguments.
+
+After calling the initializer, Puss explicitly sets every variable.
+
+*Try viewing the generated code for your models to get a better understanding of how Puss works under the hood.*
+</details>
+
