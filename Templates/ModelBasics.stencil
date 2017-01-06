@@ -1,111 +1,151 @@
 import Puss
 import Foundation
 
+{% for type in types.all %}
+{% if type|based:"Model" or type|based:"Embeddable" %}
+extension {{ type.name }} : ConcreteSerializable {
+  func pussSerialize() -> Document {
+      {% if type|based:"Model" %}
+      var doc: Document = ["_id": self.id]
+      {% else %}
+      var doc = Document()
+      {% endif %}
+
+      {% for variable in type.allVariables %}
+      // {{ variable.name }}: {{ variable.typeName }} ({{ variable.typeName.unwrappedTypeName }})
+      {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.name != "id" and variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
+        doc["{{variable.name}}"] = self.{{variable.name}}
+      {% endif %}
+      {% if variable.typeName.name|hasPrefix:"Reference" %}
+        doc["{{variable.name}}"] = self.{{variable.name}}{%if variable.typeName.isOptional%}?{%endif%}.id
+      {% endif %}
+      {% if variable.type|based:"Embeddable" %}
+        doc["{{variable.name}}"] = self.{{variable.name}}{%if variable.typeName.isOptional%}?{%endif%}.pussSerialize()
+      {% endif %}
+      {% endfor %}
+
+      return doc
+  }
+
+  convenience init(fromDocument source: Document) throws {
+      // Extract all properties
+      {% for variable in type.variables %}
+      // loop: {{ variable.name }}
+
+      {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.name != "id" and variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
+      // The property is a BSON type, so we can just extract it from the document:
+      {#2#}{% if variable.typeName.isOptional %}
+      let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
+      {#2#}{% else %}
+      let {{variable.name}}Value: {{variable.typeName}} = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
+      {#2#}{% endif %}
+      {#1#}{% else %}
+      {% if variable.typeName.name|hasPrefix:"Reference" %}
+        // o the noes it is a reference
+        let {{variable.name}}Id: ObjectId? = source["{{variable.name}}"]
+        let {{variable.name}}Value: {{variable.typeName}}
+
+        {% if variable.typeName.isOptional %}
+          if let {{variable.name}}Id = {{variable.name}}Id {
+              {{variable.name}}Value = Reference(restoring: {{variable.name}}Id)
+          } else {
+              {{variable.name}}Value = nil
+          }
+        {% else %}
+          {{variable.name}}Value = Reference(restoring: try Puss.Helpers.requireValue({{variable.name}}Id, keyForError: "{{variable.name}}"))
+        {% endif %}
+      {% endif %}
+      {% if variable.type|based:"Embeddable" %}
+        {% if variable.typeName.isOptional %}
+          let {{variable.name}}Value: {{variable.typeName}}
+          if let {{variable.name}}Document: Document = source["{{variable.name}}"] {
+            {{variable.name}}Value = try {{variable.typeName.unwrappedTypeName}}(fromDocument: {{variable.name}}Document)
+          } else {
+            {{variable.name}}Value = nil
+          }
+        {% else %}
+          let {{variable.name}}Document: Document = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
+          let {{variable.name}}Value: {{variable.typeName}} = try {{variable.typeName}}(fromDocument: {{variable.name}}Document)
+        {% endif %}
+      {% endif %}
+      {#1#}{% endif %}
+
+      {% if variable.name == "id" %}
+      let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
+      {% endif %}
+      {% endfor %}
+
+      // initializerkaas:
+      try self.init(
+          {% for parameter in type.initializers.0.parameters %}
+          {{ parameter.argumentLabel }}: {{ parameter.name}}Value
+          {% if not forloop.last %}
+          ,
+          {% endif %}
+          {% endfor %}
+      )
+
+      {% for variable in type.variables %}
+      self.{{variable.name}} = {{variable.name}}Value
+      {% endfor %}
+  }
+
+  struct VirtualInstance {
+    var keyPrefix: String
+
+    {% for variable in type.variables %}
+      // {{variable.name}}: {{variable.typeName}}
+      {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Bool" %}
+        var {{ variable.name }}: Virtual{{variable.unwrappedTypeName}} { return Virtual{{variable.unwrappedTypeName}}(name: keyPrefix + "{{variable.name}}") }
+      {% endif %}
+      {% if variable.typeName.unwrappedTypeName == "Int" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Double" %}
+        var {{ variable.name }}: VirtualNumber { return VirtualNumber(name: keyPrefix + "{{variable.name}}") }
+      {% endif %}
+      {% if variable.typeName.name|hasPrefix:"Reference" %}
+        var {{ variable.name }}: VirtualReference<{{variable.typeName.unwrappedTypeName}}.Model, {{variable.typeName.unwrappedTypeName}}.DeleteRule> { return VirtualReference(name: keyPrefix + "{{variable.name}}") }
+      {% endif %}
+      {% if variable.type|based:"Embeddable" %}
+        var {{variable.name}}: {{variable.typeName.unwrappedTypeName}}.VirtualInstance { return {{variable.typeName.unwrappedTypeName}}.VirtualInstance(keyPrefix: "{{variable.name}}.") }
+      {% endif %}
+    {% endfor %}
+
+    init(keyPrefix: String = "") {
+      self.keyPrefix = keyPrefix
+    }
+  }
+
+
+  var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+
+      {% for variable in type.variables %}
+        {% if variable.typeName.name|hasPrefix:"Reference" %}
+          {% if variable.isOptional %}
+            if let {{variable.name}}Value = self.{{variable.name}} {
+          {% else %}
+            let {{variable.name}}Value = self.{{variable.name}}
+          {% endif %}
+          result.append(("{{variable.name}}", {{variable.name}}Value.destinationType, {{variable.name}}Value.deleteRule, {{variable.name}}Value.id))
+          {% if variable.isOptional %}
+            }
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+
+      return result
+  }
+}
+{% endif %}
+{% endfor %}
+
 {% for type in types.based.Model %}
 extension {{ type.name }} : ConcreteModel {
     static let pussCollection = Puss.database["{{type.name|lowercase}}"]
 
-    func pussSerialize() -> Document {
-        var doc: Document = ["_id": self.id]
-
-        {% for variable in type.allVariables %}
-        // {{ variable.name }}: {{ variable.typeName }} ({{ variable.typeName.unwrappedTypeName }})
-        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.name != "id" and variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
-        doc["{{variable.name}}"] = self.{{variable.name}}
-        {% endif %}
-        {% endfor %}
-
-        return doc
-    }
-
-    convenience init(fromDocument source: Document) throws {
-        // Extract all properties
-        {% for variable in type.variables %}
-        // loop: {{ variable.name }}
-
-        {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.name != "id" and variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
-        // The property is a BSON type, so we can just extract it from the document:
-        {#2#}{% if variable.typeName.isOptional %}
-        let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
-        {#2#}{% else %}
-        let {{variable.name}}Value: {{variable.typeName}} = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
-        {#2#}{% endif %}
-        {#1#}{% else %}
-        {% if variable.typeName.name|hasPrefix:"Reference" %}
-          // o the noes it is a reference
-          let {{variable.name}}Id: ObjectId? = source["{{variable.name}}"]
-          let {{variable.name}}Value: {{variable.typeName}}
-
-          {% if variable.typeName.isOptional %}
-            if let {{variable.name}}Id = {{variable.name}}Id {
-                {{variable.name}}Value = Reference(restoring: {{variable.name}}Id)
-            } else {
-                {{variable.name}}Value = nil
-            }
-          {% else %}
-            {{variable.name}}Value = Reference(restoring: try Puss.Helpers.requireValue({{variable.name}}Id, keyForError: "{{variable.name}}"))
-          {% endif %}
-        {% endif %}
-        {#1#}{% endif %}
-
-        {% if variable.name == "id" %}
-        let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
-        {% endif %}
-        {% endfor %}
-
-        self.init(
-            {% for parameter in type.initializers.0.parameters %}
-            {{ parameter.argumentLabel }}: {{ parameter.name}}Value
-            {% if not forloop.last %}
-            ,
-            {% endif %}
-            {% endfor %}
-        )
-
-        {% for variable in type.variables %}
-        self.{{variable.name}} = {{variable.name}}Value
-        {% endfor %}
-    }
-
-    var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
-        var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
-        _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
-
-        {% for variable in type.variables %}
-          {% if variable.typeName.name|hasPrefix:"Reference" %}
-            {% if variable.isOptional %}
-              if let {{variable.name}}Value = self.{{variable.name}} {
-            {% else %}
-              let {{variable.name}}Value = self.{{variable.name}}
-            {% endif %}
-            result.append(("{{variable.name}}", {{variable.name}}Value.destinationType, {{variable.name}}Value.deleteRule, {{variable.name}}Value.id))
-            {% if variable.isOptional %}
-              }
-            {% endif %}
-          {% endif %}
-        {% endfor %}
-
-        return result
-    }
-
     static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<{{type.name}}> {
         let query = closure(VirtualInstance())
         return try self.find(matching: query)
-    }
-
-    struct VirtualInstance {
-      {% for variable in type.variables %}
-        // {{variable.name}}: {{variable.typeName}}
-        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Data" %}
-          let {{ variable.name }} = Virtual{{variable.unwrappedTypeName}}(name: "{{variable.name}}")
-        {% endif %}
-        {% if variable.typeName.unwrappedTypeName == "Int" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Double" %}
-          let {{ variable.name }} = VirtualNumber(name: "{{variable.name}}")
-        {% endif %}
-        {% if variable.typeName.name|hasPrefix:"Reference" %}
-          let {{ variable.name }} = VirtualReference(name: "{{variable.name}}", type: {{variable.typeName.unwrappedTypeName}}.self)
-        {% endif %}
-      {% endfor %}
     }
 }
 {% endfor %}

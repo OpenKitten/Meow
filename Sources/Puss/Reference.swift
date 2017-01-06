@@ -34,4 +34,8 @@ public final class Reference<M : ConcreteModel, D : DeleteRule> {
     
     public var destinationType: M.Type { return M.self }
     public var deleteRule: D.Type { return D.self }
+    
+    public typealias Model = M
+    public typealias DeleteRule = D
+    
 }

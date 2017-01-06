@@ -6,6 +6,10 @@ import MongoKitten
 import Foundation
 
 
+public func ==(lhs: VirtualBool, rhs: Bool) -> MongoKitten.Query {
+  return lhs.name == rhs
+}
+
 public func ==(lhs: VirtualData, rhs: Data) -> MongoKitten.Query {
   return lhs.name == rhs
 }

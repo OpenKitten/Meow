@@ -1,15 +1,13 @@
 @_exported import MongoKitten
 
-public protocol Model : class {
+public protocol Model : class, Serializable {
     var id: ObjectId { get set }
 }
 
 public typealias ReferenceValues = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
-public protocol ConcreteModel : Model {
+public protocol ConcreteModel : Model, ConcreteSerializable {
     static var pussCollection: MongoKitten.Collection { get }
-    init(fromDocument source: Document) throws
-    func pussSerialize() -> Document
     var pussReferencesWithValue: ReferenceValues { get }
 }
 
@@ -53,7 +51,7 @@ extension ConcreteModel {
         }
         
         return true
-    }
+    } 
     
     /// Validates if this object can be deleted
     ///

@@ -55,19 +55,25 @@ public struct VirtualDate : VirtualComparable {
     public init(name: String) { self.name = name }
 }
 
+// sourcery: compareType=Bool
+public struct VirtualBool : VirtualVariable {
+    public var name: String
+    public init(name: String) { self.name = name }
+}
+
 // sourcery: compareType=Data
 public struct VirtualData : VirtualVariable {
     public var name: String
     public init(name: String) { self.name = name }
 }
 
-public struct VirtualReference<T, D, R : Reference<T, D>> {
+public struct VirtualReference<T : ConcreteModel, D : DeleteRule> {
     public var name: String
-    public init(name: String, type: Reference<T, D>.Type) {
+    public init(name: String) {
         self.name = name
     }
     
-    public static func ==(lhs: VirtualReference<T,D,R>, rhs: T) -> MongoKitten.Query {
+    public static func ==(lhs: VirtualReference<T,D>, rhs: T) -> MongoKitten.Query {
         return lhs.name == rhs.id
     }
 }
