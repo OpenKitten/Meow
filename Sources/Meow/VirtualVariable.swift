@@ -1,6 +1,6 @@
 //
 //  VirtualVariable.swift
-//  Puss
+//  Meow
 //
 //  Created by Robbert Brandsma on 06-01-17.
 //
@@ -43,7 +43,7 @@ public struct VirtualObjectId : VirtualVariable {
     public init(name: String) { self.name = name }
 }
 
-// sourcery: compareType=PussNumber
+// sourcery: compareType=MeowNumber
 public struct VirtualNumber : VirtualComparable {
     public var name: String
     public init(name: String) { self.name = name }
@@ -78,8 +78,8 @@ public struct VirtualReference<T : ConcreteModel, D : DeleteRule> {
     }
 }
 
-public protocol PussNumber : ValueConvertible {}
-extension Int : PussNumber {}
-extension Int32 : PussNumber {}
-extension Int64 : PussNumber {}
-extension Double : PussNumber {}
+public protocol MeowNumber : ValueConvertible {}
+extension Int : MeowNumber {}
+extension Int32 : MeowNumber {}
+extension Int64 : MeowNumber {}
+extension Double : MeowNumber {}

@@ -1,13 +1,9 @@
-import Puss
+import Meow
 import Foundation
 
 do {
-    
-    let server = try Server(hostname: "127.0.0.1")
-    let db = server["puss"]
-    try db.drop()
-    
-    Puss.init(db)
+    try Meow.init("mongodb://localhost/meow")
+    try Meow.database.drop()
     
     let boss = try User(email: "harriebob@example.com")
     boss.firstName = "Harriebob"

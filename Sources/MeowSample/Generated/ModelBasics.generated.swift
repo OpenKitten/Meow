@@ -1,13 +1,13 @@
 // Generated using Sourcery 0.5.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
-import Puss
+import Meow
 import Foundation
 
 
 
 extension Dog : ConcreteSerializable {
-  func pussSerialize() -> Document {
+  func meowSerialize() -> Document {
       
       var doc: Document = ["_id": self.id]
       
@@ -29,7 +29,7 @@ extension Dog : ConcreteSerializable {
       
       
       
-        doc["preferences"] = self.preferences?.pussSerialize()
+        doc["preferences"] = self.preferences?.meowSerialize()
       
       
 
@@ -47,7 +47,7 @@ extension Dog : ConcreteSerializable {
       
 
       
-      let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
+      let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
       
       
       // loop: name
@@ -55,7 +55,7 @@ extension Dog : ConcreteSerializable {
       
       // The property is a BSON type, so we can just extract it from the document:
       
-      let nameValue: String = try Puss.Helpers.requireValue(source["name"], keyForError: "name")
+      let nameValue: String = try Meow.Helpers.requireValue(source["name"], keyForError: "name")
       
       
 
@@ -129,7 +129,7 @@ extension Dog : ConcreteSerializable {
   }
 
 
-  var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
       var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
       _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
@@ -148,7 +148,7 @@ extension Dog : ConcreteSerializable {
 
 
 extension House : ConcreteSerializable {
-  func pussSerialize() -> Document {
+  func meowSerialize() -> Document {
       
       var doc: Document = ["_id": self.id]
       
@@ -181,7 +181,7 @@ extension House : ConcreteSerializable {
       
 
       
-      let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
+      let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
       
       
       // loop: owner
@@ -245,7 +245,7 @@ extension House : ConcreteSerializable {
   }
 
 
-  var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
       var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
       _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
@@ -270,7 +270,7 @@ extension House : ConcreteSerializable {
 
 
 extension Preferences : ConcreteSerializable {
-  func pussSerialize() -> Document {
+  func meowSerialize() -> Document {
       
       var doc = Document()
       
@@ -295,7 +295,7 @@ extension Preferences : ConcreteSerializable {
       
       // The property is a BSON type, so we can just extract it from the document:
       
-      let likesCheeseValue: Bool = try Puss.Helpers.requireValue(source["likesCheese"], keyForError: "likesCheese")
+      let likesCheeseValue: Bool = try Meow.Helpers.requireValue(source["likesCheese"], keyForError: "likesCheese")
       
       
 
@@ -331,7 +331,7 @@ extension Preferences : ConcreteSerializable {
   }
 
 
-  var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
       var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
       _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
@@ -346,7 +346,7 @@ extension Preferences : ConcreteSerializable {
 
 
 extension User : ConcreteSerializable {
-  func pussSerialize() -> Document {
+  func meowSerialize() -> Document {
       
       var doc: Document = ["_id": self.id]
       
@@ -396,7 +396,7 @@ extension User : ConcreteSerializable {
       
       
       
-        doc["preferences"] = self.preferences.pussSerialize()
+        doc["preferences"] = self.preferences.meowSerialize()
       
       
       // pet: Reference<Dog, Cascade> (Reference<Dog, Cascade>)
@@ -428,7 +428,7 @@ extension User : ConcreteSerializable {
       
 
       
-      let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
+      let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
       
       
       // loop: email
@@ -436,7 +436,7 @@ extension User : ConcreteSerializable {
       
       // The property is a BSON type, so we can just extract it from the document:
       
-      let emailValue: String = try Puss.Helpers.requireValue(source["email"], keyForError: "email")
+      let emailValue: String = try Meow.Helpers.requireValue(source["email"], keyForError: "email")
       
       
 
@@ -480,7 +480,7 @@ extension User : ConcreteSerializable {
       
       // The property is a BSON type, so we can just extract it from the document:
       
-      let registrationDateValue: Date = try Puss.Helpers.requireValue(source["registrationDate"], keyForError: "registrationDate")
+      let registrationDateValue: Date = try Meow.Helpers.requireValue(source["registrationDate"], keyForError: "registrationDate")
       
       
 
@@ -492,7 +492,7 @@ extension User : ConcreteSerializable {
       
       
         
-          let preferencesDocument: Document = try Puss.Helpers.requireValue(source["preferences"], keyForError: "preferences")
+          let preferencesDocument: Document = try Meow.Helpers.requireValue(source["preferences"], keyForError: "preferences")
           let preferencesValue: Preferences = try Preferences(fromDocument: preferencesDocument)
         
       
@@ -509,7 +509,7 @@ extension User : ConcreteSerializable {
         let petValue: Reference<Dog, Cascade>
 
         
-          petValue = Reference(restoring: try Puss.Helpers.requireValue(petId, keyForError: "pet"))
+          petValue = Reference(restoring: try Meow.Helpers.requireValue(petId, keyForError: "pet"))
         
       
       
@@ -651,7 +651,7 @@ extension User : ConcreteSerializable {
   }
 
 
-  var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
       var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
       _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
@@ -697,29 +697,59 @@ extension User : ConcreteSerializable {
 
 
 extension Dog : ConcreteModel {
-    static let pussCollection = Puss.database["dog"]
+    static let meowCollection = Meow.database["dog"]
 
     static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<Dog> {
         let query = closure(VirtualInstance())
         return try self.find(matching: query)
     }
+
+    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> Dog? {
+        let query = closure(VirtualInstance())
+        return try self.findOne(matching: query)
+    }
+
+    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
+        let query = closure(VirtualInstance())
+        return try self.count(matching: query)
+    }
 }
 
 extension House : ConcreteModel {
-    static let pussCollection = Puss.database["house"]
+    static let meowCollection = Meow.database["house"]
 
     static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<House> {
         let query = closure(VirtualInstance())
         return try self.find(matching: query)
     }
+
+    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> House? {
+        let query = closure(VirtualInstance())
+        return try self.findOne(matching: query)
+    }
+
+    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
+        let query = closure(VirtualInstance())
+        return try self.count(matching: query)
+    }
 }
 
 extension User : ConcreteModel {
-    static let pussCollection = Puss.database["user"]
+    static let meowCollection = Meow.database["user"]
 
     static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<User> {
         let query = closure(VirtualInstance())
         return try self.find(matching: query)
+    }
+
+    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> User? {
+        let query = closure(VirtualInstance())
+        return try self.findOne(matching: query)
+    }
+
+    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
+        let query = closure(VirtualInstance())
+        return try self.count(matching: query)
     }
 }
 

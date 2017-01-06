@@ -1,4 +1,4 @@
-import Puss
+import Meow
 import Foundation
 
 final class House : Model {
@@ -9,6 +9,7 @@ final class House : Model {
 
 final class User : Model {
     var id = ObjectId()
+    
     var email: String
     var firstName: String?
     var lastName: String?

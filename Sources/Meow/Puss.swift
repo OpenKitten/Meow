@@ -1,6 +1,6 @@
 //
-//  Puss.swift
-//  Puss
+//  Meow.swift
+//  Meow
 //
 //  Created by Robbert Brandsma on 03-01-17.
 //
@@ -8,11 +8,15 @@
 
 import MongoKitten
 
-public enum Puss {
+public enum Meow {
     public static var database: MongoKitten.Database!
     
     public static func `init`(_ db: MongoKitten.Database) {
-        Puss.database = db
+        Meow.database = db
+    }
+    
+    public static func `init`(_ connectionString: String) throws {
+        Meow.init(try Database(mongoURL: connectionString))
     }
     
     public enum Helpers {

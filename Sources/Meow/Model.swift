@@ -7,8 +7,8 @@ public protocol Model : class, Serializable {
 public typealias ReferenceValues = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
 public protocol ConcreteModel : Model, ConcreteSerializable {
-    static var pussCollection: MongoKitten.Collection { get }
-    var pussReferencesWithValue: ReferenceValues { get }
+    static var meowCollection: MongoKitten.Collection { get }
+    var meowReferencesWithValue: ReferenceValues { get }
 }
 
 public protocol FieldSet {
@@ -17,13 +17,13 @@ public protocol FieldSet {
 
 extension ConcreteModel {
     public static func count(matching filter: Query? = nil, limitedTo limit: Int32? = nil, skipping skip: Int32? = nil) throws -> Int {
-        return try pussCollection.count(matching: filter, limitedTo: limit, skipping: skip)
+        return try meowCollection.count(matching: filter, limitedTo: limit, skipping: skip)
     }
     
     public func save() throws {
-        let document = pussSerialize()
+        let document = meowSerialize()
         
-        try Self.pussCollection.update(
+        try Self.meowCollection.update(
             matching: "_id" == self.id,
             to: document,
             upserting: true
@@ -31,7 +31,7 @@ extension ConcreteModel {
     }
     
     public static func find(matching query: Query? = nil) throws -> Cursor<Self> {
-        let originalCursor = try pussCollection.find(matching: query)
+        let originalCursor = try meowCollection.find(matching: query)
         
         return Cursor(base: originalCursor) { document in
             return try? Self.init(fromDocument: document)
@@ -60,10 +60,10 @@ extension ConcreteModel {
     public func validateDeletion(keyPrefix: String = "") throws -> (() throws -> ()) {
         // We'll store the actual deletion as a recursive closure, starting with ourselves:
         var cascade: (() throws -> ()) = {
-            try Self.pussCollection.remove(matching: "_id" == self.id)
+            try Self.meowCollection.remove(matching: "_id" == self.id)
         }
         
-        let referenceValues = self.pussReferencesWithValue
+        let referenceValues = self.meowReferencesWithValue
         for (key, type, deleteRule, id) in referenceValues {
             // Ignore rules should be, well... ignored
             if deleteRule == Ignore.self {
@@ -76,7 +76,7 @@ extension ConcreteModel {
             
             // A deny should prevent deletion so we throw an error, making deletion impossible
             if deleteRule == Deny.self {
-                throw Puss.Error.undeletableObject(reason: keyPrefix + key)
+                throw Meow.Error.undeletableObject(reason: keyPrefix + key)
             }
             
             // Cascades should be prefixed to our own cascade closure, so we'll do just that

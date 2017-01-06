@@ -1,6 +1,6 @@
 import XCTest
-@testable import PussTests
+@testable import MeowTests
 
 XCTMain([
-     testCase(PussTests.allTests),
+     testCase(MeowTests.allTests),
 ])

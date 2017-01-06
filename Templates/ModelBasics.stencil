@@ -1,10 +1,10 @@
-import Puss
+import Meow
 import Foundation
 
 {% for type in types.all %}
 {% if type|based:"Model" or type|based:"Embeddable" %}
 extension {{ type.name }} : ConcreteSerializable {
-  func pussSerialize() -> Document {
+  func meowSerialize() -> Document {
       {% if type|based:"Model" %}
       var doc: Document = ["_id": self.id]
       {% else %}
@@ -20,7 +20,7 @@ extension {{ type.name }} : ConcreteSerializable {
         doc["{{variable.name}}"] = self.{{variable.name}}{%if variable.typeName.isOptional%}?{%endif%}.id
       {% endif %}
       {% if variable.type|based:"Embeddable" %}
-        doc["{{variable.name}}"] = self.{{variable.name}}{%if variable.typeName.isOptional%}?{%endif%}.pussSerialize()
+        doc["{{variable.name}}"] = self.{{variable.name}}{%if variable.typeName.isOptional%}?{%endif%}.meowSerialize()
       {% endif %}
       {% endfor %}
 
@@ -37,7 +37,7 @@ extension {{ type.name }} : ConcreteSerializable {
       {#2#}{% if variable.typeName.isOptional %}
       let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
       {#2#}{% else %}
-      let {{variable.name}}Value: {{variable.typeName}} = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
+      let {{variable.name}}Value: {{variable.typeName}} = try Meow.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
       {#2#}{% endif %}
       {#1#}{% else %}
       {% if variable.typeName.name|hasPrefix:"Reference" %}
@@ -52,7 +52,7 @@ extension {{ type.name }} : ConcreteSerializable {
               {{variable.name}}Value = nil
           }
         {% else %}
-          {{variable.name}}Value = Reference(restoring: try Puss.Helpers.requireValue({{variable.name}}Id, keyForError: "{{variable.name}}"))
+          {{variable.name}}Value = Reference(restoring: try Meow.Helpers.requireValue({{variable.name}}Id, keyForError: "{{variable.name}}"))
         {% endif %}
       {% endif %}
       {% if variable.type|based:"Embeddable" %}
@@ -64,14 +64,14 @@ extension {{ type.name }} : ConcreteSerializable {
             {{variable.name}}Value = nil
           }
         {% else %}
-          let {{variable.name}}Document: Document = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
+          let {{variable.name}}Document: Document = try Meow.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
           let {{variable.name}}Value: {{variable.typeName}} = try {{variable.typeName}}(fromDocument: {{variable.name}}Document)
         {% endif %}
       {% endif %}
       {#1#}{% endif %}
 
       {% if variable.name == "id" %}
-      let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
+      let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
       {% endif %}
       {% endfor %}
 
@@ -115,7 +115,7 @@ extension {{ type.name }} : ConcreteSerializable {
   }
 
 
-  var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
       var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
       _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
@@ -141,11 +141,21 @@ extension {{ type.name }} : ConcreteSerializable {
 
 {% for type in types.based.Model %}
 extension {{ type.name }} : ConcreteModel {
-    static let pussCollection = Puss.database["{{type.name|lowercase}}"]
+    static let meowCollection = Meow.database["{{type.name|lowercase}}"]
 
     static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<{{type.name}}> {
         let query = closure(VirtualInstance())
         return try self.find(matching: query)
+    }
+
+    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> {{type.name}}? {
+        let query = closure(VirtualInstance())
+        return try self.findOne(matching: query)
+    }
+
+    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
+        let query = closure(VirtualInstance())
+        return try self.count(matching: query)
     }
 }
 {% endfor %}

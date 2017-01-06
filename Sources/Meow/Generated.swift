@@ -18,7 +18,7 @@ public func ==(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
   return lhs.name == rhs
 }
 
-public func ==(lhs: VirtualNumber, rhs: PussNumber) -> MongoKitten.Query {
+public func ==(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
   return lhs.name == rhs
 }
 
@@ -48,19 +48,19 @@ public func <=(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
   return lhs.name <= rhs
 }
 
-public func >(lhs: VirtualNumber, rhs: PussNumber) -> MongoKitten.Query {
+public func >(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
   return lhs.name > rhs
 }
 
-public func <(lhs: VirtualNumber, rhs: PussNumber) -> MongoKitten.Query {
+public func <(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
   return lhs.name < rhs
 }
 
-public func >=(lhs: VirtualNumber, rhs: PussNumber) -> MongoKitten.Query {
+public func >=(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
   return lhs.name >= rhs
 }
 
-public func <=(lhs: VirtualNumber, rhs: PussNumber) -> MongoKitten.Query {
+public func <=(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
   return lhs.name <= rhs
 }
 
