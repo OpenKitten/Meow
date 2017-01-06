@@ -76,6 +76,7 @@ While working on your project, run Sourcery in daemon mode so it updates your ge
 
 - Every model is a **final** class
 - Every model must have a property `id` of type ObjectId
+- You need to explicitly define the type of all properties you want to have serialized
 </details>
 
 <details>

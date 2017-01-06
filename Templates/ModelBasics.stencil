@@ -8,9 +8,9 @@ extension {{ type.name }} : ConcreteModel {
     func pussSerialize() -> Document {
         var doc: Document = ["_id": self.id]
 
-        {% for variable in type.variables %}
+        {% for variable in type.allVariables %}
         // {{ variable.name }}: {{ variable.typeName }} ({{ variable.typeName.unwrappedTypeName }})
-        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" %}
+        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" %}
         doc["{{variable.name}}"] = self.{{variable.name}}
         {% endif %}
         {% endfor %}
@@ -21,11 +21,18 @@ extension {{ type.name }} : ConcreteModel {
     convenience init(fromDocument source: Document) throws {
         // Extract all properties
         {% for variable in type.variables %}
-        {% if variable.typeName.isOptional %}
+        // loop: {{ variable.name }}
+
+        {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" %}
+        // The property is a BSON type, so we can just extract it from the document:
+        {#2#}{% if variable.typeName.isOptional %}
         let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
-        {% else %}
+        {#2#}{% else %}
         let {{variable.name}}Value: {{variable.typeName}} = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
-        {% endif %}
+        {#2#}{% endif %}
+        {#1#}{% else %}
+
+        {#1#}{% endif %}
         {% endfor %}
 
         self.init(
@@ -37,9 +44,6 @@ extension {{ type.name }} : ConcreteModel {
         {% for variable in type.variables %}
         self.{{variable.name}} = {{variable.name}}Value
         {% endfor %}
-
-        //{{type.initializers.0}}
-
     }
 }
 {% endfor %}

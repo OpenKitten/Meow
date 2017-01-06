@@ -8,6 +8,12 @@ public protocol ConcreteModel : Model {
     static var pussCollection: MongoKitten.Collection { get }
     init(fromDocument source: Document) throws
     func pussSerialize() -> Document
+    
+//    associatedtype Fields : FieldSet
+}
+
+public protocol FieldSet {
+    var fieldName: String { get }
 }
 
 extension ConcreteModel {
@@ -25,11 +31,15 @@ extension ConcreteModel {
         )
     }
     
-    public static func find() throws -> Cursor<Self> {
-        let originalCursor = try pussCollection.find()
+    public static func find(matching query: Query? = nil) throws -> Cursor<Self> {
+        let originalCursor = try pussCollection.find(matching: query)
         
         return Cursor(base: originalCursor) { document in
             return try? Self.init(fromDocument: document)
         }
+    }
+    
+    public static func findOne(matching query: Query? = nil) throws -> Self? {
+        return try Self.find(matching: query).makeIterator().next()
     }
 }

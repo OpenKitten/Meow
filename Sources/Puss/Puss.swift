@@ -27,5 +27,6 @@ public class Puss {
     
     public enum Error : Swift.Error {
         case missingOrInvalidValue(key: String)
+        case referenceError(id: ObjectId, type: Model.Type)
     }
 }
