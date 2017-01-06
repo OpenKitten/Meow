@@ -16,14 +16,15 @@ try! henk.save()
 
 print("Amount of users before: \(try! User.count())")
 
-print("User listing:")
+//print("User listing:")
+//
+//for user in try! User.find() {
+//    print("Found user with email: \(user.email)")
+//}
 
-for user in try! User.find() {
-    print("Found user with email: \(user.email)")
-}
 
+let users = Array(try User.find {
+    $0.firstName == "Henk" && $0.email.contains("Robbert", options: .caseInsensitive)
+})
 
-let users = try User.find {
-    $0.firstName == "Henk" && $0.email.contains("testhenk")
-}
-
+print(users.count)

@@ -23,7 +23,7 @@ extension {{ type.name }} : ConcreteModel {
         {% for variable in type.variables %}
         // loop: {{ variable.name }}
 
-        {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
+        {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.name != "id" and variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
         // The property is a BSON type, so we can just extract it from the document:
         {#2#}{% if variable.typeName.isOptional %}
         let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
@@ -47,6 +47,10 @@ extension {{ type.name }} : ConcreteModel {
           {% endif %}
         {% endif %}
         {#1#}{% endif %}
+
+        {% if variable.name == "id" %}
+        let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
+        {% endif %}
         {% endfor %}
 
         self.init(

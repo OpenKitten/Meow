@@ -30,10 +30,11 @@ extension Preferences : ConcreteModel {
         // loop: id
 
         
-        // The property is a BSON type, so we can just extract it from the document:
         
-        let idValue: ObjectId = try Puss.Helpers.requireValue(source["id"], keyForError: "id")
         
+
+        
+        let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
         
         
         // loop: likesCheese
@@ -43,6 +44,8 @@ extension Preferences : ConcreteModel {
         
         let likesCheeseValue: Bool = try Puss.Helpers.requireValue(source["likesCheese"], keyForError: "likesCheese")
         
+        
+
         
         
 
@@ -132,10 +135,11 @@ extension User : ConcreteModel {
         // loop: id
 
         
-        // The property is a BSON type, so we can just extract it from the document:
         
-        let idValue: ObjectId = try Puss.Helpers.requireValue(source["id"], keyForError: "id")
         
+
+        
+        let idValue: ObjectId = try Puss.Helpers.requireValue(source["_id"], keyForError: "id")
         
         
         // loop: email
@@ -146,6 +150,8 @@ extension User : ConcreteModel {
         let emailValue: String = try Puss.Helpers.requireValue(source["email"], keyForError: "email")
         
         
+
+        
         
         // loop: firstName
 
@@ -154,6 +160,8 @@ extension User : ConcreteModel {
         
         let firstNameValue: String? = source["firstName"]
         
+        
+
         
         
         // loop: lastName
@@ -164,6 +172,8 @@ extension User : ConcreteModel {
         let lastNameValue: String? = source["lastName"]
         
         
+
+        
         
         // loop: passwordHash
 
@@ -173,6 +183,8 @@ extension User : ConcreteModel {
         let passwordHashValue: Data? = source["passwordHash"]
         
         
+
+        
         
         // loop: registrationDate
 
@@ -181,6 +193,8 @@ extension User : ConcreteModel {
         
         let registrationDateValue: Date = try Puss.Helpers.requireValue(source["registrationDate"], keyForError: "registrationDate")
         
+        
+
         
         
         // loop: preferences
@@ -199,6 +213,8 @@ extension User : ConcreteModel {
             }
           
         
+        
+
         
         
 
