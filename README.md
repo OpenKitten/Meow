@@ -89,3 +89,10 @@ After calling the initializer, Puss explicitly sets every variable.
 *Try viewing the generated code for your models to get a better understanding of how Puss works under the hood.*
 </details>
 
+## TODO - notes to self
+
+```swift
+User.update(matching: ...) { user in
+	user.firstName = "henk"
+}
+```
