@@ -8,7 +8,7 @@
 
 import MongoKitten
 
-public class Puss {
+public enum Puss {
     public static var database: MongoKitten.Database!
     
     public static func `init`(_ db: MongoKitten.Database) {
@@ -28,5 +28,6 @@ public class Puss {
     public enum Error : Swift.Error {
         case missingOrInvalidValue(key: String)
         case referenceError(id: ObjectId, type: Model.Type)
+        case undeletableObject(reason: String)
     }
 }

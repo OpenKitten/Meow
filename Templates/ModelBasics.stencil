@@ -1,7 +1,6 @@
 import Puss
 import Foundation
 
-
 {% for type in types.based.Model %}
 extension {{ type.name }} : ConcreteModel {
     static let pussCollection = Puss.database["{{type.name|lowercase}}"]
@@ -11,7 +10,7 @@ extension {{ type.name }} : ConcreteModel {
 
         {% for variable in type.allVariables %}
         // {{ variable.name }}: {{ variable.typeName }} ({{ variable.typeName.unwrappedTypeName }})
-        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" %}
+        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.name != "id" and variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
         doc["{{variable.name}}"] = self.{{variable.name}}
         {% endif %}
         {% endfor %}
@@ -24,7 +23,7 @@ extension {{ type.name }} : ConcreteModel {
         {% for variable in type.variables %}
         // loop: {{ variable.name }}
 
-        {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" %}
+        {#1#}{% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "Data" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Bool" or variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Double" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Int" %}
         // The property is a BSON type, so we can just extract it from the document:
         {#2#}{% if variable.typeName.isOptional %}
         let {{variable.name}}Value: {{variable.typeName}} = source["{{variable.name}}"]
@@ -62,6 +61,27 @@ extension {{ type.name }} : ConcreteModel {
         {% for variable in type.variables %}
         self.{{variable.name}} = {{variable.name}}Value
         {% endfor %}
+    }
+
+    var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+        var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+        _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+
+        {% for variable in type.variables %}
+          {% if variable.typeName.name|hasPrefix:"Reference" %}
+            {% if variable.isOptional %}
+              if let {{variable.name}}Value = self.{{variable.name}} {
+            {% else %}
+              let {{variable.name}}Value = self.{{variable.name}}
+            {% endif %}
+            result.append(("{{variable.name}}", {{variable.name}}Value.destinationType, {{variable.name}}Value.deleteRule, {{variable.name}}Value.id))
+            {% if variable.isOptional %}
+              }
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+
+        return result
     }
 }
 {% endfor %}

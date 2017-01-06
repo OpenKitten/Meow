@@ -8,11 +8,13 @@ final class User : Model {
     var lastName: String?
     var passwordHash: Data?
     var registrationDate: Date
-    var preferences: Reference<Preferences>?
+    var preferences: Reference<Preferences, Cascade>?
     
     init(email: String) {
         self.email = email
         self.registrationDate = Date()
+        let preferences = Preferences()
+        self.preferences = Reference(preferences)
     }
 }
 

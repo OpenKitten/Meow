@@ -5,7 +5,6 @@ import Puss
 import Foundation
 
 
-
 extension Preferences : ConcreteModel {
     static let pussCollection = Puss.database["preferences"]
 
@@ -31,6 +30,9 @@ extension Preferences : ConcreteModel {
         // loop: id
 
         
+        // The property is a BSON type, so we can just extract it from the document:
+        
+        let idValue: ObjectId = try Puss.Helpers.requireValue(source["id"], keyForError: "id")
         
         
         
@@ -53,6 +55,19 @@ extension Preferences : ConcreteModel {
         
         self.likesCheese = likesCheeseValue
         
+    }
+
+    var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+        var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+        _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+
+        
+          
+        
+          
+        
+
+        return result
     }
 }
 
@@ -91,7 +106,7 @@ extension User : ConcreteModel {
         doc["registrationDate"] = self.registrationDate
         
         
-        // preferences: Reference<Preferences>? (Reference<Preferences>)
+        // preferences: Reference<Preferences, Cascade>? (Reference<Preferences, Cascade>)
         
         
 
@@ -104,6 +119,9 @@ extension User : ConcreteModel {
         // loop: id
 
         
+        // The property is a BSON type, so we can just extract it from the document:
+        
+        let idValue: ObjectId = try Puss.Helpers.requireValue(source["id"], keyForError: "id")
         
         
         
@@ -158,7 +176,7 @@ extension User : ConcreteModel {
         
           // o the noes it is a reference
           let preferencesId: ObjectId? = source["preferences"]
-          let preferencesValue: Reference<Preferences>?
+          let preferencesValue: Reference<Preferences, Cascade>?
 
           
             if let preferencesId = preferencesId {
@@ -193,6 +211,37 @@ extension User : ConcreteModel {
         
         self.preferences = preferencesValue
         
+    }
+
+    var pussReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+        var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+        _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+            
+              if let preferencesValue = self.preferences {
+            
+            result.append(("preferences", preferencesValue.destinationType, preferencesValue.deleteRule, preferencesValue.id))
+            
+              }
+            
+          
+        
+
+        return result
     }
 }
 

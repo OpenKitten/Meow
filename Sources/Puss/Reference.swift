@@ -8,7 +8,12 @@
 
 import Foundation
 
-public final class Reference<M : ConcreteModel> {
+public protocol DeleteRule {}
+public enum Cascade : DeleteRule {}
+public enum Deny : DeleteRule {}
+public enum Ignore : DeleteRule {}
+
+public final class Reference<M : ConcreteModel, D : DeleteRule> {
     public var id: ObjectId
     
     public init(_ instance: M) {
@@ -26,4 +31,7 @@ public final class Reference<M : ConcreteModel> {
         
         return instance
     }
+    
+    public var destinationType: M.Type { return M.self }
+    public var deleteRule: D.Type { return D.self }
 }
