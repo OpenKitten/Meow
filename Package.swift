@@ -10,6 +10,7 @@ let package = Package(
         .Package(url: "https://github.com/OpenKitten/MongoKitten.git", majorVersion: 3)
     ],
     exclude: [
-        "Templates"
+        "Templates",
+        "InternalTemplates"
     ]
 )

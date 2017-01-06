@@ -80,8 +80,16 @@ extension Preferences : ConcreteModel {
 
     struct VirtualInstance {
       
+        // id: ObjectId
+        
+          let id = VirtualObjectId(name: "id")
+        
+        
         
       
+        // likesCheese: Bool
+        
+        
         
       
     }
@@ -280,24 +288,53 @@ extension User : ConcreteModel {
 
     struct VirtualInstance {
       
+        // id: ObjectId
+        
+          let id = VirtualObjectId(name: "id")
+        
+        
         
       
+        // email: String
         
           let email = VirtualString(name: "email")
         
+        
+        
       
+        // firstName: String?
         
           let firstName = VirtualString(name: "firstName")
         
+        
+        
       
+        // lastName: String?
         
           let lastName = VirtualString(name: "lastName")
         
-      
+        
         
       
+        // passwordHash: Data?
+        
+          let passwordHash = VirtualData(name: "passwordHash")
+        
+        
         
       
+        // registrationDate: Date
+        
+          let registrationDate = VirtualDate(name: "registrationDate")
+        
+        
+        
+      
+        // preferences: Reference<Preferences, Cascade>?
+        
+        
+        
+          let preferences = VirtualReference(name: "preferences", type: Reference<Preferences, Cascade>.self)
         
       
     }

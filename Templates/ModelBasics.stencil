@@ -95,8 +95,15 @@ extension {{ type.name }} : ConcreteModel {
 
     struct VirtualInstance {
       {% for variable in type.variables %}
-        {% if variable.typeName.unwrappedTypeName == "String" %}
+        // {{variable.name}}: {{variable.typeName}}
+        {% if variable.typeName.unwrappedTypeName == "String" or variable.typeName.unwrappedTypeName == "ObjectId" or variable.typeName.unwrappedTypeName == "Date" or variable.typeName.unwrappedTypeName == "Data" %}
           let {{ variable.name }} = Virtual{{variable.unwrappedTypeName}}(name: "{{variable.name}}")
+        {% endif %}
+        {% if variable.typeName.unwrappedTypeName == "Int" or variable.typeName.unwrappedTypeName == "Int32" or variable.typeName.unwrappedTypeName == "Int64" or variable.typeName.unwrappedTypeName == "Double" %}
+          let {{ variable.name }} = VirtualNumber(name: "{{variable.name}}")
+        {% endif %}
+        {% if variable.typeName.name|hasPrefix:"Reference" %}
+          let {{ variable.name }} = VirtualReference(name: "{{variable.name}}", type: {{variable.typeName.unwrappedTypeName}}.self)
         {% endif %}
       {% endfor %}
     }

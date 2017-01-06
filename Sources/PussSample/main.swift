@@ -23,8 +23,8 @@ print("Amount of users before: \(try! User.count())")
 //}
 
 
-let users = Array(try User.find {
+let users = try User.find {
     $0.firstName == "Henk" && $0.email.contains("Robbert", options: .caseInsensitive)
-})
+}
 
-print(users.count)
+print(Array(users).count)
