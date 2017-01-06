@@ -69,6 +69,19 @@ extension Preferences : ConcreteModel {
 
         return result
     }
+
+    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<Preferences> {
+        let query = closure(VirtualInstance())
+        return try self.find(matching: query)
+    }
+
+    struct VirtualInstance {
+      
+        
+      
+        
+      
+    }
 }
 
 extension User : ConcreteModel {
@@ -242,6 +255,35 @@ extension User : ConcreteModel {
         
 
         return result
+    }
+
+    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<User> {
+        let query = closure(VirtualInstance())
+        return try self.find(matching: query)
+    }
+
+    struct VirtualInstance {
+      
+        
+      
+        
+          let email = VirtualString(name: "email")
+        
+      
+        
+          let firstName = VirtualString(name: "firstName")
+        
+      
+        
+          let lastName = VirtualString(name: "lastName")
+        
+      
+        
+      
+        
+      
+        
+      
     }
 }
 

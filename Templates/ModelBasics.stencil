@@ -83,5 +83,18 @@ extension {{ type.name }} : ConcreteModel {
 
         return result
     }
+
+    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<{{type.name}}> {
+        let query = closure(VirtualInstance())
+        return try self.find(matching: query)
+    }
+
+    struct VirtualInstance {
+      {% for variable in type.variables %}
+        {% if variable.typeName.unwrappedTypeName == "String" %}
+          let {{ variable.name }} = Virtual{{variable.unwrappedTypeName}}(name: "{{variable.name}}")
+        {% endif %}
+      {% endfor %}
+    }
 }
 {% endfor %}

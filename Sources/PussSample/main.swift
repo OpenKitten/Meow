@@ -1,4 +1,5 @@
 import Puss
+import Foundation
 
 let server = try! Server(hostname: "127.0.0.1")
 let db = server["puss"]
@@ -20,3 +21,9 @@ print("User listing:")
 for user in try! User.find() {
     print("Found user with email: \(user.email)")
 }
+
+
+let users = try User.find {
+    $0.firstName == "Henk" && $0.email.contains("testhenk")
+}
+
