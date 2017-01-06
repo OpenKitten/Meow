@@ -1,6 +1,7 @@
 import Puss
 import Foundation
 
+
 {% for type in types.based.Model %}
 extension {{ type.name }} : ConcreteModel {
     static let pussCollection = Puss.database["{{type.name|lowercase}}"]
@@ -31,13 +32,30 @@ extension {{ type.name }} : ConcreteModel {
         let {{variable.name}}Value: {{variable.typeName}} = try Puss.Helpers.requireValue(source["{{variable.name}}"], keyForError: "{{variable.name}}")
         {#2#}{% endif %}
         {#1#}{% else %}
+        {% if variable.typeName.name|hasPrefix:"Reference" %}
+          // o the noes it is a reference
+          let {{variable.name}}Id: ObjectId? = source["{{variable.name}}"]
+          let {{variable.name}}Value: {{variable.typeName}}
 
+          {% if variable.typeName.isOptional %}
+            if let {{variable.name}}Id = {{variable.name}}Id {
+                {{variable.name}}Value = Reference(restoring: {{variable.name}}Id)
+            } else {
+                {{variable.name}}Value = nil
+            }
+          {% else %}
+            {{variable.name}}Value = Reference(restoring: try Puss.Helpers.requireValue({{variable.name}}Id, keyForError: "{{variable.name}}"))
+          {% endif %}
+        {% endif %}
         {#1#}{% endif %}
         {% endfor %}
 
         self.init(
             {% for parameter in type.initializers.0.parameters %}
             {{ parameter.argumentLabel }}: {{ parameter.name}}Value
+            {% if not forloop.last %}
+            ,
+            {% endif %}
             {% endfor %}
         )
 

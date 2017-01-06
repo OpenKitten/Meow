@@ -15,6 +15,10 @@ public final class Reference<M : ConcreteModel> {
         self.id = instance.id
     }
     
+    public init(restoring id: ObjectId) {
+        self.id = id
+    }
+    
     public func resolve() throws -> M {
         guard let instance = try M.findOne(matching: "_id" == id) else {
             throw Puss.Error.referenceError(id: id, type: M.self)

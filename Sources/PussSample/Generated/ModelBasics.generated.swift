@@ -5,12 +5,16 @@ import Puss
 import Foundation
 
 
+
 extension Preferences : ConcreteModel {
     static let pussCollection = Puss.database["preferences"]
 
     func pussSerialize() -> Document {
         var doc: Document = ["_id": self.id]
 
+        
+        // id: ObjectId (ObjectId)
+        
         
         // likesCheese: Bool (Bool)
         
@@ -23,6 +27,12 @@ extension Preferences : ConcreteModel {
 
     convenience init(fromDocument source: Document) throws {
         // Extract all properties
+        
+        // loop: id
+
+        
+        
+        
         
         // loop: likesCheese
 
@@ -39,6 +49,8 @@ extension Preferences : ConcreteModel {
         )
 
         
+        self.id = idValue
+        
         self.likesCheese = likesCheeseValue
         
     }
@@ -50,6 +62,9 @@ extension User : ConcreteModel {
     func pussSerialize() -> Document {
         var doc: Document = ["_id": self.id]
 
+        
+        // id: ObjectId (ObjectId)
+        
         
         // email: String (String)
         
@@ -85,6 +100,12 @@ extension User : ConcreteModel {
 
     convenience init(fromDocument source: Document) throws {
         // Extract all properties
+        
+        // loop: id
+
+        
+        
+        
         
         // loop: email
 
@@ -134,7 +155,19 @@ extension User : ConcreteModel {
         // loop: preferences
 
         
+        
+          // o the noes it is a reference
+          let preferencesId: ObjectId? = source["preferences"]
+          let preferencesValue: Reference<Preferences>?
 
+          
+            if let preferencesId = preferencesId {
+                preferencesValue = Reference(restoring: preferencesId)
+            } else {
+                preferencesValue = nil
+            }
+          
+        
         
         
 
@@ -142,8 +175,11 @@ extension User : ConcreteModel {
             
             email: emailValue
             
+            
         )
 
+        
+        self.id = idValue
         
         self.email = emailValue
         
