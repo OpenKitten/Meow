@@ -60,7 +60,7 @@ extension ConcreteModel {
     public func validateDeletion(keyPrefix: String = "") throws -> (() throws -> ()) {
         // We'll store the actual deletion as a recursive closure, starting with ourselves:
         var cascade: (() throws -> ()) = {
-            try self.delete()
+            try Self.pussCollection.remove(matching: "_id" == self.id)
         }
         
         let referenceValues = self.pussReferencesWithValue
