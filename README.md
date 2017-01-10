@@ -129,17 +129,17 @@ After calling the initializer, Meow explicitly sets every variable.
 <details>
 <summary>`sourcery` commands for developing Meow</summary>
 
-Watch the unit tests:
+Unit tests:
 
-`sourcery Tests Templates Tests/MeowTests/Generated.swift --watch`
+`sourcery Tests Templates/Templates.swifttemplate Tests/MeowTests/Generated.swift`
 
-Watch the sample:
+Sample:
 
-`sourcery Sources/MeowSample Templates Sources/MeowSample/Generated --watch`
+`sourcery Sources/MeowSample Templates/Templates.swifttemplate Sources/MeowSample/Generated.swift`
 
-Watch the internal templates:
+Internal templates:
 
-`sourcery Sources/Meow InternalTemplates Sources/Meow/Generated.swift  --watch`
+`sourcery Sources/Meow InternalTemplates Sources/Meow/Generated.swift`
 </details>
 
 <details>

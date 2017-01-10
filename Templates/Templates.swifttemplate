@@ -1,0 +1,175 @@
+import Foundation
+import Meow
+
+<%
+let serializables = (types.based["Model"] ?? []) + (types.based["Embeddable"] ?? [])
+%>
+<% for type in serializables { %>
+extension <%= type.name %> : ConcreteSerializable {
+  func meowSerialize() -> Document {
+      <% if type.based["Model"] != nil { %>
+        var doc: Document = ["_id": self.id]
+      <% } else { %>
+      var doc = Document()
+      <% } %>
+
+      <% for variable in type.allVariables { %>
+        // <%= variable.name %>: <%= variable.typeName %> (<%= variable.typeName.unwrappedTypeName %>)
+        <% if variable.typeName.unwrappedTypeName == "String"
+           || variable.typeName.unwrappedTypeName == "Data"
+           || variable.typeName.unwrappedTypeName == "Date"
+           || variable.typeName.unwrappedTypeName == "Bool"
+           || variable.name != "id" && variable.typeName.unwrappedTypeName == "ObjectId"
+           || variable.typeName.unwrappedTypeName == "Double"
+           || variable.typeName.unwrappedTypeName == "Int32"
+           || variable.typeName.unwrappedTypeName == "Int64"
+           || variable.typeName.unwrappedTypeName == "Int" { %>
+          doc["<%= variable.name %>"] = self.<%= variable.name %>
+        <% } else if variable.typeName.name.hasPrefix("Reference") { %>
+          doc["<%= variable.name %>"] = self.<%= variable.name %><% if variable.typeName.isOptional { %>?<% } %>.id
+        <% } else if variable.type?.based["Embeddable"] != nil { %>
+          doc["<%= variable.name %>"] = self.<%= variable.name %><% if variable.typeName.isOptional { %>?<% } %>.meowSerialize()
+        <% } %>
+      <% } %>
+
+      return doc
+  }
+
+  convenience init(fromDocument source: Document) throws {
+      // Extract all properties
+      <% for variable in type.variables { %>
+        // loop: <%= variable.name %>
+
+        <% if variable.typeName.unwrappedTypeName == "String"
+           || variable.typeName.unwrappedTypeName == "Data"
+           || variable.typeName.unwrappedTypeName == "Date"
+           || variable.typeName.unwrappedTypeName == "Bool"
+           || variable.name != "id" && variable.typeName.unwrappedTypeName == "ObjectId"
+           || variable.typeName.unwrappedTypeName == "Double"
+           || variable.typeName.unwrappedTypeName == "Int32"
+           || variable.typeName.unwrappedTypeName == "Int64"
+           || variable.typeName.unwrappedTypeName == "Int" { %>
+           // The property is a BSON type, so we can just extract it from the document:
+           <% if variable.typeName.isOptional { %>
+                let <%=variable.name%>Value: <%=variable.typeName%> = source["<%=variable.name%>"]
+           <% } else { %>
+                let <%=variable.name%>Value: <%=variable.typeName%> = try Meow.Helpers.requireValue(source["<%=variable.name%>"], keyForError: "<%=variable.name%>")
+           <% } %>
+        <% } else if variable.typeName.name.hasPrefix("Reference") { %>
+           // o the noes it is a reference
+           let <%=variable.name%>Id: ObjectId? = source["<%=variable.name%>"]
+           let <%=variable.name%>Value: <%=variable.typeName%>
+
+           <% if variable.typeName.isOptional { %>
+              if let <%=variable.name%>Id = <%=variable.name%>Id {
+                  <%=variable.name%>Value = Reference(restoring: <%=variable.name%>Id)
+              } else {
+                  <%=variable.name%>Value = nil
+              }
+           <% } else { %>
+              <%=variable.name%>Value = Reference(restoring: try Meow.Helpers.requireValue(<%=variable.name%>Id, keyForError: "<%=variable.name%>"))
+           <% } %>
+      <% } else if variable.type?.based["Embeddable"] != nil { %>
+        <% if variable.typeName.isOptional { %>
+            let <%=variable.name%>Value: <%=variable.typeName%>
+            if let <%=variable.name%>Document: Document = source["<%=variable.name%>"] {
+              <%=variable.name%>Value = try <%=variable.typeName.unwrappedTypeName%>(fromDocument: <%=variable.name%>Document)
+            } else {
+              <%=variable.name%>Value = nil
+            }
+        <% } else { %>
+            let <%=variable.name%>Document: Document = try Meow.Helpers.requireValue(source["<%=variable.name%>"], keyForError: "<%=variable.name%>")
+            let <%=variable.name%>Value: <%=variable.typeName%> = try <%=variable.typeName%>(fromDocument: <%=variable.name%>Document)
+        <% } %>
+      <% } else if variable.name == "id" { %>
+          let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+      <% } %>
+     <% } %>
+
+      // initializerkaas:
+      try self.init(
+        <% let parameters = type.initializers.first?.parameters ?? [] %>
+        <% for (index, parameter) in parameters.enumerated() { %>
+          <%= parameter.argumentLabel %>: <%= parameter.name%>Value
+          <% if parameters.count != index+1 { %>
+          ,
+          <% } %>
+        <% } %>
+      )
+
+      <% for variable in type.variables { %>
+        self.<%=variable.name%> = <%=variable.name%>Value
+      <% } %>
+  }
+
+  struct VirtualInstance {
+    var keyPrefix: String
+
+    <% for variable in type.variables { %>
+      // <%=variable.name%>: <%=variable.typeName%>
+      <% if variable.typeName.unwrappedTypeName == "String"
+         || variable.typeName.unwrappedTypeName == "ObjectId"
+         || variable.typeName.unwrappedTypeName == "Date"
+         || variable.typeName.unwrappedTypeName == "Data"
+         || variable.typeName.unwrappedTypeName == "Bool" { %>
+        var <%= variable.name %>: Virtual<%=variable.unwrappedTypeName%> { return Virtual<%=variable.unwrappedTypeName%>(name: keyPrefix + "<%=variable.name%>") }
+      <% } else if variable.typeName.unwrappedTypeName == "Int"
+         || variable.typeName.unwrappedTypeName == "Int32"
+         || variable.typeName.unwrappedTypeName == "Int64"
+         || variable.typeName.unwrappedTypeName == "Double" { %>
+        var <%= variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + "<%=variable.name%>") }
+      <% } else if variable.typeName.name.hasPrefix("Reference") { %>
+        var <%= variable.name %>: VirtualReference<<%=variable.typeName.unwrappedTypeName%>.Model, <%=variable.typeName.unwrappedTypeName%>.DeleteRule> { return VirtualReference(name: keyPrefix + "<%=variable.name%>") }
+      <% } else if variable.type?.based["Embeddable"] != nil { %>
+        var <%=variable.name%>: <%=variable.typeName.unwrappedTypeName%>.VirtualInstance { return <%=variable.typeName.unwrappedTypeName%>.VirtualInstance(keyPrefix: "<%=variable.name%>.") }
+      <% } %>
+    <% } %>
+
+    init(keyPrefix: String = "") {
+      self.keyPrefix = keyPrefix
+    }
+  }
+
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+
+      <% for variable in type.variables { %>
+        <% if variable.typeName.name.hasPrefix("Reference") { %>
+          <% if variable.isOptional { %>
+            if let <%=variable.name%>Value = self.<%=variable.name%> {
+          <% } else { %>
+            let <%=variable.name%>Value = self.<%=variable.name%>
+          <% } %>
+          result.append(("<%=variable.name%>", <%=variable.name%>Value.destinationType, <%=variable.name%>Value.deleteRule, <%=variable.name%>Value.id))
+          <% if variable.isOptional { %>
+            }
+          <% } %>
+        <% } %>
+      <% } %>
+
+      return result
+  }
+}
+<% } %>
+
+<% for type in types.based["Model"] ?? [] { %>
+extension <%= type.name %> : ConcreteModel {
+    static let meowCollection = Meow.database["<%= type.name.lowercased() %>"]
+
+    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<<%= type.name %>> {
+        let query = closure(VirtualInstance())
+        return try self.find(matching: query)
+    }
+
+    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> <%= type.name %>? {
+        let query = closure(VirtualInstance())
+        return try self.findOne(matching: query)
+    }
+
+    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
+        let query = closure(VirtualInstance())
+        return try self.count(matching: query)
+    }
+}
+<% } %>
