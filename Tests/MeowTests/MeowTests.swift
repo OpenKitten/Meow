@@ -6,6 +6,7 @@ final class House : Model {
     var id = ObjectId()
     
     var owner: Reference<User, Deny>?
+    var family: [Reference<User, Cascade>] = []
 }
 
 final class User : Model {
@@ -67,6 +68,25 @@ class MeowTests: XCTestCase {
             return
         }
         
+        let wife = try User(email: "wife@family.example.com")
+        let son = try User(email: "son@family.example.com")
+        let daughter = try User(email: "daughter@family.example.com")
+        
+        try wife.save()
+        try son.save()
+        try daughter.save()
+        
+        house.family = [Reference(wife), Reference(son), Reference(daughter)]
+        
+        try house.save()
+        
+        guard let house2 = try House.findOne(matching: { h in
+            return h.family.contains(daughter)
+        }) else {
+            XCTFail()
+            return
+        }
+        
         XCTAssertEqual(house.id, bossHouse.id)
         XCTAssertEqual(try house.owner?.resolve().email, boss.email)
         
@@ -85,11 +105,25 @@ class MeowTests: XCTestCase {
         employee.preferences.likesCheese = true
         employee2.preferences.likesCheese = false
         
+        if let house2 = try House.findOne(matching: { h in
+            return h.family.contains(employee2)
+        }) {
+            XCTFail()
+            return
+        }
+        
+        if let house2 = try House.findOne(matching: { h in
+            return !h.family.contains(daughter)
+        }) {
+            XCTFail()
+            return
+        }
+        
         try employee.save()
         try employee2.save()
         
         XCTAssertEqual(try User.count { $0.preferences.likesCheese == true }, 1)
-        XCTAssertEqual(try User.count { $0.preferences.likesCheese == false }, 2)
+        XCTAssertEqual(try User.count { $0.preferences.likesCheese == false }, 5)
     }
 
 

@@ -15,6 +15,10 @@ do {
     try bossHouse.save()
     
     try bossHouse.delete()
+    
+    _ = try Flat.find { flat in
+        return flat.id == "kaas"
+    }
 } catch {
     print("Whoops, \(error)")
 }

@@ -16,15 +16,21 @@ extension Dog : ConcreteSerializable {
       
         // id: ObjectId (ObjectId)
         
+          
+        
       
         // name: String (String)
         
-          doc["name"] = self.name
+          
+            doc["name"] = self.name
+          
         
       
         // preferences: Preferences? (Preferences)
         
-          doc["preferences"] = self.preferences?.meowSerialize()
+          
+            doc["preferences"] = self.preferences?.meowSerialize()
+          
         
       
 
@@ -37,28 +43,34 @@ extension Dog : ConcreteSerializable {
         // loop: id
 
         
-          let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+          
+            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+        
       
      
         // loop: name
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let nameValue: String = try Meow.Helpers.requireValue(source["name"], keyForError: "name")
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let nameValue: String = try Meow.Helpers.requireValue(source["name"], keyForError: "name")
+             
+          
+      
      
         // loop: preferences
 
         
-        
-            let preferencesValue: Preferences?
-            if let preferencesDocument: Document = source["preferences"] {
-              preferencesValue = try Preferences(fromDocument: preferencesDocument)
-            } else {
-              preferencesValue = nil
-            }
+          
+          
+              let preferencesValue: Preferences?
+              if let preferencesDocument: Document = source["preferences"] {
+                preferencesValue = try Preferences(fromDocument: preferencesDocument)
+              } else {
+                preferencesValue = nil
+              }
+          
         
       
      
@@ -119,7 +131,7 @@ extension Dog : ConcreteSerializable {
   }
 }
 
-extension House : ConcreteSerializable {
+extension Flat : ConcreteSerializable {
   func meowSerialize() -> Document {
       
         var doc: Document = ["_id": self.id]
@@ -128,10 +140,15 @@ extension House : ConcreteSerializable {
       
         // id: ObjectId (ObjectId)
         
-      
-        // owner: Reference<User, Deny>? (Reference<User, Deny>)
+          
         
-          doc["owner"] = self.owner?.id
+      
+        // owners: [Reference<User, Cascade>] ([Reference<User, Cascade>])
+        
+          
+            doc["owners"] = self.owners.map { $0.id }
+          
+          // TODO: Support [Embeddable]?
         
       
 
@@ -144,23 +161,125 @@ extension House : ConcreteSerializable {
         // loop: id
 
         
-          let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+          
+            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+        
+      
+     
+        // loop: owners
+
+        
+          
+            // o the noes it is a reference
+            let ownersIds: Document? = source["owners"]
+            let ownersValue: [Reference<User, Cascade>]
+
+            
+               ownersValue = try Meow.Helpers.requireValue(ownersIds, keyForError: "owners").map {
+                  Reference(restoring: try Meow.Helpers.requireValue($0 as? ObjectId, keyForError: "owners"))
+                }
+            
+          
+        
+     
+
+      // initializerkaas:
+      try self.init(
+        
+        
+      )
+
+      
+        self.id = idValue
+      
+        self.owners = ownersValue
+      
+  }
+
+  struct VirtualInstance {
+    var keyPrefix: String
+
+    
+      // id: ObjectId
+      
+        var id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "id") }
+      
+    
+      // owners: [Reference<User, Cascade>]
+      
+        var owners: VirtualArray<VirtualReference<Reference<User, Cascade>.Model, Reference<User, Cascade>.DeleteRule>> { return VirtualArray<VirtualReference<Reference<User, Cascade>.Model, Reference<User, Cascade>.DeleteRule>>(name: keyPrefix + "owners") }
+      
+    
+
+    init(keyPrefix: String = "") {
+      self.keyPrefix = keyPrefix
+    }
+  }
+
+  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+
+      
+        
+      
+        
+      
+
+      return result
+  }
+}
+
+extension House : ConcreteSerializable {
+  func meowSerialize() -> Document {
+      
+        var doc: Document = ["_id": self.id]
+      
+
+      
+        // id: ObjectId (ObjectId)
+        
+          
+        
+      
+        // owner: Reference<User, Deny>? (Reference<User, Deny>)
+        
+          
+            doc["owner"] = self.owner?.id
+          
+        
+      
+
+      return doc
+  }
+
+  convenience init(fromDocument source: Document) throws {
+      // Extract all properties
+      
+        // loop: id
+
+        
+          
+            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+        
       
      
         // loop: owner
 
         
-           // o the noes it is a reference
-           let ownerId: ObjectId? = source["owner"]
-           let ownerValue: Reference<User, Deny>?
+          
+             // o the noes it is a reference
+             let ownerId: ObjectId? = source["owner"]
+             let ownerValue: Reference<User, Deny>?
 
-           
-              if let ownerId = ownerId {
-                  ownerValue = Reference(restoring: ownerId)
-              } else {
-                  ownerValue = nil
-              }
-           
+             
+                if let ownerId = ownerId {
+                    ownerValue = Reference(restoring: ownerId)
+                } else {
+                    ownerValue = nil
+                }
+             
+        
       
      
 
@@ -228,45 +347,63 @@ extension User : ConcreteSerializable {
       
         // id: ObjectId (ObjectId)
         
+          
+        
       
         // email: String (String)
         
-          doc["email"] = self.email
+          
+            doc["email"] = self.email
+          
         
       
         // firstName: String? (String)
         
-          doc["firstName"] = self.firstName
+          
+            doc["firstName"] = self.firstName
+          
         
       
         // lastName: String? (String)
         
-          doc["lastName"] = self.lastName
+          
+            doc["lastName"] = self.lastName
+          
         
       
         // passwordHash: Data? (Data)
         
-          doc["passwordHash"] = self.passwordHash
+          
+            doc["passwordHash"] = self.passwordHash
+          
         
       
         // registrationDate: Date (Date)
         
-          doc["registrationDate"] = self.registrationDate
+          
+            doc["registrationDate"] = self.registrationDate
+          
         
       
         // preferences: Preferences (Preferences)
         
-          doc["preferences"] = self.preferences.meowSerialize()
+          
+            doc["preferences"] = self.preferences.meowSerialize()
+          
         
       
         // pet: Reference<Dog, Cascade> (Reference<Dog, Cascade>)
         
-          doc["pet"] = self.pet.id
+          
+            doc["pet"] = self.pet.id
+          
         
       
         // boss: Reference<User, Ignore>? (Reference<User, Ignore>)
         
-          doc["boss"] = self.boss?.id
+          
+            doc["boss"] = self.boss?.id
+          
         
       
 
@@ -279,89 +416,107 @@ extension User : ConcreteSerializable {
         // loop: id
 
         
-          let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+          
+            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+        
       
      
         // loop: email
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let emailValue: String = try Meow.Helpers.requireValue(source["email"], keyForError: "email")
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let emailValue: String = try Meow.Helpers.requireValue(source["email"], keyForError: "email")
+             
+          
+      
      
         // loop: firstName
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let firstNameValue: String? = source["firstName"]
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let firstNameValue: String? = source["firstName"]
+             
+          
+      
      
         // loop: lastName
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let lastNameValue: String? = source["lastName"]
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let lastNameValue: String? = source["lastName"]
+             
+          
+      
      
         // loop: passwordHash
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let passwordHashValue: Data? = source["passwordHash"]
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let passwordHashValue: Data? = source["passwordHash"]
+             
+          
+      
      
         // loop: registrationDate
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let registrationDateValue: Date = try Meow.Helpers.requireValue(source["registrationDate"], keyForError: "registrationDate")
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let registrationDateValue: Date = try Meow.Helpers.requireValue(source["registrationDate"], keyForError: "registrationDate")
+             
+          
+      
      
         // loop: preferences
 
         
-        
-            let preferencesDocument: Document = try Meow.Helpers.requireValue(source["preferences"], keyForError: "preferences")
-            let preferencesValue: Preferences = try Preferences(fromDocument: preferencesDocument)
+          
+          
+              let preferencesDocument: Document = try Meow.Helpers.requireValue(source["preferences"], keyForError: "preferences")
+              let preferencesValue: Preferences = try Preferences(fromDocument: preferencesDocument)
+          
         
       
      
         // loop: pet
 
         
-           // o the noes it is a reference
-           let petId: ObjectId? = source["pet"]
-           let petValue: Reference<Dog, Cascade>
+          
+             // o the noes it is a reference
+             let petId: ObjectId? = source["pet"]
+             let petValue: Reference<Dog, Cascade>
 
-           
-              petValue = Reference(restoring: try Meow.Helpers.requireValue(petId, keyForError: "pet"))
-           
+             
+                petValue = Reference(restoring: try Meow.Helpers.requireValue(petId, keyForError: "pet"))
+             
+        
       
      
         // loop: boss
 
         
-           // o the noes it is a reference
-           let bossId: ObjectId? = source["boss"]
-           let bossValue: Reference<User, Ignore>?
+          
+             // o the noes it is a reference
+             let bossId: ObjectId? = source["boss"]
+             let bossValue: Reference<User, Ignore>?
 
-           
-              if let bossId = bossId {
-                  bossValue = Reference(restoring: bossId)
-              } else {
-                  bossValue = nil
-              }
-           
+             
+                if let bossId = bossId {
+                    bossValue = Reference(restoring: bossId)
+                } else {
+                    bossValue = nil
+                }
+             
+        
       
      
 
@@ -501,7 +656,9 @@ extension Preferences : ConcreteSerializable {
       
         // likesCheese: Bool (Bool)
         
-          doc["likesCheese"] = self.likesCheese
+          
+            doc["likesCheese"] = self.likesCheese
+          
         
       
 
@@ -514,11 +671,13 @@ extension Preferences : ConcreteSerializable {
         // loop: likesCheese
 
         
-           // The property is a BSON type, so we can just extract it from the document:
-           
-                let likesCheeseValue: Bool = try Meow.Helpers.requireValue(source["likesCheese"], keyForError: "likesCheese")
-           
-        
+          
+             // The property is a BSON type, so we can just extract it from the document:
+             
+                  let likesCheeseValue: Bool = try Meow.Helpers.requireValue(source["likesCheese"], keyForError: "likesCheese")
+             
+          
+      
      
 
       // initializerkaas:
@@ -570,6 +729,25 @@ extension Dog : ConcreteModel {
     }
 
     static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> Dog? {
+        let query = closure(VirtualInstance())
+        return try self.findOne(matching: query)
+    }
+
+    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
+        let query = closure(VirtualInstance())
+        return try self.count(matching: query)
+    }
+}
+
+extension Flat : ConcreteModel {
+    static let meowCollection = Meow.database["flat"]
+
+    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<Flat> {
+        let query = closure(VirtualInstance())
+        return try self.find(matching: query)
+    }
+
+    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> Flat? {
         let query = closure(VirtualInstance())
         return try self.findOne(matching: query)
     }

@@ -38,3 +38,9 @@ final class Dog : Model {
     
     var preferences: Preferences?
 }
+
+final class Flat : Model {
+    var id = ObjectId()
+    
+    var owners: [Reference<User, Cascade>] = []
+}

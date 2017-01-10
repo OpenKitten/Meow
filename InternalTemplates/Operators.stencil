@@ -1,7 +1,7 @@
 import MongoKitten
 import Foundation
 
-{% for type in types.implementing.VirtualVariable|struct %}
+  {% for type in types.implementing.VirtualVariable|struct|!annotated:"donotequate" %}
 public func ==(lhs: {{type.name}}, rhs: {{type.annotations.compareType}}) -> MongoKitten.Query {
   return lhs.name == rhs
 }

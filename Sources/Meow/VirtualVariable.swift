@@ -61,13 +61,28 @@ public struct VirtualBool : VirtualVariable {
     public init(name: String) { self.name = name }
 }
 
+// sourcery: donotequate
+public struct VirtualArray<V: VirtualVariable> : VirtualVariable {
+    public var name: String
+    public init(name: String) { self.name = name }
+    
+    typealias VirtualSubtype = V.Type
+    
+    public func contains(_ other: ValueConvertible) -> Query {
+        return [
+            self.name: other
+        ]
+    }
+}
+
 // sourcery: compareType=Data
 public struct VirtualData : VirtualVariable {
     public var name: String
     public init(name: String) { self.name = name }
 }
 
-public struct VirtualReference<T : ConcreteModel, D : DeleteRule> {
+// sourcery: donotequate
+public struct VirtualReference<T : ConcreteModel, D : DeleteRule>: VirtualVariable {
     public var name: String
     public init(name: String) {
         self.name = name
@@ -76,6 +91,22 @@ public struct VirtualReference<T : ConcreteModel, D : DeleteRule> {
     public static func ==(lhs: VirtualReference<T,D>, rhs: T) -> MongoKitten.Query {
         return lhs.name == rhs.id
     }
+}
+
+// sourcery: donotequate
+public struct VirtualReferenceArray<T : ConcreteModel, D : DeleteRule>: VirtualVariable {
+    public var name: String
+    public init(name: String) {
+        self.name = name
+    }
+    
+    public func contains(_ rhs: T) -> MongoKitten.Query {
+        return self.name == rhs.id
+    }
+}
+
+public prefix func !(rhs: Query) -> Query {
+    return Query(aqt: .not(rhs.aqt))
 }
 
 public protocol MeowNumber : ValueConvertible {}
