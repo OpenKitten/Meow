@@ -80,9 +80,23 @@ class MeowTests: XCTestCase {
         
         try house.save()
         
-        guard let house2 = try House.findOne(matching: { h in
+        guard try House.findOne(matching: { h in
             return h.family.contains(daughter)
-        }) else {
+        }) != nil else {
+            XCTFail()
+            return
+        }
+        
+        guard try House.findOne(matching: { h in
+            return !(!h.family.contains(daughter))
+        }) != nil else {
+            XCTFail()
+            return
+        }
+        
+        guard try House.findOne(matching: { h in
+            return !(!h.family.contains(daughter)) && h.family.contains(son)
+        }) != nil else {
             XCTFail()
             return
         }
@@ -105,16 +119,23 @@ class MeowTests: XCTestCase {
         employee.preferences.likesCheese = true
         employee2.preferences.likesCheese = false
         
-        if let house2 = try House.findOne(matching: { h in
-            return h.family.contains(employee2)
-        }) {
+        guard try House.findOne(matching: { h in
+            return h.family.contains(son) || (h.family.contains(employee) && h.family.contains(employee2))
+        }) != nil else {
             XCTFail()
             return
         }
         
-        if let house2 = try House.findOne(matching: { h in
+        if try House.findOne(matching: { h in
+            return h.family.contains(employee2)
+        }) != nil {
+            XCTFail()
+            return
+        }
+        
+        if try House.findOne(matching: { h in
             return !h.family.contains(daughter)
-        }) {
+        }) != nil {
             XCTFail()
             return
         }
