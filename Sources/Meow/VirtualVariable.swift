@@ -106,7 +106,15 @@ public struct VirtualReferenceArray<T : ConcreteModel, D : DeleteRule>: VirtualV
 }
 
 public prefix func !(rhs: Query) -> Query {
-    return Query(aqt: .not(rhs.aqt))
+    var query = Document()
+    
+    for (key, value) in rhs.makeDocument() {
+        query[key] = [
+            "$not": value
+        ] as Document
+    }
+    
+    return Query(query)
 }
 
 public protocol MeowNumber : ValueConvertible {}
