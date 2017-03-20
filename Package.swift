@@ -7,10 +7,6 @@ let package = Package(
         Target(name: "MeowSample", dependencies: ["Meow"])
     ],
     dependencies: [
-        .Package(url: "https://github.com/OpenKitten/MongoKitten.git", majorVersion: 3)
-    ],
-    exclude: [
-        "Templates",
-        "InternalTemplates"
+        .Package(url: "https://github.com/OpenKitten/MongoKitten.git", Version(0,0,19)),
     ]
 )

@@ -1,156 +1,111 @@
 import XCTest
 @testable import Meow
-import Foundation
 
-final class House : Model {
-    var id = ObjectId()
-    
-    var owner: Reference<User, Deny>?
-    var family: [Reference<User, Cascade>] = []
-}
-
-final class User : Model {
-    var id = ObjectId()
-    
-    var email: String
-    var firstName: String?
-    var lastName: String?
-    var passwordHash: Data?
-    var registrationDate: Date
-    var preferences = Preferences()
-    var pet: Reference<Dog, Cascade>
-    var boss: Reference<User, Ignore>?
-    
-    init(email: String) throws {
-        self.email = email
-        self.registrationDate = Date()
-        let pet = Dog()
-        try pet.save()
-        self.pet = Reference(pet)
-    }
-}
-
-final class Preferences : Embeddable {
-    var likesCheese: Bool = false
-}
-
-final class Dog : Model {
-    var id = ObjectId()
-    var name: String = "Fluffy"
-    
-    var preferences: Preferences?
-}
 
 class MeowTests: XCTestCase {
     override func setUp() {
-        try! Meow.init("mongodb://localhost/meow")
+        try! Meow.init("mongodb://localhost:27017/meow")
         try! Meow.database.drop()
     }
     
     func testExample() throws {
-        let boss = try User(email: "harriebob@example.com")
-        boss.firstName = "Harriebob"
-        boss.lastName = "Konijn"
-        XCTAssertEqual(try User.count(), 0)
-        try boss.save()
-        XCTAssertEqual(try User.count(), 1)
+        let user0 = User(username: "piet", password: "123", age: 20, gender: .male)
+        let user1 = User(username: "henk", password: "321", age: 20, gender: .male)
+        let user2 = User(username: "klaas", password: "12345", age: 16, gender: .female)
+        let user3 = User(username: "harrie", password: "bob", age: 24, gender: .male)
+        let user4 = User(username: "bob", password: "harrie", age: 42, gender: .male)
         
-        let bossHouse = House()
-        bossHouse.owner = Reference(boss)
-        try bossHouse.save()
+        try user0.save()
+        try user1.save()
+        try user2.save()
+        try user3.save()
+        try user4.save()
         
-        XCTAssertThrowsError(try bossHouse.delete())
+        XCTAssertEqual(try User.count { user in
+            return user.username == "piet" || user.password == "321"
+        }, 2)
         
-        guard let house = try House.findOne(matching: {
-            $0.owner == boss
-        }) else {
-            XCTFail()
-            return
-        }
+        XCTAssertEqual(try User.count { user in
+            return user.username == "piet" || user.password == "123"
+            }, 1)
         
-        let wife = try User(email: "wife@family.example.com")
-        let son = try User(email: "son@family.example.com")
-        let daughter = try User(email: "daughter@family.example.com")
+        XCTAssertEqual(try User.count { user in
+            return user.username == "harrie" || user.password == "harrie"
+            }, 2)
         
-        try wife.save()
-        try son.save()
-        try daughter.save()
+        XCTAssertEqual(try User.count { user in
+            return user.username.hasPrefix("h")
+            }, 2)
         
-        house.family = [Reference(wife), Reference(son), Reference(daughter)]
+        XCTAssertEqual(try User.count { user in
+            return user.gender == .female
+            }, 1)
         
-        try house.save()
+        XCTAssertEqual(try User.count { user in
+            return user.gender == .male
+            }, 4)
         
-        guard try House.findOne(matching: { h in
-            return h.family.contains(daughter)
-        }) != nil else {
-            XCTFail()
-            return
-        }
+        XCTAssertEqual(try User.count { user in
+            return user.age >= 20
+            }, 4)
         
-        guard try House.findOne(matching: { h in
-            return !(!h.family.contains(daughter))
-        }) != nil else {
-            XCTFail()
-            return
-        }
+        XCTAssertEqual(try User.count { user in
+            return user.age > 20
+            }, 2)
         
-        guard try House.findOne(matching: { h in
-            return !(!h.family.contains(daughter)) && h.family.contains(son)
-        }) != nil else {
-            XCTFail()
-            return
-        }
+        XCTAssertEqual(try User.count { user in
+            return user.age < 20
+            }, 1)
         
-        XCTAssertEqual(house.id, bossHouse.id)
-        XCTAssertEqual(try house.owner?.resolve().email, boss.email)
+        XCTAssertEqual(try User.count(), 5)
         
-        let employee = try User(email: "joannis@orlandos.nl")
-        let employee2 = try User(email: "i@robbertbrandsma.nl")
+        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.password, "bob")
         
-        employee.boss = Reference(boss)
-        employee2.boss = Reference(boss)
-        
-        employee.firstName = "Joannis"
-        employee.lastName = "Orlandos"
-        
-        employee2.firstName = "Robbert"
-        employee2.lastName = "Brandsma"
-        
-        employee.preferences.likesCheese = true
-        employee2.preferences.likesCheese = false
-        
-        guard try House.findOne(matching: { h in
-            return h.family.contains(son) || (h.family.contains(employee) && h.family.contains(employee2))
-        }) != nil else {
-            XCTFail()
-            return
-        }
-        
-        if try House.findOne(matching: { h in
-            return h.family.contains(employee2)
-        }) != nil {
-            XCTFail()
-            return
-        }
-        
-        if try House.findOne(matching: { h in
-            return !h.family.contains(daughter)
-        }) != nil {
-            XCTFail()
-            return
-        }
-        
-        try employee.save()
-        try employee2.save()
-        
-        XCTAssertEqual(try User.count { $0.preferences.likesCheese == true }, 1)
-        XCTAssertEqual(try User.count { $0.preferences.likesCheese == false }, 5)
+//        try user0.delete()
+//        try user1.delete()
+//        try user2.delete()
+//        try user3.delete()
+//        try user4.delete()
     }
 
+//    func test
 
     static var allTests : [(String, (MeowTests) -> () throws -> Void)] {
         return [
             ("testExample", testExample),
         ]
     }
+}
+
+
+final class User: Model {
+    var id = ObjectId()
+    
+    var username: String
+    var password: String
+    var age: Int?
+    var gender: Gender?
+    var details: Details?
+    var preferences = [Preference]()
+    var extraPreferences: [Preference]?
+    
+    init(username: String, password: String, age: Int? = nil, gender: Gender? = nil) {
+        self.username = username
+        self.password = password
+        self.age = age
+        self.gender = gender
+    }
+}
+
+enum Gender: String, Embeddable {
+    case male, female
+}
+
+enum Preference: String, Embeddable {
+    case swift, mongodb, linux, macos
+}
+
+struct Details: Embeddable {
+    var firstName: String?
+    var lastName: String?
 }

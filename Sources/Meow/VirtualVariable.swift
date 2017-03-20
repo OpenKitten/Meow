@@ -9,13 +9,17 @@
 import Foundation
 import MongoKitten
 
+#if os(Linux)
+    public typealias NSRegularExpression = RegularExpression
+#endif
+
 public protocol VirtualVariable {
     var name: String { get }
 }
 
 public protocol VirtualComparable : VirtualVariable {}
 
-public func ==(lhs: VirtualVariable, rhs: ValueConvertible) -> Query {
+public func ==(lhs: VirtualVariable, rhs: Primitive) -> Query {
     return lhs.name == rhs
 }
 
@@ -68,9 +72,37 @@ public struct VirtualArray<V: VirtualVariable> : VirtualVariable {
     
     typealias VirtualSubtype = V.Type
     
-    public func contains(_ other: ValueConvertible) -> Query {
+    public func contains(_ other: Primitive) -> Query {
         return [
             self.name: other
+        ]
+    }
+}
+
+// sourcery: donotequate
+public struct VirtualSingleValueArray<V: ConcreteSingleValueSerializable> : VirtualVariable {
+    public var name: String
+    public init(name: String) { self.name = name }
+    
+    typealias VirtualSubtype = V.Type
+    
+    public func contains(_ other: V) -> Query {
+        return [
+            self.name: other.meowSerialize()
+        ]
+    }
+}
+
+// sourcery: donotequate
+public struct VirtualEmbeddablesArray<V: ConcreteSerializable> : VirtualVariable {
+    public var name: String
+    public init(name: String) { self.name = name }
+    
+    typealias VirtualSubtype = V.Type
+    
+    public func contains(_ other: V) -> Query {
+        return [
+            self.name: other.meowSerialize()
         ]
     }
 }
@@ -117,8 +149,7 @@ public prefix func !(rhs: Query) -> Query {
     return Query(query)
 }
 
-public protocol MeowNumber : ValueConvertible {}
+public protocol MeowNumber : Primitive {}
 extension Int : MeowNumber {}
 extension Int32 : MeowNumber {}
-extension Int64 : MeowNumber {}
 extension Double : MeowNumber {}

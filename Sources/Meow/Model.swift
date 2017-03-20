@@ -1,45 +1,67 @@
 @_exported import MongoKitten
 
-public protocol Model : class, Serializable {
+/// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
+///
+/// Only requires an identifier
+///
+/// Embeddables will have a generated Virtual variant of itself for the type safe queries
+public protocol Model : Serializable {
+    /// The database identifier
     var id: ObjectId { get set }
 }
 
 public typealias ReferenceValues = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
-public protocol ConcreteModel : Model, ConcreteSerializable {
+/// Should be implemented in an extension by the generator
+///
+/// When implemented, it exposes the collection where this entity resides in
+public protocol ConcreteModel : Model, ConcreteSerializable, Primitive {
+    /// The collection this entity resides in
     static var meowCollection: MongoKitten.Collection { get }
+    
+    /// All references to foreign objects
     var meowReferencesWithValue: ReferenceValues { get }
 }
 
-public protocol FieldSet {
-    var fieldName: String { get }
-}
-
+/// Implementes basic CRUD functionality for the object
 extension ConcreteModel {
-    public static func count(matching filter: Query? = nil, limitedTo limit: Int32? = nil, skipping skip: Int32? = nil) throws -> Int {
-        return try meowCollection.count(matching: filter, limitedTo: limit, skipping: skip)
+    public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
+        return self.meowSerialize().convert(to: type)
     }
     
+    public var typeIdentifier: Byte {
+        return 0x03 // document
+    }
+    
+    public func makeBinary() -> Bytes {
+        return self.meowSerialize().makeBinary()
+    }
+    
+    /// Counts the amount of objects matching the query
+    public static func count(_ filter: Query? = nil, limiting limit: Int? = nil, skipping skip: Int? = nil) throws -> Int {
+        return try meowCollection.count(filter, limiting: limit, skipping: skip)
+    }
+    
+    /// Saves this object
     public func save() throws {
         let document = meowSerialize()
         
-        try Self.meowCollection.update(
-            matching: "_id" == self.id,
+        try Self.meowCollection.update("_id" == self.id,
             to: document,
             upserting: true
         )
     }
     
-    public static func find(matching query: Query? = nil) throws -> Cursor<Self> {
-        let originalCursor = try meowCollection.find(matching: query)
-        
-        return Cursor(base: originalCursor) { document in
+    /// Returns all objects matching the query
+    public static func find(_ query: Query? = nil) throws -> Cursor<Self> {
+        return Cursor(in: meowCollection, where: query) { document in
             return try? Self.init(fromDocument: document)
         }
     }
     
-    public static func findOne(matching query: Query? = nil) throws -> Self? {
-        return try Self.find(matching: query).makeIterator().next()
+    /// Returns the first object matching the query
+    public static func findOne(_ query: Query? = nil) throws -> Self? {
+        return try Self.find(query).first
     }
     
     /// Returns `true` if the object can be deleted, `false` otherwise
@@ -51,7 +73,7 @@ extension ConcreteModel {
         }
         
         return true
-    } 
+    }
     
     /// Validates if this object can be deleted
     ///
@@ -60,7 +82,7 @@ extension ConcreteModel {
     public func validateDeletion(keyPrefix: String = "") throws -> (() throws -> ()) {
         // We'll store the actual deletion as a recursive closure, starting with ourselves:
         var cascade: (() throws -> ()) = {
-            try Self.meowCollection.remove(matching: "_id" == self.id)
+            try Self.meowCollection.remove("_id" == self.id)
         }
         
         let referenceValues = self.meowReferencesWithValue
@@ -70,7 +92,7 @@ extension ConcreteModel {
                 continue
             }
             
-            guard let referee = try type.findOne(matching: "_id" == id) else {
+            guard let referee = try type.findOne("_id" == id) else {
                 continue
             }
             
@@ -92,6 +114,7 @@ extension ConcreteModel {
         return cascade
     }
     
+    /// Removes this object from the database
     public func delete() throws {
         try self.validateDeletion()()
     }

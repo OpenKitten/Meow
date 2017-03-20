@@ -1,713 +1,731 @@
-// Generated using Sourcery 0.5.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.5.8 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 
 import Foundation
-import Meow
+import MeowMongo
 
 
 
-extension Dog : ConcreteSerializable {
-  func meowSerialize() -> Document {
-      
-        var doc: Document = ["_id": self.id]
-      
 
-      
-        // id: ObjectId (ObjectId)
-        
-          
-        
-      
-        // name: String (String)
-        
-          
-            doc["name"] = self.name
-          
-        
-      
-        // preferences: Preferences? (Preferences)
-        
-          
-            doc["preferences"] = self.preferences?.meowSerialize()
-          
-        
-      
 
-      return doc
+  extension Array where Element == ObjectId {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(ObjectId(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
   }
+  
 
-  convenience init(fromDocument source: Document) throws {
-      // Extract all properties
-      
-        // loop: id
+  extension Array where Element == String {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
 
-        
-          
-            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
-        
-      
-     
-        // loop: name
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(String(primitive), keyForError: "")
+      }
 
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let nameValue: String = try Meow.Helpers.requireValue(source["name"], keyForError: "name")
-             
-          
-      
-     
-        // loop: preferences
+      guard let me = schrodingerSelf else {
+        return nil
+      }
 
-        
-          
-          
-              let preferencesValue: Preferences?
-              if let preferencesDocument: Document = source["preferences"] {
-                preferencesValue = try Preferences(fromDocument: preferencesDocument)
-              } else {
-                preferencesValue = nil
-              }
-          
-        
-      
-     
-
-      // initializerkaas:
-      try self.init(
-        
-        
-      )
-
-      
-        self.id = idValue
-      
-        self.name = nameValue
-      
-        self.preferences = preferencesValue
-      
+      self = me
+    }
   }
+  
 
-  struct VirtualInstance {
-    var keyPrefix: String
+  extension Array where Element == Int {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Int(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Int32 {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Int32(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Bool {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Bool(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Document {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Document(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Double {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Double(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Data {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Data(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Binary {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Binary(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == Date {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(Date(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+  extension Array where Element == RegularExpression {
+    init?(_ primitive: Primitive?) {
+      guard let doc = Document(primitive) else {
+        return nil
+      }
+
+      let schrodingerSelf = try? doc.arrayValue.map { primitive in
+        return try Meow.Helpers.requireValue(RegularExpression(primitive), keyForError: "")
+      }
+
+      guard let me = schrodingerSelf else {
+        return nil
+      }
+
+      self = me
+    }
+  }
+  
+
+
+
+
+  extension Gender : ConcreteSingleValueSerializable {
+    
+    init(value: Primitive?) throws {
+      let value = try Meow.Helpers.requireValue(value, keyForError: "")
+      let primitiveValue: String = try Meow.Helpers.requireValue(String(value), keyForError: "")
+      let me: Gender = try Meow.Helpers.requireValue(Gender(rawValue: primitiveValue), keyForError: "")
+
+      self = me
+    }
 
     
-      // id: ObjectId
-      
-        var id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "id") }
-      
-    
-      // name: String
-      
-        var name: VirtualString { return VirtualString(name: keyPrefix + "name") }
-      
-    
-      // preferences: Preferences?
-      
-        var preferences: Preferences.VirtualInstance { return Preferences.VirtualInstance(keyPrefix: "preferences.") }
-      
-    
+    func meowSerialize() -> Primitive {
+      return self.rawValue
+    }
 
-    init(keyPrefix: String = "") {
-      self.keyPrefix = keyPrefix
+    
+    func meowSerialize(resolvingReferences: Bool = false) throws -> Primitive {
+      return self.rawValue
+    }
+
+    
+    struct VirtualInstance {
+      
+      static func ==(lhs: VirtualInstance, rhs: Gender) -> Query {
+        return lhs.keyPrefix == rhs.meowSerialize()
+      }
+
+      var keyPrefix: String
+
+      init(keyPrefix: String = "") {
+        self.keyPrefix = keyPrefix
+      }
     }
   }
 
-  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
-      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
-      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
+  extension Preference : ConcreteSingleValueSerializable {
+    
+    init(value: Primitive?) throws {
+      let value = try Meow.Helpers.requireValue(value, keyForError: "")
+      let primitiveValue: String = try Meow.Helpers.requireValue(String(value), keyForError: "")
+      let me: Preference = try Meow.Helpers.requireValue(Preference(rawValue: primitiveValue), keyForError: "")
 
-      
-        
-      
-        
-      
-        
-      
+      self = me
+    }
 
-      return result
+    
+    func meowSerialize() -> Primitive {
+      return self.rawValue
+    }
+
+    
+    func meowSerialize(resolvingReferences: Bool = false) throws -> Primitive {
+      return self.rawValue
+    }
+
+    
+    struct VirtualInstance {
+      
+      static func ==(lhs: VirtualInstance, rhs: Preference) -> Query {
+        return lhs.keyPrefix == rhs.meowSerialize()
+      }
+
+      var keyPrefix: String
+
+      init(keyPrefix: String = "") {
+        self.keyPrefix = keyPrefix
+      }
+    }
   }
-}
 
-extension House : ConcreteSerializable {
-  func meowSerialize() -> Document {
+
+
+  extension User : ConcreteSerializable {
+    func meowSerialize() -> Document {
+      return (try? self.meowSerialize(resolvingReferences: false) ) ?? Document()
+    }
+
+    func meowSerialize(resolvingReferences: Bool) throws -> Document {
       
         var doc: Document = ["_id": self.id]
       
 
       
-        // id: ObjectId (ObjectId)
-        
-          
-        
+
       
-        // owner: Reference<User, Deny>? (Reference<User, Deny>)
-        
+          doc["username"] = self.username
           
-            doc["owner"] = self.owner?.id
+          doc["password"] = self.password
           
-        
-      
-        // family: [Reference<User, Cascade>] ([Reference<User, Cascade>])
-        
+          doc["age"] = self.age
           
-            doc["family"] = self.family.map { $0.id }
+          doc["gender"] = self.gender?.meowSerialize()
           
-          // TODO: Support [Embeddable]?
+          doc["details"] = self.details?.meowSerialize()
+          
+          doc["preferences"] = self.preferences.map { $0.meowSerialize() }
+          // If it's an array of references
         
-      
+          doc["extraPreferences"] = self.extraPreferences?.map { $0.meowSerialize() }
+          // If it's an array of references
+        
 
       return doc
-  }
+    }
 
-  convenience init(fromDocument source: Document) throws {
+    
+   convenience  init(fromDocument source: Document) throws {
+      var source = source
       // Extract all properties
       
-        // loop: id
-
+      
         
-          
-            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
+        
+          let idValue: ObjectId = try Meow.Helpers.requireValue(source.removeValue(forKey: "_id") as? ObjectId, keyForError: "id")
         
       
-     
-        // loop: owner
-
+        
         
           
-             // o the noes it is a reference
-             let ownerId: ObjectId? = source["owner"]
-             let ownerValue: Reference<User, Deny>?
-
-             
-                if let ownerId = ownerId {
-                    ownerValue = Reference(restoring: ownerId)
+            // The property is a BSON type, so we can just extract it from the document:
+            
+              let usernameValue: String = try Meow.Helpers.requireValue(String(source.removeValue(forKey: "username")), keyForError: "username")
+            
+          
+        
+      
+        
+        
+          
+            // The property is a BSON type, so we can just extract it from the document:
+            
+              let passwordValue: String = try Meow.Helpers.requireValue(String(source.removeValue(forKey: "password")), keyForError: "password")
+            
+          
+        
+      
+        
+        
+          
+            // The property is a BSON type, so we can just extract it from the document:
+            
+              let ageValue: Int? = Int(source.removeValue(forKey: "age"))
+            
+          
+        
+      
+        
+        
+          
+            
+              let genderValue: Gender?
+              
+                if let sourceVal = source.removeValue(forKey: "gender") {
+                  genderValue = try Gender(value: sourceVal)
                 } else {
-                    ownerValue = nil
+                  genderValue = nil
                 }
-             
-        
-      
-     
-        // loop: family
-
-        
-          
-            // o the noes it is a reference
-            let familyIds = try Meow.Helpers.requireValue(source["family"] as Document?, keyForError: "family").arrayValue
-            let familyValue: [Reference<User, Cascade>]
-
-            
-               familyValue = try familyIds.map {
-                  Reference(restoring: try Meow.Helpers.requireValue($0 as? ObjectId, keyForError: "family"))
-                }
+              
             
           
         
-     
-
-      // initializerkaas:
-      try self.init(
-        
-        
-      )
-
-      
-        self.id = idValue
-      
-        self.owner = ownerValue
-      
-        self.family = familyValue
-      
-  }
-
-  struct VirtualInstance {
-    var keyPrefix: String
-
-    
-      // id: ObjectId
-      
-        var id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "id") }
-      
-    
-      // owner: Reference<User, Deny>?
-      
-        var owner: VirtualReference<Reference<User, Deny>.Model, Reference<User, Deny>.DeleteRule> { return VirtualReference(name: keyPrefix + "owner") }
-      
-    
-      // family: [Reference<User, Cascade>]
-      
-        var family: VirtualReferenceArray<Reference<User, Cascade>.Model, Reference<User, Cascade>.DeleteRule> { return VirtualReferenceArray<Reference<User, Cascade>.Model, Reference<User, Cascade>.DeleteRule>(name: keyPrefix + "family") }
-      
-    
-
-    init(keyPrefix: String = "") {
-      self.keyPrefix = keyPrefix
-    }
-  }
-
-  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
-      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
-      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
-
       
         
-      
         
           
-            if let ownerValue = self.owner {
+            
+              let detailsValue: Details?
+              
+
+                if let detailsDocument: Document = source.removeValue(forKey: "details") as? Document {
+                  detailsValue = try Details(fromDocument: detailsDocument)
+                } else {
+                  detailsValue = nil
+                }
+              
+            
           
-          result.append(("owner", ownerValue.destinationType, ownerValue.deleteRule, ownerValue.id))
+        
+      
+        
+        
           
+
+          
+            let preferencesPrimitiveValues = try Meow.Helpers.requireValue(Document(source.removeValue(forKey: "preferences")), keyForError: "preferences").arrayValue
+            let preferencesValue: [Preference] = try preferencesPrimitiveValues.map {
+              try Preference(value: $0)
             }
           
         
       
         
-      
+        
+          
 
-      return result
-  }
-}
-
-extension User : ConcreteSerializable {
-  func meowSerialize() -> Document {
-      
-        var doc: Document = ["_id": self.id]
-      
-
-      
-        // id: ObjectId (ObjectId)
-        
           
-        
-      
-        // email: String (String)
-        
-          
-            doc["email"] = self.email
-          
-        
-      
-        // firstName: String? (String)
-        
-          
-            doc["firstName"] = self.firstName
-          
-        
-      
-        // lastName: String? (String)
-        
-          
-            doc["lastName"] = self.lastName
-          
-        
-      
-        // passwordHash: Data? (Data)
-        
-          
-            doc["passwordHash"] = self.passwordHash
-          
-        
-      
-        // registrationDate: Date (Date)
-        
-          
-            doc["registrationDate"] = self.registrationDate
-          
-        
-      
-        // preferences: Preferences (Preferences)
-        
-          
-            doc["preferences"] = self.preferences.meowSerialize()
-          
-        
-      
-        // pet: Reference<Dog, Cascade> (Reference<Dog, Cascade>)
-        
-          
-            doc["pet"] = self.pet.id
-          
-        
-      
-        // boss: Reference<User, Ignore>? (Reference<User, Ignore>)
-        
-          
-            doc["boss"] = self.boss?.id
-          
-        
-      
-
-      return doc
-  }
-
-  convenience init(fromDocument source: Document) throws {
-      // Extract all properties
-      
-        // loop: id
-
-        
-          
-            let idValue: ObjectId = try Meow.Helpers.requireValue(source["_id"], keyForError: "id")
-        
-      
-     
-        // loop: email
-
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let emailValue: String = try Meow.Helpers.requireValue(source["email"], keyForError: "email")
-             
-          
-      
-     
-        // loop: firstName
-
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let firstNameValue: String? = source["firstName"]
-             
-          
-      
-     
-        // loop: lastName
-
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let lastNameValue: String? = source["lastName"]
-             
-          
-      
-     
-        // loop: passwordHash
-
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let passwordHashValue: Data? = source["passwordHash"]
-             
-          
-      
-     
-        // loop: registrationDate
-
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let registrationDateValue: Date = try Meow.Helpers.requireValue(source["registrationDate"], keyForError: "registrationDate")
-             
-          
-      
-     
-        // loop: preferences
-
-        
-          
-          
-              let preferencesDocument: Document = try Meow.Helpers.requireValue(source["preferences"], keyForError: "preferences")
-              let preferencesValue: Preferences = try Preferences(fromDocument: preferencesDocument)
-          
-        
-      
-     
-        // loop: pet
-
-        
-          
-             // o the noes it is a reference
-             let petId: ObjectId? = source["pet"]
-             let petValue: Reference<Dog, Cascade>
-
-             
-                petValue = Reference(restoring: try Meow.Helpers.requireValue(petId, keyForError: "pet"))
-             
-        
-      
-     
-        // loop: boss
-
-        
-          
-             // o the noes it is a reference
-             let bossId: ObjectId? = source["boss"]
-             let bossValue: Reference<User, Ignore>?
-
-             
-                if let bossId = bossId {
-                    bossValue = Reference(restoring: bossId)
-                } else {
-                    bossValue = nil
-                }
-             
-        
-      
-     
-
-      // initializerkaas:
-      try self.init(
-        
-        
-          email: emailValue
-          
-        
-      )
-
-      
-        self.id = idValue
-      
-        self.email = emailValue
-      
-        self.firstName = firstNameValue
-      
-        self.lastName = lastNameValue
-      
-        self.passwordHash = passwordHashValue
-      
-        self.registrationDate = registrationDateValue
-      
-        self.preferences = preferencesValue
-      
-        self.pet = petValue
-      
-        self.boss = bossValue
-      
-  }
-
-  struct VirtualInstance {
-    var keyPrefix: String
-
-    
-      // id: ObjectId
-      
-        var id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "id") }
-      
-    
-      // email: String
-      
-        var email: VirtualString { return VirtualString(name: keyPrefix + "email") }
-      
-    
-      // firstName: String?
-      
-        var firstName: VirtualString { return VirtualString(name: keyPrefix + "firstName") }
-      
-    
-      // lastName: String?
-      
-        var lastName: VirtualString { return VirtualString(name: keyPrefix + "lastName") }
-      
-    
-      // passwordHash: Data?
-      
-        var passwordHash: VirtualData { return VirtualData(name: keyPrefix + "passwordHash") }
-      
-    
-      // registrationDate: Date
-      
-        var registrationDate: VirtualDate { return VirtualDate(name: keyPrefix + "registrationDate") }
-      
-    
-      // preferences: Preferences
-      
-        var preferences: Preferences.VirtualInstance { return Preferences.VirtualInstance(keyPrefix: "preferences.") }
-      
-    
-      // pet: Reference<Dog, Cascade>
-      
-        var pet: VirtualReference<Reference<Dog, Cascade>.Model, Reference<Dog, Cascade>.DeleteRule> { return VirtualReference(name: keyPrefix + "pet") }
-      
-    
-      // boss: Reference<User, Ignore>?
-      
-        var boss: VirtualReference<Reference<User, Ignore>.Model, Reference<User, Ignore>.DeleteRule> { return VirtualReference(name: keyPrefix + "boss") }
-      
-    
-
-    init(keyPrefix: String = "") {
-      self.keyPrefix = keyPrefix
-    }
-  }
-
-  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
-      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
-      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
-
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-          
-            let petValue = self.pet
-          
-          result.append(("pet", petValue.destinationType, petValue.deleteRule, petValue.id))
-          
-        
-      
-        
-          
-            if let bossValue = self.boss {
-          
-          result.append(("boss", bossValue.destinationType, bossValue.deleteRule, bossValue.id))
-          
+            let extraPreferencesPrimitiveValues = try Document(source.removeValue(forKey: "extraPreferences"))?.arrayValue
+            let extraPreferencesValue: [Preference]? = try extraPreferencesPrimitiveValues?.map {
+              try Preference(value: $0)
             }
           
         
       
 
-      return result
-  }
-}
-
-extension Preferences : ConcreteSerializable {
-  func meowSerialize() -> Document {
-      
-      var doc = Document()
-      
-
-      
-        // likesCheese: Bool (Bool)
-        
-          
-            doc["likesCheese"] = self.likesCheese
-          
-        
-      
-
-      return doc
-  }
-
-  convenience init(fromDocument source: Document) throws {
-      // Extract all properties
-      
-        // loop: likesCheese
-
-        
-          
-             // The property is a BSON type, so we can just extract it from the document:
-             
-                  let likesCheeseValue: Bool = try Meow.Helpers.requireValue(source["likesCheese"], keyForError: "likesCheese")
-             
-          
-      
-     
-
-      // initializerkaas:
+      // Uses the first existing initializer
+      // TODO: Support multiple/more complex initializers
       try self.init(
         
         
+          username: usernameValue
+          
+            ,
+          
+        
+          password: passwordValue
+          
+            ,
+          
+        
+          age: ageValue
+          
+            ,
+          
+        
+          gender: genderValue
+          
+        
       )
 
+      // Sets the other variables
       
-        self.likesCheese = likesCheeseValue
       
-  }
-
-  struct VirtualInstance {
-    var keyPrefix: String
-
-    
-      // likesCheese: Bool
+        
+        
+          self.id = idValue
+        
       
-        var likesCheese: VirtualBool { return VirtualBool(name: keyPrefix + "likesCheese") }
+        
+        
+          self.username = usernameValue
+        
       
-    
-
-    init(keyPrefix: String = "") {
-      self.keyPrefix = keyPrefix
+        
+        
+          self.password = passwordValue
+        
+      
+        
+        
+          self.age = ageValue
+        
+      
+        
+        
+          self.gender = genderValue
+        
+      
+        
+        
+          self.details = detailsValue
+        
+      
+        
+        
+          self.preferences = preferencesValue
+        
+      
+        
+        
+          self.extraPreferences = extraPreferencesValue
+        
+      
     }
-  }
 
-  var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+    
+    struct VirtualInstance {
+      var keyPrefix: String
+
+      
+      
+        
+        // id: ObjectId
+        
+          var id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "id") }
+        
+      
+        
+        // username: String
+        
+          var username: VirtualString { return VirtualString(name: keyPrefix + "username") }
+        
+      
+        
+        // password: String
+        
+          var password: VirtualString { return VirtualString(name: keyPrefix + "password") }
+        
+      
+        
+        // age: Int?
+        
+          var age: VirtualNumber { return VirtualNumber(name: keyPrefix + "age") }
+        
+      
+        
+        // gender: Gender?
+        
+          
+            var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: "gender") }
+          
+        
+      
+        
+        // details: Details?
+        
+          
+            var details: Details.VirtualInstance { return Details.VirtualInstance(keyPrefix: "details.") }
+          
+        
+      
+        
+        // preferences: [Preference]
+        
+          
+            var preferences: VirtualSingleValueArray<Preference> { return VirtualSingleValueArray<Preference>(name: keyPrefix + "preferences") }
+          
+        
+      
+        
+        // extraPreferences: [Preference]?
+        
+          
+            var extraPreferences: VirtualSingleValueArray<Preference> { return VirtualSingleValueArray<Preference>(name: keyPrefix + "extraPreferences") }
+          
+        
+      
+
+      init(keyPrefix: String = "") {
+        self.keyPrefix = keyPrefix
+      }
+    }
+
+    
+    var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
       var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
       _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
       
         
       
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
 
       return result
+    }
   }
-}
 
-
-
-extension Dog : ConcreteModel {
-    static let meowCollection = Meow.database["dog"]
-
-    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<Dog> {
-        let query = closure(VirtualInstance())
-        return try self.find(matching: query)
+  extension Details : ConcreteSerializable {
+    func meowSerialize() -> Document {
+      return (try? self.meowSerialize(resolvingReferences: false) ) ?? Document()
     }
 
-    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> Dog? {
-        let query = closure(VirtualInstance())
-        return try self.findOne(matching: query)
+    func meowSerialize(resolvingReferences: Bool) throws -> Document {
+      
+        var doc = Document()
+      
+
+      
+
+      
+          doc["firstName"] = self.firstName
+          
+          doc["lastName"] = self.lastName
+          
+
+      return doc
     }
 
-    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
-        let query = closure(VirtualInstance())
-        return try self.count(matching: query)
+    
+   init(fromDocument source: Document) throws {
+      var source = source
+      // Extract all properties
+      
+      
+        
+        
+          
+            // The property is a BSON type, so we can just extract it from the document:
+            
+              let firstNameValue: String? = String(source.removeValue(forKey: "firstName"))
+            
+          
+        
+      
+        
+        
+          
+            // The property is a BSON type, so we can just extract it from the document:
+            
+              let lastNameValue: String? = String(source.removeValue(forKey: "lastName"))
+            
+          
+        
+      
+
+      // Uses the first existing initializer
+      // TODO: Support multiple/more complex initializers
+      try self.init(
+        
+        
+      )
+
+      // Sets the other variables
+      
+      
+        
+        
+          self.firstName = firstNameValue
+        
+      
+        
+        
+          self.lastName = lastNameValue
+        
+      
     }
-}
 
-extension House : ConcreteModel {
-    static let meowCollection = Meow.database["house"]
+    
+    struct VirtualInstance {
+      var keyPrefix: String
 
-    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<House> {
-        let query = closure(VirtualInstance())
-        return try self.find(matching: query)
+      
+      
+        
+        // firstName: String?
+        
+          var firstName: VirtualString { return VirtualString(name: keyPrefix + "firstName") }
+        
+      
+        
+        // lastName: String?
+        
+          var lastName: VirtualString { return VirtualString(name: keyPrefix + "lastName") }
+        
+      
+
+      init(keyPrefix: String = "") {
+        self.keyPrefix = keyPrefix
+      }
     }
 
-    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> House? {
-        let query = closure(VirtualInstance())
-        return try self.findOne(matching: query)
-    }
+    
+    var meowReferencesWithValue: [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)] {
+      var result = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]()
+      _ = result.popLast() // to silence the warning of not mutating above variable in the case of a type with no references
 
-    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
-        let query = closure(VirtualInstance())
-        return try self.count(matching: query)
-    }
-}
+      
+        
+      
+        
+      
 
-extension User : ConcreteModel {
+      return result
+    }
+  }
+
+
+
+
+  extension User : ConcreteModel {
     static let meowCollection = Meow.database["user"]
 
-    static func find(matching closure: ((VirtualInstance) -> (Query))) throws -> Cursor<User> {
-        let query = closure(VirtualInstance())
-        return try self.find(matching: query)
+    static func find(_ closure: ((VirtualInstance) -> (Query))) throws -> Cursor<User> {
+      let query = closure(VirtualInstance())
+      return try self.find(query)
     }
 
-    static func findOne(matching closure: ((VirtualInstance) -> (Query))) throws -> User? {
-        let query = closure(VirtualInstance())
-        return try self.findOne(matching: query)
+    static func findOne(_ closure: ((VirtualInstance) -> (Query))) throws -> User? {
+      let query = closure(VirtualInstance())
+      return try self.findOne(query)
     }
 
-    static func count(matching closure: ((VirtualInstance) -> (Query))) throws -> Int {
-        let query = closure(VirtualInstance())
-        return try self.count(matching: query)
+    static func count(_ closure: ((VirtualInstance) -> (Query))) throws -> Int {
+      let query = closure(VirtualInstance())
+      return try self.count(query)
     }
-}
+
+    static func createIndex(named name: String? = nil, withParameters closure: ((VirtualInstance, IndexSubject) -> ())) throws {
+      let indexSubject = IndexSubject()
+      closure(VirtualInstance(), indexSubject)
+
+      try meowCollection.createIndexes([(name: name ?? "", parameters: indexSubject.makeIndexParameters())])
+    }
+  }
+
 

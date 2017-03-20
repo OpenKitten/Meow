@@ -11,7 +11,7 @@ public func ==(lhs: VirtualBool, rhs: Bool) -> MongoKitten.Query {
 }
 
 public func ==(lhs: VirtualData, rhs: Data) -> MongoKitten.Query {
-  return lhs.name == rhs
+    return lhs.name == Binary(data: rhs, withSubtype: .generic)
 }
 
 public func ==(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
