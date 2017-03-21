@@ -18,60 +18,62 @@ class MeowTests: XCTestCase {
         user4.preferences = [.swift, .linux]
         user2.extraPreferences = [.swift, .mongodb, .macos]
         
+        user3.details = Details()
+        user3.details!.firstName = "Harrietjuh"
+        
         try user0.save()
         try user1.save()
         try user2.save()
         try user3.save()
         try user4.save()
         
-//        XCTAssertEqual(try User.count { user in
-//            return user.username == "piet" || user.password == "321"
-//        }, 2)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.username == "piet" || user.password == "123"
-//            }, 1)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.username == "harrie" || user.password == "harrie"
-//            }, 2)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.username.hasPrefix("h")
-//            }, 2)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.gender == .female
-//            }, 1)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.gender == .male
-//            }, 4)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.age >= 20
-//            }, 4)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.age > 20
-//            }, 2)
-//        
-//        XCTAssertEqual(try User.count { user in
-//            return user.age < 20
-//            }, 1)
-//        
-//        XCTAssertEqual(try User.count(), 5)
-//        
-//        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.password, "bob")
-        
-//        try user0.delete()
-//        try user1.delete()
-//        try user2.delete()
-//        try user3.delete()
-//        try user4.delete()
-    }
+        XCTAssertEqual(try User.count { user in
+            return user.username == "piet" || user.password == "321"
+        }, 2)
 
-//    func test
+        XCTAssertEqual(try User.count { user in
+            return user.username == "piet" || user.password == "123"
+            }, 1)
+        
+        XCTAssertEqual(try User.count { user in
+            return user.username == "harrie" || user.password == "harrie"
+            }, 2)
+        
+        XCTAssertEqual(try User.count { user in
+            return user.username.hasPrefix("h")
+            }, 2)
+        
+        XCTAssertEqual(try User.count { user in
+            return user.gender == .female
+            }, 1)
+
+        XCTAssertEqual(try User.count { user in
+            return user.gender == .male
+            }, 4)
+        
+        XCTAssertEqual(try User.count { user in
+            return user.age >= 20
+            }, 4)
+        
+        XCTAssertEqual(try User.count { user in
+            return user.age > 20
+            }, 2)
+        
+        XCTAssertEqual(try User.count { user in
+            return user.age < 20
+            }, 1)
+
+        XCTAssertEqual(try User.count(), 5)
+        
+        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.password, "bob")
+        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.details?.firstName, "Harrietjuh")
+        
+        try user0.delete()
+        try user1.delete()
+        try user2.delete()
+        try user3.delete()
+        try user4.delete()
+    }
 
     static var allTests : [(String, (MeowTests) -> () throws -> Void)] {
         return [
@@ -124,6 +126,8 @@ enum Preference: String {
 struct Details {
     var firstName: String?
     var lastName: String?
+
+    init() {}
     
     // sourcery:inline:Details.Meow
     init(meowDocument source: Document) throws {      

@@ -55,13 +55,19 @@ extension ConcreteModel {
     /// Returns all objects matching the query
     public static func find(_ query: Query? = nil) throws -> CollectionSlice<Self> {
         return try meowCollection.find(query).flatMap { document in
-            return try? Self.init(meowDocument: document)
+            do {
+                return try Self.init(meowDocument: document)
+            } catch {
+                print("initializing from document failed: \(error)")
+                assertionFailure()
+                return nil
+            }
         }
     }
     
     /// Returns the first object matching the query
     public static func findOne(_ query: Query? = nil) throws -> Self? {
-        return try Self.find(query).first
+        return try Self.find(query).makeIterator().next()
     }
     
     /// Returns `true` if the object can be deleted, `false` otherwise

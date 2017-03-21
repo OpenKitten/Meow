@@ -220,8 +220,10 @@ import Meow
     // sourcery:inline:User.Meow
     // sourcery:end
 
-      convenience init(meowValue: Primitive?) throws {
-        let document = try Meow.Helpers.requireValue(Document(meowValue), keyForError: "document for User")
+      convenience init?(meowValue: Primitive?) throws {
+        guard let document = Document(meowValue) else {
+          return nil
+        }
         try self.init(meowDocument: document)
       }
 
@@ -242,6 +244,32 @@ import Meow
       func meowSerialize(resolvingReferences: Bool) throws -> Document {
         // TODO: re-evaluate references
           return self.meowSerialize()
+      }
+
+      struct VirtualInstance {
+        var keyPrefix: String
+
+        
+           /// _id: ObjectId
+            var _id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "_id") } 
+           /// username: String
+            var username: VirtualString { return VirtualString(name: keyPrefix + "username") } 
+           /// password: String
+            var password: VirtualString { return VirtualString(name: keyPrefix + "password") } 
+           /// age: Int?
+            var age: VirtualNumber { return VirtualNumber(name: keyPrefix + "age") } 
+           /// gender: Gender?
+            var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: keyPrefix + "gender") } 
+           /// details: Details?
+           
+           /// preferences: [Preference]
+           
+           /// extraPreferences: [Preference]?
+           
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
       }
     } // end struct or class extension of User
 
@@ -270,16 +298,6 @@ import Meow
 
           try meowCollection.createIndexes([(name: name ?? "", parameters: indexSubject.makeIndexParameters())])
         }
-
-        struct VirtualInstance {
-          var keyPrefix: String
-
-          // TODO: Add properties
-
-          init(keyPrefix: String = "") {
-            self.keyPrefix = keyPrefix
-          }
-        }
       }
     
   func meowReinstantiateUserArray(from source: Primitive?) throws -> [User]? {
@@ -287,8 +305,8 @@ import Meow
         return nil
       }
 
-      return try document.map { _, rawValue -> User in
-          return try User(meowValue: rawValue)
+      return try document.map { index, rawValue -> User in
+          return try Meow.Helpers.requireValue(User(meowValue: rawValue), keyForError: "index \(index) on array of User")
       }
   }
 
@@ -308,6 +326,19 @@ import Meow
       func meowSerialize() -> Primitive {
         return self.rawValue
       }
+
+      struct VirtualInstance {
+        /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+        static func ==(lhs: VirtualInstance, rhs: Gender?) -> Query {
+          return lhs.keyPrefix == rhs?.meowSerialize()
+        }
+
+        var keyPrefix: String
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
+      }
     }
   
   func meowReinstantiateGenderArray(from source: Primitive?) throws -> [Gender]? {
@@ -315,8 +346,8 @@ import Meow
         return nil
       }
 
-      return try document.map { _, rawValue -> Gender in
-          return try Gender(meowValue: rawValue)
+      return try document.map { index, rawValue -> Gender in
+          return try Meow.Helpers.requireValue(Gender(meowValue: rawValue), keyForError: "index \(index) on array of Gender")
       }
   }
 
@@ -325,8 +356,10 @@ import Meow
     // sourcery:inline:Details.Meow
     // sourcery:end
 
-       init(meowValue: Primitive?) throws {
-        let document = try Meow.Helpers.requireValue(Document(meowValue), keyForError: "document for Details")
+       init?(meowValue: Primitive?) throws {
+        guard let document = Document(meowValue) else {
+          return nil
+        }
         try self.init(meowDocument: document)
       }
 
@@ -342,6 +375,20 @@ import Meow
         // TODO: re-evaluate references
           return self.meowSerialize()
       }
+
+      struct VirtualInstance {
+        var keyPrefix: String
+
+        
+           /// firstName: String?
+            var firstName: VirtualString { return VirtualString(name: keyPrefix + "firstName") } 
+           /// lastName: String?
+            var lastName: VirtualString { return VirtualString(name: keyPrefix + "lastName") } 
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
+      }
     } // end struct or class extension of Details
 
   func meowReinstantiateDetailsArray(from source: Primitive?) throws -> [Details]? {
@@ -349,8 +396,8 @@ import Meow
         return nil
       }
 
-      return try document.map { _, rawValue -> Details in
-          return try Details(meowValue: rawValue)
+      return try document.map { index, rawValue -> Details in
+          return try Meow.Helpers.requireValue(Details(meowValue: rawValue), keyForError: "index \(index) on array of Details")
       }
   }
 
@@ -370,6 +417,19 @@ import Meow
       func meowSerialize() -> Primitive {
         return self.rawValue
       }
+
+      struct VirtualInstance {
+        /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+        static func ==(lhs: VirtualInstance, rhs: Preference?) -> Query {
+          return lhs.keyPrefix == rhs?.meowSerialize()
+        }
+
+        var keyPrefix: String
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
+      }
     }
   
   func meowReinstantiatePreferenceArray(from source: Primitive?) throws -> [Preference]? {
@@ -377,8 +437,8 @@ import Meow
         return nil
       }
 
-      return try document.map { _, rawValue -> Preference in
-          return try Preference(meowValue: rawValue)
+      return try document.map { index, rawValue -> Preference in
+          return try Meow.Helpers.requireValue(Preference(meowValue: rawValue), keyForError: "index \(index) on array of Preference")
       }
   }
 

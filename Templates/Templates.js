@@ -85,6 +85,7 @@ let embeddables = (types.based["Embeddable"] || []);
 let serializables = models.concat(embeddables);
 
 let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
+let numberTypes = ["Int", "Int32", "Double"];
 
 supportedPrimitives.forEach(primitive => { %>
 
@@ -147,6 +148,19 @@ while (serializables.length > generatedSerializables.length) {
       func meowSerialize() -> Primitive {
         return self.rawValue
       }
+
+      struct VirtualInstance {
+        /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+        static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
+          return lhs.keyPrefix == rhs?.meowSerialize()
+        }
+
+        var keyPrefix: String
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
+      }
     }
   <% } else { %>
     // Struct or Class extension
@@ -159,8 +173,10 @@ while (serializables.length > generatedSerializables.length) {
     }
     // sourcery:end
 
-      <% if (serializable.kind == "class") { %>convenience<% } %> init(meowValue: Primitive?) throws {
-        let document = try Meow.Helpers.requireValue(Document(meowValue), keyForError: "document for <%- serializable.name %>")
+      <% if (serializable.kind == "class") { %>convenience<% } %> init?(meowValue: Primitive?) throws {
+        guard let document = Document(meowValue) else {
+          return nil
+        }
         try self.init(meowDocument: document)
       }
 
@@ -175,6 +191,29 @@ while (serializables.length > generatedSerializables.length) {
       func meowSerialize(resolvingReferences: Bool) throws -> Document {
         // TODO: re-evaluate references
           return self.meowSerialize()
+      }
+
+      struct VirtualInstance {
+        var keyPrefix: String
+
+        <% serializable.variables.forEach(variable => {%>
+           /// <%- variable.name %>: <%- variable.typeName.name %>
+           <%
+           if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
+             if (numberTypes.includes(variable.unwrappedTypeName)) {
+               %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + "<%- variable.name %>") } <%
+             } else {
+               %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + "<%-variable.name%>") } <%
+             }
+           } else if (variable.type && variable.type.kind == "enum") {
+             ensureSerializable(variable.type);
+             %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + "<%-variable.name%>") } <%
+           }
+        }) %>
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
       }
     } // end struct or class extension of <%- serializable.name %>
 <%
@@ -204,16 +243,6 @@ while (serializables.length > generatedSerializables.length) {
 
           try meowCollection.createIndexes([(name: name ?? "", parameters: indexSubject.makeIndexParameters())])
         }
-
-        struct VirtualInstance {
-          var keyPrefix: String
-
-          // TODO: Add properties
-
-          init(keyPrefix: String = "") {
-            self.keyPrefix = keyPrefix
-          }
-        }
       }
     <% }
   }
@@ -223,8 +252,8 @@ while (serializables.length > generatedSerializables.length) {
         return nil
       }
 
-      return try document.map { _, rawValue -> <%- serializable.name %> in
-          return try <%- serializable.name %>(meowValue: rawValue)
+      return try document.map { index, rawValue -> <%- serializable.name %> in
+          return try Meow.Helpers.requireValue(<%- serializable.name %>(meowValue: rawValue), keyForError: "index \(index) on array of <%- serializable.name %>")
       }
   }
 <%
