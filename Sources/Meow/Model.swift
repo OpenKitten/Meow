@@ -7,7 +7,7 @@
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
 public protocol Model : Serializable {
     /// The database identifier
-    var id: ObjectId { get set }
+    var _id: ObjectId { get set }
 }
 
 public typealias ReferenceValues = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
@@ -46,16 +46,16 @@ extension ConcreteModel {
     public func save() throws {
         let document = meowSerialize()
         
-        try Self.meowCollection.update("_id" == self.id,
+        try Self.meowCollection.update("_id" == self._id,
             to: document,
             upserting: true
         )
     }
     
     /// Returns all objects matching the query
-    public static func find(_ query: Query? = nil) throws -> Cursor<Self> {
-        return Cursor(in: meowCollection, where: query) { document in
-            return try? Self.init(fromDocument: document)
+    public static func find(_ query: Query? = nil) throws -> CollectionSlice<Self> {
+        return try meowCollection.find(query).flatMap { document in
+            return try? Self.init(meowDocument: document)
         }
     }
     
@@ -82,7 +82,7 @@ extension ConcreteModel {
     public func validateDeletion(keyPrefix: String = "") throws -> (() throws -> ()) {
         // We'll store the actual deletion as a recursive closure, starting with ourselves:
         var cascade: (() throws -> ()) = {
-            try Self.meowCollection.remove("_id" == self.id)
+            try Self.meowCollection.remove("_id" == self._id)
         }
         
         let referenceValues = self.meowReferencesWithValue

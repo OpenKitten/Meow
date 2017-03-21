@@ -1,0 +1,72 @@
+{
+  "autoPin": true,
+  "pins": [
+    {
+      "package": "BSON",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/BSON.git",
+      "version": "5.0.0-obbut9"
+    },
+    {
+      "package": "CLibreSSL",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/clibressl.git",
+      "version": "1.0.0"
+    },
+    {
+      "package": "Cheetah",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/Cheetah.git",
+      "version": "0.3.2"
+    },
+    {
+      "package": "Core",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/core.git",
+      "version": "1.1.1"
+    },
+    {
+      "package": "CryptoSwift",
+      "reason": null,
+      "repositoryURL": "https://github.com/krzyzanowskim/CryptoSwift.git",
+      "version": "0.6.7"
+    },
+    {
+      "package": "KittenCore",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/KittenCore.git",
+      "version": "0.2.3"
+    },
+    {
+      "package": "LogKitten",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/LogKitten.git",
+      "version": "0.3.0"
+    },
+    {
+      "package": "MongoKitten",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",
+      "version": "0.0.19"
+    },
+    {
+      "package": "Schrodinger",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/Schrodinger.git",
+      "version": "0.1.2"
+    },
+    {
+      "package": "Socks",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/socks.git",
+      "version": "1.2.7"
+    },
+    {
+      "package": "TLS",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/tls.git",
+      "version": "1.1.2"
+    }
+  ],
+  "version": 1
+}

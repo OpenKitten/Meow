@@ -26,7 +26,7 @@ public final class Reference<M : ConcreteModel, D : DeleteRule> {
     public var id: ObjectId
     
     public init(_ instance: M) {
-        self.id = instance.id
+        self.id = instance._id
     }
     
     public init(restoring id: ObjectId) {

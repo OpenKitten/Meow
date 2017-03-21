@@ -121,7 +121,7 @@ public struct VirtualReference<T : ConcreteModel, D : DeleteRule>: VirtualVariab
     }
     
     public static func ==(lhs: VirtualReference<T,D>, rhs: T) -> MongoKitten.Query {
-        return lhs.name == rhs.id
+        return lhs.name == rhs._id
     }
 }
 
@@ -133,7 +133,7 @@ public struct VirtualReferenceArray<T : ConcreteModel, D : DeleteRule>: VirtualV
     }
     
     public func contains(_ rhs: T) -> MongoKitten.Query {
-        return self.name == rhs.id
+        return self.name == rhs._id
     }
 }
 
