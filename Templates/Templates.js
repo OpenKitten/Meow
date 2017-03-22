@@ -10,6 +10,7 @@ let embeddables = (types.based["Embeddable"] || []);
 // An array containing all serializable types
 // Additional types may be added below, in the template itself (supporting implicit serializables)
 let serializables = models.concat(embeddables);
+let serializableTuples = [];
 
 let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
 let numberTypes = ["Int", "Int32", "Double"];
@@ -46,6 +47,13 @@ function deserializeFromPrimitive(name, type, typeName, accessor) {
     } else {
       %> try Meow.Helpers.requireValue(meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>), keyForError: "<%-name%>") <%
     }
+  } else if (typeName.isTuple) {
+    ensureSerializable(typeName);
+    if (typeName.isOptional) {
+      %> try <%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
+    }
   }
 
   %> /* <%-typeName.name%> */ <%
@@ -72,15 +80,25 @@ function serializeToPrimitive(accessor, type, typeName) {
     } else {
       %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.map { $0.meowSerialize() } <%
     }
+  } else if (typeName.isTuple) {
+    ensureSerializable(typeName);
+    %> <%- makeTupleSerializeFunctionName(typeName) %>(<%- accessor %>)<%
   }
 }
 
 /**
 Ensures the given type is serializable. If it is not already, it will be added to the serialization code generation queue.
 
-@param {object} type - The type object (e.g. variable.type)
+@param {object} type - The type object (e.g. variable.type) or tuple instance
 */
 function ensureSerializable(type) {
+  if (type.isTuple) {
+    let signature = makeTupleSignature(type);
+    if (serializableTuples.find(t => makeTupleSignature(t) == signature)) { return };
+    serializableTuples.push(type);
+    return;
+  }
+
   // check if it is already in the queue, and if it is, return:
   if (serializables.find(t => t.name == type.name)) { return };
   serializables.push(type);
@@ -112,6 +130,41 @@ function ensureSerializableArray(typeName) {
   return elementTypeNameString;
 }
 
+/**
+@param {object} tuple - The sourcery tuple object
+@returns {string} The tuple signature
+*/
+function makeTupleSignature(tuple) {
+  if (tuple.isTuple) {
+    // The tuple is secretly a typeName
+    tuple = tuple.tuple;
+  }
+
+  if (!tuple) {
+    return "invalidTuple";
+  }
+
+  return tuple.elements.map(e => ((e.name || "") + e.unwrappedTypeName)).join("And");
+}
+
+/**
+@param {object} tuple - The sourcery tuple object
+@returns {string} The tuple serialization swift function name
+*/
+function makeTupleSerializeFunctionName(tuple) {
+  let signature = makeTupleSignature(tuple);
+  return `meowSerializeTupleOf${signature}`;
+}
+
+/**
+@param {object} tuple - The sourcery tuple object
+@returns {string} The tuple deserialization swift function name
+*/
+function makeTupleDeserializeFunctionName(tuple) {
+  let signature = makeTupleSignature(tuple);
+  return `meowDeserializeTupleOf${signature}`;
+}
+
 supportedPrimitives.forEach(primitive => { %>
 
   func meowReinstantiate<%- primitive %>Array(from source: Primitive?) throws -> [<%- primitive %>]? {
@@ -129,171 +182,216 @@ supportedPrimitives.forEach(primitive => { %>
 // It is important to keep this as far down as possible.
 // Keep track of the serializables we already handled:
 let generatedSerializables = [];
+let generatedSerializableTuples = [];
 
-// The reason for looping this way is that embedded serializables may be recursive, so implicit serializables may be added while looping
-let serializableIndex = 0;
-while (serializables.length > generatedSerializables.length) {
-  let serializable = serializables[serializableIndex];
-  serializableIndex++;
-  generatedSerializables.push(serializable);
+function generateSerializables() {
+  // The reason for looping this way is that embedded serializables may be recursive, so implicit serializables may be added while looping
+  let serializableIndex = 0;
+  while (serializables.length > generatedSerializables.length) {
+    let serializable = serializables[serializableIndex];
+    serializableIndex++;
+    generatedSerializables.push(serializable);
 
-  if (serializable.kind == "enum") {
+    if (serializable.kind == "enum") {
+      %>
+      // Enum extension
+      extension <%- serializable.name %> : ConcreteSingleValueSerializable {
+        /// Creates a `<%- serializable.name %>` from a BSON Primtive
+        init(meowValue: Primitive?) throws {
+          <% if (serializable.typeName) { %>
+            let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(meowValue), keyForError: "enum <%- serializable.name %>")
+            self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
+          <% } else if (!serializable.hasAssociatedValues) { %>
+            let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum <%- serializable.name %>")
+            switch rawValue {
+              <% serializable.cases.forEach(enumCase => {
+                %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
+              <%})%>
+              default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+            }
+          <% } else { %>
+            <# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
+          <% } %>
+        }
+
+        func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
+          return self.meowSerialize()
+        }
+
+        func meowSerialize() -> Primitive {
+          <% if (serializable.typeName) { %>
+            return self.rawValue
+          <% } else { %>
+            switch self {
+              <% serializable.cases.forEach(enumCase => {
+                %> case .<%- enumCase.name %>: return "<%- enumCase.name %>"
+              <%})%>
+            }
+          <% } %>
+        }
+
+        struct VirtualInstance {
+          /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+          static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
+            return lhs.keyPrefix == rhs?.meowSerialize()
+          }
+
+          var keyPrefix: String
+
+          init(keyPrefix: String = "") {
+            self.keyPrefix = keyPrefix
+          }
+        }
+      }
+    <% } else { %>
+      // Struct or Class extension
+      extension <%- serializable.name %> : ConcreteSerializable {
+      <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
+      init(meowDocument source: Document) throws {-%>
+        <% serializable.variables.forEach(variable => { %>
+          self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
+        }); %>
+      }
+      <% if (serializable.kind == "class") { %>// sourcery:end<% } %>
+
+
+        <% if (serializable.kind == "class") { %>convenience<% } %> init?(meowValue: Primitive?) throws {
+          guard let document = Document(meowValue) else {
+            return nil
+          }
+          try self.init(meowDocument: document)
+        }
+
+        func meowSerialize() -> Document {
+          var document = Document()
+          <% serializable.variables.forEach(variable => { %>
+            document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
+          });%>
+          return document
+        }
+
+        func meowSerialize(resolvingReferences: Bool) throws -> Document {
+          // TODO: re-evaluate references
+            return self.meowSerialize()
+        }
+
+        struct VirtualInstance {
+          var keyPrefix: String
+
+          <% serializable.variables.forEach(variable => {%>
+             /// <%- variable.name %>: <%- variable.typeName.name %>
+             <%
+             if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
+               if (numberTypes.includes(variable.unwrappedTypeName)) {
+                 %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + "<%- variable.name %>") } <%
+               } else {
+                 %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + "<%-variable.name%>") } <%
+               }
+             } else if (variable.type && variable.type.kind == "enum") {
+               ensureSerializable(variable.type);
+               %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + "<%-variable.name%>") } <%
+             }
+          }) %>
+
+          init(keyPrefix: String = "") {
+            self.keyPrefix = keyPrefix
+          }
+        } // end VirtualInstance
+
+        enum Key : String {-%>
+          <% serializable.variables.forEach(variable => {%>
+            case <%- variable.name %>-%>
+          <%})%>
+
+
+        }
+
+      } // end struct or class extension of <%- serializable.name %>
+  <%
+      if (serializable.based["Model"]) { %>
+        extension <%- serializable.name %> : ConcreteModel {
+          static let meowCollection: MongoKitten.Collection = Meow.database["<%- serializable.name.toLowerCase() %>"]
+          var meowReferencesWithValue: ReferenceValues { return [] }
+
+          static func find(_ closure: ((VirtualInstance) -> (Query))) throws -> CollectionSlice<<%- serializable.name %>> {
+            let query = closure(VirtualInstance())
+            return try self.find(query)
+          }
+
+          static func findOne(_ closure: ((VirtualInstance) -> (Query))) throws -> <%- serializable.name %>? {
+            let query = closure(VirtualInstance())
+            return try self.findOne(query)
+          }
+
+          static func count(_ closure: ((VirtualInstance) -> (Query))) throws -> Int {
+            let query = closure(VirtualInstance())
+            return try self.count(query)
+          }
+
+          static func createIndex(named name: String? = nil, withParameters closure: ((VirtualInstance, IndexSubject) -> ())) throws {
+            let indexSubject = IndexSubject()
+            closure(VirtualInstance(), indexSubject)
+
+            try meowCollection.createIndexes([(name: name ?? "", parameters: indexSubject.makeIndexParameters())])
+          }
+        }
+      <% }
+    }
     %>
-    // Enum extension
-    extension <%- serializable.name %> : ConcreteSingleValueSerializable {
-      /// Creates a `<%- serializable.name %>` from a BSON Primtive
-      init(meowValue: Primitive?) throws {
-        <% if (serializable.typeName) { %>
-          let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(meowValue), keyForError: "enum <%- serializable.name %>")
-          self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
-        <% } else if (!serializable.hasAssociatedValues) { %>
-          let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum <%- serializable.name %>")
-          switch rawValue {
-            <% serializable.cases.forEach(enumCase => {
-              %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
-            <%})%>
-            default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
-          }
-        <% } else { %>
-          <# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
-        <% } %>
-      }
-
-      func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
-        return self.meowSerialize()
-      }
-
-      func meowSerialize() -> Primitive {
-        <% if (serializable.typeName) { %>
-          return self.rawValue
-        <% } else { %>
-          switch self {
-            <% serializable.cases.forEach(enumCase => {
-              %> case .<%- enumCase.name %>: return "<%- enumCase.name %>"
-            <%})%>
-          }
-        <% } %>
-      }
-
-      struct VirtualInstance {
-        /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
-        static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
-          return lhs.keyPrefix == rhs?.meowSerialize()
-        }
-
-        var keyPrefix: String
-
-        init(keyPrefix: String = "") {
-          self.keyPrefix = keyPrefix
-        }
-      }
-    }
-  <% } else { %>
-    // Struct or Class extension
-    extension <%- serializable.name %> : ConcreteSerializable {
-    <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
-    init(meowDocument source: Document) throws {-%>
-      <% serializable.variables.forEach(variable => { %>
-        self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
-      }); %>
-    }
-    <% if (serializable.kind == "class") { %>// sourcery:end<% } %>
-
-
-      <% if (serializable.kind == "class") { %>convenience<% } %> init?(meowValue: Primitive?) throws {
-        guard let document = Document(meowValue) else {
+    func meowReinstantiate<%- serializable.name %>Array(from source: Primitive?) throws -> [<%- serializable.name %>]? {
+        guard let document = Document(source) else {
           return nil
         }
-        try self.init(meowDocument: document)
-      }
 
-      func meowSerialize() -> Document {
-        var document = Document()
-        <% serializable.variables.forEach(variable => { %>
-          document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
-        });%>
-        return document
-      }
-
-      func meowSerialize(resolvingReferences: Bool) throws -> Document {
-        // TODO: re-evaluate references
-          return self.meowSerialize()
-      }
-
-      struct VirtualInstance {
-        var keyPrefix: String
-
-        <% serializable.variables.forEach(variable => {%>
-           /// <%- variable.name %>: <%- variable.typeName.name %>
-           <%
-           if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
-             if (numberTypes.includes(variable.unwrappedTypeName)) {
-               %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + "<%- variable.name %>") } <%
-             } else {
-               %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + "<%-variable.name%>") } <%
-             }
-           } else if (variable.type && variable.type.kind == "enum") {
-             ensureSerializable(variable.type);
-             %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + "<%-variable.name%>") } <%
-           }
-        }) %>
-
-        init(keyPrefix: String = "") {
-          self.keyPrefix = keyPrefix
+        return try document.map { index, rawValue -> <%- serializable.name %> in
+            return try Meow.Helpers.requireValue(<%- serializable.name %>(meowValue: rawValue), keyForError: "index \(index) on array of <%- serializable.name %>")
         }
-      } // end VirtualInstance
+    }
+  <%
+  } // end struct/class serializable loop
 
-      enum Key : String {-%>
-        <% serializable.variables.forEach(variable => {%>
-          case <%- variable.name %>-%>
-        <%})%>
+  let tupleIndex = 0;
+  while (serializableTuples.length > generatedSerializableTuples.length) {
+    let tupleName = serializableTuples[tupleIndex];
+    let tuple = tupleName.tuple;
+    tupleIndex++;
+    generatedSerializableTuples.push(tuple);
 
-
-      }
-
-    } // end struct or class extension of <%- serializable.name %>
-<%
-    if (serializable.based["Model"]) { %>
-      extension <%- serializable.name %> : ConcreteModel {
-        static let meowCollection: MongoKitten.Collection = Meow.database["<%- serializable.name.toLowerCase() %>"]
-        var meowReferencesWithValue: ReferenceValues { return [] }
-
-        static func find(_ closure: ((VirtualInstance) -> (Query))) throws -> CollectionSlice<<%- serializable.name %>> {
-          let query = closure(VirtualInstance())
-          return try self.find(query)
-        }
-
-        static func findOne(_ closure: ((VirtualInstance) -> (Query))) throws -> <%- serializable.name %>? {
-          let query = closure(VirtualInstance())
-          return try self.findOne(query)
-        }
-
-        static func count(_ closure: ((VirtualInstance) -> (Query))) throws -> Int {
-          let query = closure(VirtualInstance())
-          return try self.count(query)
-        }
-
-        static func createIndex(named name: String? = nil, withParameters closure: ((VirtualInstance, IndexSubject) -> ())) throws {
-          let indexSubject = IndexSubject()
-          closure(VirtualInstance(), indexSubject)
-
-          try meowCollection.createIndexes([(name: name ?? "", parameters: indexSubject.makeIndexParameters())])
-        }
-      }
-    <% }
-  }
-  %>
-  func meowReinstantiate<%- serializable.name %>Array(from source: Primitive?) throws -> [<%- serializable.name %>]? {
-      guard let document = Document(source) else {
+    %>
+    func <%- makeTupleSerializeFunctionName(tuple); %>(_ tuple: <%- tupleName.unwrappedTypeName %>?) -> Document? {
+      guard let tuple = tuple else {
         return nil
       }
 
-      return try document.map { index, rawValue -> <%- serializable.name %> in
-          return try Meow.Helpers.requireValue(<%- serializable.name %>(meowValue: rawValue), keyForError: "index \(index) on array of <%- serializable.name %>")
-      }
-  }
-<%
-} // end serializables loop
+      return [
+        <% tuple.elements.forEach(element => { %>
+          "<%- element.name %>": tuple.<%- element.name %>,-%>
+        <% }) %>
+      ]
+    }
 
+    func <%- makeTupleDeserializeFunctionName(tuple); %>(_ primitive: Primitive?) throws -> <%- tupleName.unwrappedTypeName %>? {
+      guard let document = Document(primitive) else {
+        return nil
+      }
+
+      return (-%>
+        <% tuple.elements.forEach((element, index) => { %>
+          <%- element.name %>: <%- deserializeFromPrimitive("tuple element " + element.name, element.type, element.typeName, `document["${element.name}"]`) %>-%>
+          <% if (index < tuple.elements.length-1) { %>,<% } %> -%>
+        <% }) %>
+      )
+    }
+    <%
+
+  } // end tuple loop
+
+} // end generatedSerializables
+
+// three times for types that are discovered during the tuple generation process
+generateSerializables()
+generateSerializables()
+generateSerializables()
 %>
 // Serializables parsed: <%- serializables.map(s => s.name) %>
+// Tuples parsed: <%- serializableTuples.map(s => makeTupleSignature(s)) %>
