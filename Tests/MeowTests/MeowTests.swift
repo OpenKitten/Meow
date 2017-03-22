@@ -69,6 +69,7 @@ class MeowTests: XCTestCase {
         XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.password, "bob")
         XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.details?.firstName, "Harrietjuh")
         XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.details?.address?.city, "Eindhoven")
+        XCTAssertEqual(try User.findOne { $0.username == "piet" }?.unnamedTuple.2, 4)
         
         try user0.delete()
         try user1.delete()
@@ -95,6 +96,7 @@ final class User: Model {
     var details: Details?
     var preferences = [Preference]()
     var extraPreferences: [Preference]?
+    var unnamedTuple: (String,String,Int) = ("Example", "Other example", 4)
     
     init(username: String, password: String, age: Int? = nil, gender: Gender? = nil) {
         self.username = username
@@ -113,6 +115,7 @@ final class User: Model {
           self.details = try Details(meowValue: source["details"])  /* Details? */ 
           self.preferences = try Meow.Helpers.requireValue(meowReinstantiatePreferenceArray(from: source["preferences"]), keyForError: "preferences")  /* [Preference] */ 
           self.extraPreferences = try meowReinstantiatePreferenceArray(from: source["extraPreferences"])  /* [Preference]? */ 
+          self.unnamedTuple = try Meow.Helpers.requireValue(meowDeserializeTupleOf0StringAnd1StringAnd2Int(source["unnamedTuple"]), keyForError: "unnamedTuple")  /* (String,String,Int) */ 
       }
     //sourcery:end
 }

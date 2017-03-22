@@ -52,7 +52,7 @@ function deserializeFromPrimitive(name, type, typeName, accessor) {
     if (typeName.isOptional) {
       %> try <%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>) <%
     } else {
-      %> try Meow.Helpers.requireValue(makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
+      %> try Meow.Helpers.requireValue(<%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
     }
   }
 
@@ -377,7 +377,9 @@ function generateSerializables() {
 
       return (-%>
         <% tuple.elements.forEach((element, index) => { %>
-          <%- element.name %>: <%- deserializeFromPrimitive("tuple element " + element.name, element.type, element.typeName, `document["${element.name}"]`) %>-%>
+          <% /* /^\d+$/ checks if the element name has only numbers in it */ %> -%>
+          <% if (! /^\d+$/.test(element.name)) { %> <%- element.name %>: <% } %> -%>
+          <%- deserializeFromPrimitive("tuple element " + element.name, element.type, element.typeName, `document["${element.name}"]`) %>-%>
           <% if (index < tuple.elements.length-1) { %>,<% } %> -%>
         <% }) %>
       )

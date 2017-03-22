@@ -151,6 +151,7 @@ import Meow
             document["details"] = self.details?.meowSerialize() 
             document["preferences"] = self.preferences.map { $0.meowSerialize() } 
             document["extraPreferences"] = self.extraPreferences?.map { $0.meowSerialize() } 
+            document["unnamedTuple"] = meowSerializeTupleOf0StringAnd1StringAnd2Int(self.unnamedTuple)
           return document
         }
 
@@ -179,6 +180,8 @@ import Meow
              
              /// extraPreferences: [Preference]?
              
+             /// unnamedTuple: (String,String,Int)
+             
 
           init(keyPrefix: String = "") {
             self.keyPrefix = keyPrefix
@@ -194,6 +197,7 @@ import Meow
             case details          
             case preferences          
             case extraPreferences          
+            case unnamedTuple          
 
 
         }
@@ -415,6 +419,31 @@ import Meow
         }
     }
   
+    func meowSerializeTupleOf0StringAnd1StringAnd2Int(_ tuple: (String,String,Int)?) -> Document? {
+      guard let tuple = tuple else {
+        return nil
+      }
+
+      return [
+        
+          "0": tuple.0,        
+          "1": tuple.1,        
+          "2": tuple.2,        
+      ]
+    }
+
+    func meowDeserializeTupleOf0StringAnd1StringAnd2Int(_ primitive: Primitive?) throws -> (String,String,Int)? {
+      guard let document = Document(primitive) else {
+        return nil
+      }
+
+      return (        
+                                 try Meow.Helpers.requireValue(String(document["0"]), keyForError: "tuple element 0")  /* String */           ,         
+                                 try Meow.Helpers.requireValue(String(document["1"]), keyForError: "tuple element 1")  /* String */           ,         
+                                 try Meow.Helpers.requireValue(Int(document["2"]), keyForError: "tuple element 2")  /* Int */                    
+      )
+    }
+    
     func meowSerializeTupleOfstreetNameStringAndnumberIntAndcityStringAndhouseGenderGender(_ tuple: (streetName: String?, number: Int, city: String, houseGender: Gender)?) -> Document? {
       guard let tuple = tuple else {
         return nil
@@ -435,12 +464,12 @@ import Meow
       }
 
       return (        
-          streetName:  String(document["streetName"])  /* String? */           ,         
-          number:  try Meow.Helpers.requireValue(Int(document["number"]), keyForError: "tuple element number")  /* Int */           ,         
-          city:  try Meow.Helpers.requireValue(String(document["city"]), keyForError: "tuple element city")  /* String */           ,         
-          houseGender:  try Meow.Helpers.requireValue(Gender(meowValue: document["houseGender"]), keyForError: "tuple element houseGender")  /* Gender */                    
+                      streetName:             String(document["streetName"])  /* String? */           ,         
+                      number:             try Meow.Helpers.requireValue(Int(document["number"]), keyForError: "tuple element number")  /* Int */           ,         
+                      city:             try Meow.Helpers.requireValue(String(document["city"]), keyForError: "tuple element city")  /* String */           ,         
+                      houseGender:             try Meow.Helpers.requireValue(Gender(meowValue: document["houseGender"]), keyForError: "tuple element houseGender")  /* Gender */                    
       )
     }
     
 // Serializables parsed: User,Gender,Details,Preference
-// Tuples parsed: streetNameStringAndnumberIntAndcityStringAndhouseGenderGender
+// Tuples parsed: 0StringAnd1StringAnd2Int,streetNameStringAndnumberIntAndcityStringAndhouseGenderGender
