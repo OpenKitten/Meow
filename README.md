@@ -101,6 +101,7 @@ Meow currently supports variables of the following kind:
 	
 - Structs defined in the same module as the model. As long as all their variables are of a kind supported by Meow (including other structs) they should work out of the box.
 - Classes defined in the same module as the model. The same rules apply here as with structs. However, due to a limitation in the Swift language (designated initializers have to be defined within the class definition), these classes also need the `sourcery:inline` markers.
+- Tuples of which the elements comply to the normal variable rules
 
 
 ## ℹ About the queries
