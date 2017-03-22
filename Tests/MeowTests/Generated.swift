@@ -7,218 +7,131 @@ import Meow
 
 
 
-  extension Array where Element == ObjectId {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateObjectIdArray(from source: Primitive?) throws -> [ObjectId]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(ObjectId(primitive), keyForError: "")
+      return try document.map { index, rawValue -> ObjectId in
+          return try Meow.Helpers.requireValue(ObjectId(rawValue), keyForError: "index \(index) on array of ObjectId")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == String {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateStringArray(from source: Primitive?) throws -> [String]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(String(primitive), keyForError: "")
+      return try document.map { index, rawValue -> String in
+          return try Meow.Helpers.requireValue(String(rawValue), keyForError: "index \(index) on array of String")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Int {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateIntArray(from source: Primitive?) throws -> [Int]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Int(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Int in
+          return try Meow.Helpers.requireValue(Int(rawValue), keyForError: "index \(index) on array of Int")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Int32 {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateInt32Array(from source: Primitive?) throws -> [Int32]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Int32(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Int32 in
+          return try Meow.Helpers.requireValue(Int32(rawValue), keyForError: "index \(index) on array of Int32")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Bool {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateBoolArray(from source: Primitive?) throws -> [Bool]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Bool(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Bool in
+          return try Meow.Helpers.requireValue(Bool(rawValue), keyForError: "index \(index) on array of Bool")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Document {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateDocumentArray(from source: Primitive?) throws -> [Document]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Document(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Document in
+          return try Meow.Helpers.requireValue(Document(rawValue), keyForError: "index \(index) on array of Document")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Double {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateDoubleArray(from source: Primitive?) throws -> [Double]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Double(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Double in
+          return try Meow.Helpers.requireValue(Double(rawValue), keyForError: "index \(index) on array of Double")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Data {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateDataArray(from source: Primitive?) throws -> [Data]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Data(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Data in
+          return try Meow.Helpers.requireValue(Data(rawValue), keyForError: "index \(index) on array of Data")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Binary {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateBinaryArray(from source: Primitive?) throws -> [Binary]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Binary(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Binary in
+          return try Meow.Helpers.requireValue(Binary(rawValue), keyForError: "index \(index) on array of Binary")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == Date {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateDateArray(from source: Primitive?) throws -> [Date]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(Date(primitive), keyForError: "")
+      return try document.map { index, rawValue -> Date in
+          return try Meow.Helpers.requireValue(Date(rawValue), keyForError: "index \(index) on array of Date")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
 
-  extension Array where Element == RegularExpression {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiateRegularExpressionArray(from source: Primitive?) throws -> [RegularExpression]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(RegularExpression(primitive), keyForError: "")
+      return try document.map { index, rawValue -> RegularExpression in
+          return try Meow.Helpers.requireValue(RegularExpression(rawValue), keyForError: "index \(index) on array of RegularExpression")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 
     // Struct or Class extension
     extension User : ConcreteSerializable {
     // sourcery:inline:User.Meow
     // sourcery:end
+
 
       convenience init?(meowValue: Primitive?) throws {
         guard let document = Document(meowValue) else {
@@ -236,8 +149,8 @@ import Meow
           document["age"] = self.age 
           document["gender"] = self.gender?.meowSerialize() 
           document["details"] = self.details?.meowSerialize() 
-          document["preferences"] = self.preferences.map { $0.meowSerialize() }  // parsed element string: Preference 
-          document["extraPreferences"] = self.extraPreferences?.map { $0.meowSerialize() }  // parsed element string: Preference 
+          document["preferences"] = self.preferences.map { $0.meowSerialize() } 
+          document["extraPreferences"] = self.extraPreferences?.map { $0.meowSerialize() } 
         return document
       }
 
@@ -270,7 +183,21 @@ import Meow
         init(keyPrefix: String = "") {
           self.keyPrefix = keyPrefix
         }
+      } // end VirtualInstance
+
+      enum Key : String {        
+          case _id        
+          case username        
+          case password        
+          case age        
+          case gender        
+          case details        
+          case preferences        
+          case extraPreferences        
+
+
       }
+
     } // end struct or class extension of User
 
       extension User : ConcreteModel {
@@ -310,13 +237,19 @@ import Meow
       }
   }
 
-
     // Enum extension
     extension Gender : ConcreteSingleValueSerializable {
       /// Creates a `Gender` from a BSON Primtive
       init(meowValue: Primitive?) throws {
-        let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Gender")
-        self = try Meow.Helpers.requireValue(Gender(rawValue: rawValue), keyForError: "enum Gender")
+        
+          let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Gender")
+          switch rawValue {
+             case "male": self = .male
+             case "female": self = .female
+            
+            default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
+          }
+        
       }
 
       func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
@@ -324,7 +257,13 @@ import Meow
       }
 
       func meowSerialize() -> Primitive {
-        return self.rawValue
+        
+          switch self {
+             case .male: return "male"
+             case .female: return "female"
+            
+          }
+        
       }
 
       struct VirtualInstance {
@@ -353,8 +292,13 @@ import Meow
 
     // Struct or Class extension
     extension Details : ConcreteSerializable {
-    // sourcery:inline:Details.Meow
-    // sourcery:end
+    
+    init(meowDocument source: Document) throws {      
+        self.firstName = String(source["firstName"])  /* String? */ 
+        self.lastName = String(source["lastName"])  /* String? */ 
+    }
+    
+
 
        init?(meowValue: Primitive?) throws {
         guard let document = Document(meowValue) else {
@@ -388,7 +332,15 @@ import Meow
         init(keyPrefix: String = "") {
           self.keyPrefix = keyPrefix
         }
+      } // end VirtualInstance
+
+      enum Key : String {        
+          case firstName        
+          case lastName        
+
+
       }
+
     } // end struct or class extension of Details
 
   func meowReinstantiateDetailsArray(from source: Primitive?) throws -> [Details]? {
@@ -401,13 +353,21 @@ import Meow
       }
   }
 
-
     // Enum extension
     extension Preference : ConcreteSingleValueSerializable {
       /// Creates a `Preference` from a BSON Primtive
       init(meowValue: Primitive?) throws {
-        let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Preference")
-        self = try Meow.Helpers.requireValue(Preference(rawValue: rawValue), keyForError: "enum Preference")
+        
+          let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Preference")
+          switch rawValue {
+             case "swift": self = .swift
+             case "mongodb": self = .mongodb
+             case "linux": self = .linux
+             case "macos": self = .macos
+            
+            default: throw Meow.Error.enumCaseNotFound(enum: "Preference", name: rawValue)
+          }
+        
       }
 
       func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
@@ -415,7 +375,15 @@ import Meow
       }
 
       func meowSerialize() -> Primitive {
-        return self.rawValue
+        
+          switch self {
+             case .swift: return "swift"
+             case .mongodb: return "mongodb"
+             case .linux: return "linux"
+             case .macos: return "macos"
+            
+          }
+        
       }
 
       struct VirtualInstance {

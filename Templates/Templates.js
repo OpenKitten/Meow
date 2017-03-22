@@ -17,34 +17,34 @@ let numberTypes = ["Int", "Int32", "Double"];
 /**
 Generates code for deserializing a value from a document
 
-@param {string} name - The name of the value to look up in the document
+@param {string} name - The name of the value to use as error key
 @param {object} type - The type (e.g. variable.type), if available - required for nonprimitive values, may be null or undefined for primitives
 @param {object} typeName - The typeName (required, e.g. variable.typeName)
-@param {string} documentName - The local name of the variable in which the source document is stored
+@param {string} accessor - The accessor to the primitive
 */
-function deserializeFromDocument(name, type, typeName, documentName) {
+function deserializeFromPrimitive(name, type, typeName, accessor) {
   if (supportedPrimitives.includes(typeName.unwrappedTypeName)) {
     if (typeName.isOptional) {
-      %> <%- typeName.unwrappedTypeName %>(source["<%-name%>"]) <%
+      %> <%- typeName.unwrappedTypeName %>(<%- accessor %>) <%
     } else {
-      %> try Meow.Helpers.requireValue(<%-typeName.name%>(source["<%-name%>"]), keyForError: "<%-name%>") <%
+      %> try Meow.Helpers.requireValue(<%-typeName.name%>(<%- accessor %>), keyForError: "<%-name%>") <%
     }
   } else if (type) {
     // Embed a custom type
     ensureSerializable(type);
 
     if (typeName.isOptional) {
-      %> try <%-typeName.unwrappedTypeName-%>(meowValue: source["<%-name%>"]) <%
+      %> try <%-typeName.unwrappedTypeName-%>(meowValue: <%- accessor %>) <%
     } else {
-      %> try Meow.Helpers.requireValue(<%-typeName.unwrappedTypeName-%>(meowValue: source["<%-name%>"]), keyForError: "<%-name%>") <%
+      %> try Meow.Helpers.requireValue(<%-typeName.unwrappedTypeName-%>(meowValue: <%- accessor %>), keyForError: "<%-name%>") <%
     }
   } else if (typeName.isArray) {
     let elementTypeNameString = ensureSerializableArray(typeName);
 
     if (typeName.isOptional) {
-      %> try meowReinstantiate<%- elementTypeNameString %>Array(from: source["<%-name%>"]) <%
+      %> try meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>) <%
     } else {
-      %> try Meow.Helpers.requireValue(meowReinstantiate<%- elementTypeNameString %>Array(from: source["<%-name%>"]), keyForError: "<%-name%>") <%
+      %> try Meow.Helpers.requireValue(meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>), keyForError: "<%-name%>") <%
     }
   }
 
@@ -194,7 +194,7 @@ while (serializables.length > generatedSerializables.length) {
     <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
     init(meowDocument source: Document) throws {-%>
       <% serializable.variables.forEach(variable => { %>
-        self.<%- variable.name %> =<% deserializeFromDocument(variable.name, variable.type, variable.typeName, "source");
+        self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
       }); %>
     }
     <% if (serializable.kind == "class") { %>// sourcery:end<% } %>

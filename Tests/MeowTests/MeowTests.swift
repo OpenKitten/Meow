@@ -128,11 +128,4 @@ struct Details {
     var lastName: String?
 
     init() {}
-    
-    // sourcery:inline:Details.Meow
-    init(meowDocument source: Document) throws {      
-        self.firstName = String(source["firstName"])  /* String? */ 
-        self.lastName = String(source["lastName"])  /* String? */ 
-    }
-    // sourcery:end
 }
