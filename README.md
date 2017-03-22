@@ -65,6 +65,16 @@ This class is a valid model, because:
 
 Sourcery and Meow will do the rest: with the definition shown above, you can now query and save users.
 
+A minimal (but not very useful) model looks like this:
+
+```swift
+class MyModel: Model {
+    init() {}
+    // sourcery:inline:MyModel.Meow
+    // sourcery:end
+}
+```
+
 ### Queries
 
 Queries use a syntax that will feel familiar if you ever used the `filter` syntax on a Swift array:
@@ -121,4 +131,12 @@ These "Virtual" types expose an API that is similar to the types provided by the
 <summary>`sourcery` commands for developing Meow</summary>
 
 We provide a few scripts to facilitate this: `WatchSampleMeow.sh`, `WatchSampleMeowVapor.sh`, `GenerateTests.sh`
+</details>
+
+<details>
+<summary>Linux support</summary>
+
+**Generated code is fully Linux-compatible.** However, because Sourcery does not support Linux at the moment, code generation is only possible on macOS.
+
+We recommend committing the generated code into your application repo. That way you can use the generated code on your Linux machine, as long as your development environment is on macOS.
 </details>
