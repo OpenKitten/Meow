@@ -2,6 +2,18 @@ import Foundation
 import Meow
 
 <%
+
+// Selects all classes and structs that are either based on a model or embeddable protocol
+let models = (types.based["Model"] || []);
+let embeddables = (types.based["Embeddable"] || []);
+
+// An array containing all serializable types
+// Additional types may be added below, in the template itself (supporting implicit serializables)
+let serializables = models.concat(embeddables);
+
+let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
+let numberTypes = ["Int", "Int32", "Double"];
+
 /**
 Generates code for deserializing a value from a document
 
@@ -27,9 +39,7 @@ function deserializeFromDocument(name, type, typeName, documentName) {
       %> try Meow.Helpers.requireValue(<%-typeName.unwrappedTypeName-%>(meowValue: source["<%-name%>"]), keyForError: "<%-name%>") <%
     }
   } else if (typeName.isArray) {
-    let elementTypeNameString = typeName.name.substring(1, typeName.name.length - (typeName.isOptional ? 2 : 1)); // workaround for sourcery bug
-    let elementType = types.all.find(t => t.name == elementTypeNameString);
-    ensureSerializable(elementType);
+    let elementTypeNameString = ensureSerializableArray(typeName);
 
     if (typeName.isOptional) {
       %> try meowReinstantiate<%- elementTypeNameString %>Array(from: source["<%-name%>"]) <%
@@ -56,12 +66,12 @@ function serializeToPrimitive(accessor, type, typeName) {
     ensureSerializable(type);
     %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.meowSerialize() <%
   } else if (typeName.isArray) {
-    let elementTypeNameString = typeName.name.substring(1, typeName.name.length - (typeName.isOptional ? 2 : 1)); // workaround for sourcery bug
-    let elementType = types.all.find(t => t.name == elementTypeNameString);
-    ensureSerializable(elementType);
-    // ensureSerializable(types.all[elementTypeNameString]);
-    %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.map { $0.meowSerialize() } <%
-    %> // parsed element string: <%- elementTypeNameString  %> <%
+    let elementTypeNameString = ensureSerializableArray(typeName);
+    if (supportedPrimitives.includes(elementTypeNameString)) {
+      %> <%- accessor %> <%
+    } else {
+      %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.map { $0.meowSerialize() } <%
+    }
   }
 }
 
@@ -76,35 +86,41 @@ function ensureSerializable(type) {
   serializables.push(type);
 }
 
-// Selects all classes and structs that are either based on a model or embeddable protocol
-let models = (types.based["Model"] || []);
-let embeddables = (types.based["Embeddable"] || []);
+/**
+Ensures the given array element is serializable. If it is not already, it will be added to the serialization code generation queue.
+If the type was not found, an error is generated.
 
-// An array containing all serializable types
-// Additional types may be added below, in the template itself (supporting implicit serializables)
-let serializables = models.concat(embeddables);
+@param {object} typeName - The type name of the array
+@returns {string} The parsed type name of the array
+*/
+function ensureSerializableArray(typeName) {
+  // Work around a bug in Sourcery (the element type is not given on arrays)
+  let elementTypeNameString = typeName.name.substring(1, typeName.name.length - (typeName.isOptional ? 2 : 1)); // workaround for sourcery bug
 
-let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
-let numberTypes = ["Int", "Int32", "Double"];
+  if (supportedPrimitives.includes(elementTypeNameString)) {
+    return elementTypeNameString;
+  }
+
+  let elementType = types.all.find(t => t.name == elementTypeNameString);
+
+  if (elementType == undefined) {
+    %> <#meow error: array type <%- elementTypeNameString %> was not found, is not a primitive and cannot be serialized#> <%
+    return elementTypeNameString;
+  }
+
+  ensureSerializable(elementType);
+  return elementTypeNameString;
+}
 
 supportedPrimitives.forEach(primitive => { %>
-
-  extension Array where Element == <%- primitive -%> {
-    init?(_ primitive: Primitive?) {
-      guard let doc = Document(primitive) else {
+  func meowReinstantiate<%- primitive %>Array(from source: Primitive?) throws -> [<%- primitive %>]? {
+      guard let document = Document(source) else {
         return nil
       }
 
-      let schrodingerSelf = try? doc.arrayValue.map { primitive in
-        return try Meow.Helpers.requireValue(<%- primitive -%>(primitive), keyForError: "")
+      return try document.map { index, rawValue -> <%- primitive %> in
+          return try Meow.Helpers.requireValue(<%- primitive %>(rawValue), keyForError: "index \(index) on array of <%- primitive %>")
       }
-
-      guard let me = schrodingerSelf else {
-        return nil
-      }
-
-      self = me
-    }
   }
 <% }) // end supportedPrimitives loop
 
@@ -173,6 +189,7 @@ while (serializables.length > generatedSerializables.length) {
     }
     // sourcery:end
 
+
       <% if (serializable.kind == "class") { %>convenience<% } %> init?(meowValue: Primitive?) throws {
         guard let document = Document(meowValue) else {
           return nil
@@ -215,6 +232,7 @@ while (serializables.length > generatedSerializables.length) {
           self.keyPrefix = keyPrefix
         }
       }
+
     } // end struct or class extension of <%- serializable.name %>
 <%
     if (serializable.based["Model"]) { %>
