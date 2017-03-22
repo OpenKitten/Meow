@@ -138,24 +138,25 @@ while (serializables.length > generatedSerializables.length) {
   generatedSerializables.push(serializable);
 
   if (serializable.kind == "enum") {
-    if (!serializable.rawTypeName) { %>
-        <#enum <%- serializable.name %> has no raw type#>
-        <#To fix this error, add a BSON primitive type (such as String) as raw type to your enum#>
-      <%
-      continue;
-    } else if (!supportedPrimitives.includes(serializable.rawTypeName.name)) { %>
-      <#enum <%- serializable.name %> has an unsupported raw type#>
-      <#To fix this error, add a BSON primitive type (such as String) as raw type to your enum#>
-    <%
-      continue;
-    } %>
-
+    %>
     // Enum extension
     extension <%- serializable.name %> : ConcreteSingleValueSerializable {
       /// Creates a `<%- serializable.name %>` from a BSON Primtive
       init(meowValue: Primitive?) throws {
-        let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(meowValue), keyForError: "enum <%- serializable.name %>")
-        self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
+        <% if (serializable.typeName) { %>
+          let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(meowValue), keyForError: "enum <%- serializable.name %>")
+          self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
+        <% } else if (!serializable.hasAssociatedValues) { %>
+          let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum <%- serializable.name %>")
+          switch rawValue {
+            <% serializable.cases.forEach(enumCase => {
+              %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
+            <%})%>
+            default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+          }
+        <% } else { %>
+          <# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
+        <% } %>
       }
 
       func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
@@ -163,7 +164,15 @@ while (serializables.length > generatedSerializables.length) {
       }
 
       func meowSerialize() -> Primitive {
-        return self.rawValue
+        <% if (serializable.typeName) { %>
+          return self.rawValue
+        <% } else { %>
+          switch self {
+            <% serializable.cases.forEach(enumCase => {
+              %> case .<%- enumCase.name %>: return "<%- enumCase.name %>"
+            <%})%>
+          }
+        <% } %>
       }
 
       struct VirtualInstance {

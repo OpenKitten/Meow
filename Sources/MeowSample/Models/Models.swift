@@ -27,7 +27,7 @@ final class User: Model {
     // sourcery:end
 }
 
-enum Gender: String {
+enum Gender {
     case male, female, undecided
 }
 

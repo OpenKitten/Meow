@@ -89,15 +89,15 @@ More information on how this works is specified below.
 Meow currently supports variables of the following kind:
 
 - Variables of one of the BSON types: `String`, `Int`, `Int32`, `Bool`, `Document`, `Double`, `ObjectId`, `Data`, `Binary`, `Date`, and `RegularExpression`
-- `enum`s that are defined in the same module as the model, with a raw type defined above that have no associated values. For example, the following enum can be used out of the box:
+- `enum`s that have no associated values. For example, the following enum can be used out of the box:
 
 	```swift
-	enum Gender : String {
+	enum Gender {
 		case male, female
 	}
 	```
 	
-	We are working on removing these limitations, so enums without a raw value and enums with associated values are also supported.
+	Support for associated values is on our todo list. If an enum has a underlying type, that type currently has to be supported by BSON.
 	
 - Structs defined in the same module as the model. As long as all their variables are of a kind supported by Meow (including other structs) they should work out of the box.
 - Classes defined in the same module as the model. The same rules apply here as with structs. However, due to a limitation in the Swift language (designated initializers have to be defined within the class definition), these classes also need the `sourcery:inline` markers.

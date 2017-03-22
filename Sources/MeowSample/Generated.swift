@@ -229,13 +229,20 @@ import Meow
       }
   }
 
-
     // Enum extension
     extension Gender : ConcreteSingleValueSerializable {
       /// Creates a `Gender` from a BSON Primtive
       init(meowValue: Primitive?) throws {
-        let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Gender")
-        self = try Meow.Helpers.requireValue(Gender(rawValue: rawValue), keyForError: "enum Gender")
+        
+          let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Gender")
+          switch rawValue {
+             case "male": self = .male
+             case "female": self = .female
+             case "undecided": self = .undecided
+            
+            default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
+          }
+        
       }
 
       func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
@@ -243,7 +250,14 @@ import Meow
       }
 
       func meowSerialize() -> Primitive {
-        return self.rawValue
+        
+          switch self {
+             case .male: return "male"
+             case .female: return "female"
+             case .undecided: return "undecided"
+            
+          }
+        
       }
 
       struct VirtualInstance {

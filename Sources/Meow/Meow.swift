@@ -40,5 +40,6 @@ public enum Meow {
         case missingOrInvalidValue(key: String)
         case referenceError(id: ObjectId, type: Model.Type)
         case undeletableObject(reason: String)
+        case enumCaseNotFound(enum: String, name: String)
     }
 }
