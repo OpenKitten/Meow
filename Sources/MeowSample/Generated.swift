@@ -130,7 +130,8 @@ import Meow
       // Struct or Class extension
       extension User : ConcreteSerializable {
       // sourcery:inline:User.Meow
-      // sourcery:end
+        // sourcery:end
+      
 
 
         convenience init?(meowValue: Primitive?) throws {
@@ -142,8 +143,8 @@ import Meow
 
         func meowSerialize() -> Document {
           var document = Document()
+            document["_id"] = self._id
           
-            document["_id"] = self._id 
             document["email"] = self.email 
             document["name"] = self.name 
             document["genders"] = self.genders.map { $0.meowSerialize() } 
@@ -161,8 +162,6 @@ import Meow
           var keyPrefix: String
 
           
-             /// _id: ObjectId
-              var _id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "_id") } 
              /// email: String
               var email: VirtualString { return VirtualString(name: keyPrefix + "email") } 
              /// name: String
@@ -179,8 +178,8 @@ import Meow
           }
         } // end VirtualInstance
 
-        enum Key : String {          
-            case _id          
+        enum Key : String {            case _id
+          
             case email          
             case name          
             case genders          
@@ -287,7 +286,9 @@ import Meow
       // Struct or Class extension
       extension Address : ConcreteSerializable {
       
-      init(meowDocument source: Document) throws {        
+      init(meowDocument source: Document) throws {
+          
+        
           self.streetName = try Meow.Helpers.requireValue(String(source["streetName"]), keyForError: "streetName")  /* String */ 
       }
       
@@ -302,6 +303,7 @@ import Meow
 
         func meowSerialize() -> Document {
           var document = Document()
+            
           
             document["streetName"] = self.streetName 
           return document
@@ -324,7 +326,8 @@ import Meow
           }
         } // end VirtualInstance
 
-        enum Key : String {          
+        enum Key : String {            case _id
+          
             case streetName          
 
 

@@ -130,7 +130,8 @@ import Meow
       // Struct or Class extension
       extension User : ConcreteSerializable {
       // sourcery:inline:User.Meow
-      // sourcery:end
+        // sourcery:end
+      
 
 
         convenience init?(meowValue: Primitive?) throws {
@@ -142,8 +143,8 @@ import Meow
 
         func meowSerialize() -> Document {
           var document = Document()
+            document["_id"] = self._id
           
-            document["_id"] = self._id 
             document["username"] = self.username 
             document["password"] = self.password 
             document["age"] = self.age 
@@ -164,8 +165,6 @@ import Meow
           var keyPrefix: String
 
           
-             /// _id: ObjectId
-              var _id: VirtualObjectId { return VirtualObjectId(name: keyPrefix + "_id") } 
              /// username: String
               var username: VirtualString { return VirtualString(name: keyPrefix + "username") } 
              /// password: String
@@ -188,8 +187,8 @@ import Meow
           }
         } // end VirtualInstance
 
-        enum Key : String {          
-            case _id          
+        enum Key : String {            case _id
+          
             case username          
             case password          
             case age          
@@ -297,7 +296,9 @@ import Meow
       // Struct or Class extension
       extension Details : ConcreteSerializable {
       
-      init(meowDocument source: Document) throws {        
+      init(meowDocument source: Document) throws {
+          
+        
           self.firstName = String(source["firstName"])  /* String? */ 
           self.lastName = String(source["lastName"])  /* String? */ 
           self.address = try meowDeserializeTupleOfstreetNameStringAndnumberIntAndcityStringAndhouseGenderGender(source["address"])  /* (streetName: String?, number: Int, city: String, houseGender: Gender)? */ 
@@ -314,6 +315,7 @@ import Meow
 
         func meowSerialize() -> Document {
           var document = Document()
+            
           
             document["firstName"] = self.firstName 
             document["lastName"] = self.lastName 
@@ -342,7 +344,8 @@ import Meow
           }
         } // end VirtualInstance
 
-        enum Key : String {          
+        enum Key : String {            case _id
+          
             case firstName          
             case lastName          
             case address          

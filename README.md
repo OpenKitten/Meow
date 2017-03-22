@@ -42,7 +42,6 @@ Start by defining models. Models are just normal Swift classes that look like th
 
 ```swift
 final class User: Model {
-    var _id = ObjectId()
     var email: String
     var name: String
     var gender: Gender
@@ -61,8 +60,8 @@ final class User: Model {
 
 This class is a valid model, because:
 
-- It conforms to the `Model` protocol by defining an `_id` variable
-- It marks a place four Sourcery to insert a generated initializer
+- It states conformance to the `Model` protocol
+- It marks a place four Sourcery to insert a generated initializer and `_id` variable
 
 Sourcery and Meow will do the rest: with the definition shown above, you can now query and save users.
 

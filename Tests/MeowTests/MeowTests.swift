@@ -87,8 +87,6 @@ class MeowTests: XCTestCase {
 
 
 final class User: Model {
-    var _id = ObjectId()
-    
     var username: String
     var password: String
     var age: Int?
@@ -106,8 +104,9 @@ final class User: Model {
     }
     
     // sourcery:inline:User.Meow
-      init(meowDocument source: Document) throws {        
-          self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")  /* ObjectId */ 
+      init(meowDocument source: Document) throws {
+          self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")
+        
           self.username = try Meow.Helpers.requireValue(String(source["username"]), keyForError: "username")  /* String */ 
           self.password = try Meow.Helpers.requireValue(String(source["password"]), keyForError: "password")  /* String */ 
           self.age = Int(source["age"])  /* Int? */ 
@@ -117,6 +116,8 @@ final class User: Model {
           self.extraPreferences = try meowReinstantiatePreferenceArray(from: source["extraPreferences"])  /* [Preference]? */ 
           self.unnamedTuple = try Meow.Helpers.requireValue(meowDeserializeTupleOf0StringAnd1StringAnd2Int(source["unnamedTuple"]), keyForError: "unnamedTuple")  /* (String,String,Int) */ 
       }
+      
+        var _id = ObjectId()
     //sourcery:end
 }
 

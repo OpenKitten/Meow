@@ -80,12 +80,6 @@
       "version": "1.0.6"
     },
     {
-      "package": "LogKitten",
-      "reason": null,
-      "repositoryURL": "https://github.com/OpenKitten/LogKitten.git",
-      "version": "0.3.0"
-    },
-    {
       "package": "MongoKitten",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",

@@ -247,12 +247,16 @@ function generateSerializables() {
       // Struct or Class extension
       extension <%- serializable.name %> : ConcreteSerializable {
       <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
-      init(meowDocument source: Document) throws {-%>
+      init(meowDocument source: Document) throws {
+          <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => { %>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
       }
-      <% if (serializable.kind == "class") { %>// sourcery:end<% } %>
+      <% if (serializable.kind == "class") { %>
+        <% if (serializable.based["Model"]) { %>var _id = ObjectId()<% } %>
+        // sourcery:end
+      <% } %>
 
 
         <% if (serializable.kind == "class") { %>convenience<% } %> init?(meowValue: Primitive?) throws {
@@ -264,6 +268,7 @@ function generateSerializables() {
 
         func meowSerialize() -> Document {
           var document = Document()
+            <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
           <% serializable.variables.forEach(variable => { %>
             document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
@@ -299,6 +304,7 @@ function generateSerializables() {
         } // end VirtualInstance
 
         enum Key : String {-%>
+            case _id
           <% serializable.variables.forEach(variable => {%>
             case <%- variable.name %>-%>
           <%})%>

@@ -2,11 +2,9 @@
 
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
 ///
-/// Only requires an identifier
-///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
 public protocol Model : Serializable {
-    /// The database identifier
+    /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you.
     var _id: ObjectId { get set }
 }
 
