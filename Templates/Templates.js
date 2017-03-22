@@ -113,6 +113,7 @@ function ensureSerializableArray(typeName) {
 }
 
 supportedPrimitives.forEach(primitive => { %>
+
   func meowReinstantiate<%- primitive %>Array(from source: Primitive?) throws -> [<%- primitive %>]? {
       guard let document = Document(source) else {
         return nil
@@ -181,13 +182,13 @@ while (serializables.length > generatedSerializables.length) {
   <% } else { %>
     // Struct or Class extension
     extension <%- serializable.name %> : ConcreteSerializable {
-    // sourcery:inline:<%- serializable.name %>.Meow
+    <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
     init(meowDocument source: Document) throws {-%>
       <% serializable.variables.forEach(variable => { %>
         self.<%- variable.name %> =<% deserializeFromDocument(variable.name, variable.type, variable.typeName, "source");
       }); %>
     }
-    // sourcery:end
+    <% if (serializable.kind == "class") { %>// sourcery:end<% } %>
 
 
       <% if (serializable.kind == "class") { %>convenience<% } %> init?(meowValue: Primitive?) throws {
@@ -231,6 +232,14 @@ while (serializables.length > generatedSerializables.length) {
         init(keyPrefix: String = "") {
           self.keyPrefix = keyPrefix
         }
+      } // end VirtualInstance
+
+      enum Key : String {-%>
+        <% serializable.variables.forEach(variable => {%>
+          case <%- variable.name %>-%>
+        <%})%>
+
+
       }
 
     } // end struct or class extension of <%- serializable.name %>

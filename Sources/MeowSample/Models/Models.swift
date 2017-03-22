@@ -3,10 +3,11 @@ import Foundation
 
 final class User: Model {
     var _id = ObjectId()
-    var email: String = ""
-    var name: String = ""
+    var email: String
+    var name: String
     var genders: [Gender]
     var favoriteNumbers: [Int] = []
+    var address: Address?
     
     init(email: String, name: String, gender: Gender) {
         self.email = email
@@ -21,10 +22,19 @@ final class User: Model {
         self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
         self.genders = try Meow.Helpers.requireValue(meowReinstantiateGenderArray(from: source["genders"]), keyForError: "genders")  /* [Gender] */ 
         self.favoriteNumbers = try Meow.Helpers.requireValue(meowReinstantiateIntArray(from: source["favoriteNumbers"]), keyForError: "favoriteNumbers")  /* [Int] */ 
+        self.address = try Address(meowValue: source["address"])  /* Address? */ 
     }
     // sourcery:end
 }
 
 enum Gender: String {
     case male, female, undecided
+}
+
+struct Address {
+    var streetName: String
+    
+    init(streetName: String) {
+        self.streetName = streetName
+    }
 }

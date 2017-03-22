@@ -6,6 +6,7 @@ import Foundation
 import Meow
 
 
+
   func meowReinstantiateObjectIdArray(from source: Primitive?) throws -> [ObjectId]? {
       guard let document = Document(source) else {
         return nil
@@ -15,6 +16,7 @@ import Meow
           return try Meow.Helpers.requireValue(ObjectId(rawValue), keyForError: "index \(index) on array of ObjectId")
       }
   }
+
 
   func meowReinstantiateStringArray(from source: Primitive?) throws -> [String]? {
       guard let document = Document(source) else {
@@ -26,6 +28,7 @@ import Meow
       }
   }
 
+
   func meowReinstantiateIntArray(from source: Primitive?) throws -> [Int]? {
       guard let document = Document(source) else {
         return nil
@@ -35,6 +38,7 @@ import Meow
           return try Meow.Helpers.requireValue(Int(rawValue), keyForError: "index \(index) on array of Int")
       }
   }
+
 
   func meowReinstantiateInt32Array(from source: Primitive?) throws -> [Int32]? {
       guard let document = Document(source) else {
@@ -46,6 +50,7 @@ import Meow
       }
   }
 
+
   func meowReinstantiateBoolArray(from source: Primitive?) throws -> [Bool]? {
       guard let document = Document(source) else {
         return nil
@@ -55,6 +60,7 @@ import Meow
           return try Meow.Helpers.requireValue(Bool(rawValue), keyForError: "index \(index) on array of Bool")
       }
   }
+
 
   func meowReinstantiateDocumentArray(from source: Primitive?) throws -> [Document]? {
       guard let document = Document(source) else {
@@ -66,6 +72,7 @@ import Meow
       }
   }
 
+
   func meowReinstantiateDoubleArray(from source: Primitive?) throws -> [Double]? {
       guard let document = Document(source) else {
         return nil
@@ -75,6 +82,7 @@ import Meow
           return try Meow.Helpers.requireValue(Double(rawValue), keyForError: "index \(index) on array of Double")
       }
   }
+
 
   func meowReinstantiateDataArray(from source: Primitive?) throws -> [Data]? {
       guard let document = Document(source) else {
@@ -86,6 +94,7 @@ import Meow
       }
   }
 
+
   func meowReinstantiateBinaryArray(from source: Primitive?) throws -> [Binary]? {
       guard let document = Document(source) else {
         return nil
@@ -96,6 +105,7 @@ import Meow
       }
   }
 
+
   func meowReinstantiateDateArray(from source: Primitive?) throws -> [Date]? {
       guard let document = Document(source) else {
         return nil
@@ -105,6 +115,7 @@ import Meow
           return try Meow.Helpers.requireValue(Date(rawValue), keyForError: "index \(index) on array of Date")
       }
   }
+
 
   func meowReinstantiateRegularExpressionArray(from source: Primitive?) throws -> [RegularExpression]? {
       guard let document = Document(source) else {
@@ -137,6 +148,7 @@ import Meow
           document["name"] = self.name 
           document["genders"] = self.genders.map { $0.meowSerialize() } 
           document["favoriteNumbers"] = self.favoriteNumbers 
+          document["address"] = self.address?.meowSerialize() 
         return document
       }
 
@@ -159,10 +171,23 @@ import Meow
            
            /// favoriteNumbers: [Int]
            
+           /// address: Address?
+           
 
         init(keyPrefix: String = "") {
           self.keyPrefix = keyPrefix
         }
+      } // end VirtualInstance
+
+      enum Key : String {        
+          case _id        
+          case email        
+          case name        
+          case genders        
+          case favoriteNumbers        
+          case address        
+
+
       }
 
     } // end struct or class extension of User
@@ -245,4 +270,62 @@ import Meow
       }
   }
 
-// Serializables parsed: User,Gender
+    // Struct or Class extension
+    extension Address : ConcreteSerializable {
+    
+    init(meowDocument source: Document) throws {      
+        self.streetName = try Meow.Helpers.requireValue(String(source["streetName"]), keyForError: "streetName")  /* String */ 
+    }
+    
+
+
+       init?(meowValue: Primitive?) throws {
+        guard let document = Document(meowValue) else {
+          return nil
+        }
+        try self.init(meowDocument: document)
+      }
+
+      func meowSerialize() -> Document {
+        var document = Document()
+        
+          document["streetName"] = self.streetName 
+        return document
+      }
+
+      func meowSerialize(resolvingReferences: Bool) throws -> Document {
+        // TODO: re-evaluate references
+          return self.meowSerialize()
+      }
+
+      struct VirtualInstance {
+        var keyPrefix: String
+
+        
+           /// streetName: String
+            var streetName: VirtualString { return VirtualString(name: keyPrefix + "streetName") } 
+
+        init(keyPrefix: String = "") {
+          self.keyPrefix = keyPrefix
+        }
+      } // end VirtualInstance
+
+      enum Key : String {        
+          case streetName        
+
+
+      }
+
+    } // end struct or class extension of Address
+
+  func meowReinstantiateAddressArray(from source: Primitive?) throws -> [Address]? {
+      guard let document = Document(source) else {
+        return nil
+      }
+
+      return try document.map { index, rawValue -> Address in
+          return try Meow.Helpers.requireValue(Address(meowValue: rawValue), keyForError: "index \(index) on array of Address")
+      }
+  }
+
+// Serializables parsed: User,Gender,Address
