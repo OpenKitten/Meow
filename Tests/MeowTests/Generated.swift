@@ -34,6 +34,10 @@ extension User : StringInitializable {
            return model.email == value
         }
     }
+    
+    func integrate(with droplet: Droplet) {
+    
+    }
 }
 
 

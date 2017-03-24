@@ -10,6 +10,7 @@ import Vapor
     }
 
     let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
+    let supportedReturnTypes = ["JSONObject", "JSONArray", "JSON", "Response", "ResponseRepresentable"];
     let models = (types.based["Model"] || []);
 
     let generatedModels = [];
@@ -47,6 +48,19 @@ extension <%- model.name %> : StringInitializable {
            return model.<%-variable.name%> == value
         }
     }<% }); %>
+    
+    func integrate(with droplet: Droplet) {
+    <% model.allMethods.forEach(method => {
+        let basicReturnType = supportedReturnTypes.includes(method.unwrappedReturnTypeName);
+
+        if(!basicReturnType || method.returnType.based.ResponseRepresentable) {
+            return;
+        }
+
+        // TODO: Call method appropriately
+            %>
+    <%});%>
+    }
 }
 <%
     }
