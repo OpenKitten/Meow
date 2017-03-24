@@ -19,7 +19,7 @@ public protocol VirtualVariable {
 
 public protocol VirtualComparable : VirtualVariable {}
 
-public func ==(lhs: VirtualVariable, rhs: Primitive) -> Query {
+public func ==(lhs: VirtualVariable, rhs: Primitive?) -> Query {
     return lhs.name == rhs
 }
 
