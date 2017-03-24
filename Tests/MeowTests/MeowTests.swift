@@ -9,11 +9,11 @@ class MeowTests: XCTestCase {
     }
     
     func testExample() throws {
-        let user0 = User(username: "piet", password: "123", age: 20, gender: .male)
-        let user1 = User(username: "henk", password: "321", age: 20, gender: .male)
-        let user2 = User(username: "klaas", password: "12345", age: 16, gender: .female)
-        let user3 = User(username: "harrie", password: "bob", age: 24, gender: .male)
-        let user4 = User(username: "bob", password: "harrie", age: 42, gender: .male)
+        let user0 = User(username: "piet", email: "piet@openkitten.org", password: "123", age: 20, gender: .male)
+        let user1 = User(username: "henk", email: "henk@openkitten.org", password: "321", age: 20, gender: .male)
+        let user2 = User(username: "klaas", email: "klaas@openkitten.org", password: "12345", age: 16, gender: .female)
+        let user3 = User(username: "harrie", email: "harrie@openkitten.org", password: "bob", age: 24, gender: .male)
+        let user4 = User(username: "bob", email: "bob@openkitten.org", password: "harrie", age: 42, gender: .male)
         
         user4.preferences = [.swift, .linux]
         user2.extraPreferences = [.swift, .mongodb, .macos]
@@ -87,7 +87,11 @@ class MeowTests: XCTestCase {
 
 
 final class User: Model {
+    // sourcery:begin: unique
     var username: String
+    var email: String
+    // sourcery:end
+    
     var password: String
     var age: Int?
     var gender: Gender?
@@ -96,8 +100,9 @@ final class User: Model {
     var extraPreferences: [Preference]?
     var unnamedTuple: (String,String,Int) = ("Example", "Other example", 4)
     
-    init(username: String, password: String, age: Int? = nil, gender: Gender? = nil) {
+    init(username: String, email: String, password: String, age: Int? = nil, gender: Gender? = nil) {
         self.username = username
+        self.email = email
         self.password = password
         self.age = age
         self.gender = gender
@@ -108,6 +113,7 @@ final class User: Model {
           self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")
         
           self.username = try Meow.Helpers.requireValue(String(source["username"]), keyForError: "username")  /* String */ 
+          self.email = try Meow.Helpers.requireValue(String(source["email"]), keyForError: "email")  /* String */ 
           self.password = try Meow.Helpers.requireValue(String(source["password"]), keyForError: "password")  /* String */ 
           self.age = Int(source["age"])  /* Int? */ 
           self.gender = try Gender(meowValue: source["gender"])  /* Gender? */ 

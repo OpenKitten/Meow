@@ -1,6 +1,3 @@
-import Foundation
-import Meow
-
 <%
 
 // Selects all classes and structs that are either based on a model or embeddable protocol

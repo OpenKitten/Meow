@@ -8,6 +8,6 @@ try! Meow.database.drop()
 let henk = User(email: "henk@example.com", name: "Henk", gender: .undecided)
 try! henk.save()
 
-let drop = Droplet()
+let drop = try Droplet()
 Meow.integrate(drop)
-drop.run()
+try drop.run()
