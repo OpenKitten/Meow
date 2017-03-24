@@ -100,6 +100,7 @@ final class User: Model {
     var extraPreferences: [Preference]?
     var unnamedTuple: (String,String,Int) = ("Example", "Other example", 4)
     
+    // sourcery: permissions = "anonymous"
     init(username: String, email: String, password: String, age: Int? = nil, gender: Gender? = nil) {
         self.username = username
         self.email = email
