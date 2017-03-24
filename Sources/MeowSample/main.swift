@@ -1,5 +1,4 @@
 import Meow
-import MeowVapor
 import Vapor
 
 try! Meow.init("mongodb://localhost:27017/meow-sample")
@@ -13,7 +12,3 @@ let otherHenk = try User.findOne { $0.email == "henk@example.com" }
 guard henk === otherHenk! else {
     fatalError()
 }
-
-let drop = try Droplet()
-Meow.integrate(with: drop)
-try drop.run()
