@@ -4,6 +4,35 @@
 
 import Foundation
 import Meow
+import MeowVapor
+import Vapor
+
+
+extension User : StringInitializable {
+    public convenience init?(from string: String) throws {
+        let objectId = try ObjectId(string)
+        
+        guard let selfDocument = try User.meowCollection.findOne("_id" == objectId) else {
+            return nil
+        }
+        
+        try self.init(meowDocument: selfDocument)
+    }
+    
+    fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
+        droplet.post("users") { request in
+            return "";
+        }
+        
+    }
+}
+
+extension Meow {
+    public static func integrate(with droplet: Droplet) {
+        User.integrate(with: droplet)
+    }
+}
+
 
 
 

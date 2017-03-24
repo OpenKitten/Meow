@@ -1,6 +1,18 @@
 import Meow
 import Foundation
 
+enum Gender {
+    case male, female, undecided
+}
+
+struct Address {
+    var streetName: String
+    
+    init(streetName: String) {
+        self.streetName = streetName
+    }
+}
+
 final class User: Model {
     var email: String
     var name: String
@@ -8,6 +20,7 @@ final class User: Model {
     var favoriteNumbers: [Int] = []
     var address: Address?
     
+    // sourcery: permissions = "anonymous"
     init(email: String, name: String, gender: Gender) {
         self.email = email
         self.name = name
@@ -27,16 +40,4 @@ final class User: Model {
       
         var _id = ObjectId()
     // sourcery:end
-}
-
-enum Gender {
-    case male, female, undecided
-}
-
-struct Address {
-    var streetName: String
-    
-    init(streetName: String) {
-        self.streetName = streetName
-    }
 }

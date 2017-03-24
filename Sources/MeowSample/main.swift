@@ -9,5 +9,5 @@ let henk = User(email: "henk@example.com", name: "Henk", gender: .undecided)
 try! henk.save()
 
 let drop = try Droplet()
-Meow.integrate(drop)
+Meow.integrate(with: drop)
 try drop.run()

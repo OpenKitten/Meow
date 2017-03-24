@@ -1,5 +1,6 @@
 import Meow
 import class Vapor.Droplet
 
-
-
+public struct Permissions {
+    
+}
