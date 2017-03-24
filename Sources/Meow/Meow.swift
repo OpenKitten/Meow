@@ -42,4 +42,36 @@ public enum Meow {
         case undeletableObject(reason: String)
         case enumCaseNotFound(enum: String, name: String)
     }
+    
+    public static var pool = ObjectPool()
+    
+    public class ObjectPool {
+        fileprivate init() {}
+        
+        private var storage = WeakDictionary<ObjectId, AnyObject>(minimumCapacity: 1000)
+        
+        /// TODO: Make this thread-safe
+        func instantiateIfNeeded<M : ConcreteModel>(type: ConcreteModel.Type, document: Document) throws -> M {
+            guard let id = ObjectId(document["_id"]) else {
+                throw Error.missingOrInvalidValue(key: "_id")
+            }
+            
+            if let existingInstance = storage[id] as? M {
+                return existingInstance
+            }
+            
+            let instance = try M(meowDocument: document)
+            storage[id] = instance
+            
+            return instance
+        }
+        
+        func pool(_ instance: ConcreteModel) {
+            if let current = storage[instance._id] {
+                assert(current === instance, "two model instances with the same _id is invalid")
+            }
+            
+            storage[instance._id] = instance
+        }
+    }
 }

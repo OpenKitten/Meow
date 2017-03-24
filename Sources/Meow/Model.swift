@@ -3,7 +3,7 @@
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
 ///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
-public protocol Model : Serializable {
+public protocol Model : class, Serializable {
     /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you.
     var _id: ObjectId { get set }
 }
@@ -19,6 +19,8 @@ public protocol ConcreteModel : Model, ConcreteSerializable, Primitive {
     
     /// All references to foreign objects
     var meowReferencesWithValue: ReferenceValues { get }
+    
+    init(meowDocument: Document) throws
 }
 
 /// Implementes basic CRUD functionality for the object
@@ -44,6 +46,8 @@ extension ConcreteModel {
     public func save() throws {
         let document = meowSerialize()
         
+        Meow.pool.pool(self)
+        
         try Self.meowCollection.update("_id" == self._id,
             to: document,
             upserting: true
@@ -54,7 +58,7 @@ extension ConcreteModel {
     public static func find(_ query: Query? = nil) throws -> CollectionSlice<Self> {
         return try meowCollection.find(query).flatMap { document in
             do {
-                return try Self.init(meowDocument: document)
+                return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
             } catch {
                 print("initializing from document failed: \(error)")
                 assertionFailure()
