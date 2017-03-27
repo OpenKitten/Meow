@@ -464,8 +464,8 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         var object: JSONObject = [
             "id": self._id.hexString
         ]
-        <%model.variables.forEach(variable => {
-            if(!variable.annotations["public"]) {
+        <%model.allVariables.forEach(variable => {
+            if(!variable.annotations["public"] || variable.isStatic) {
                 return;
             }
             %>
@@ -501,8 +501,11 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         }
     }<% }); %>
 
-    fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {<%
-
+    fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
+      drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self) { request, subject in
+        return subject
+      }
+<%
     let methods = [];
     let hasInitializer = false;
 
@@ -577,7 +580,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             }
 
             let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: otherValue)
-                  <% } else if(enumMapping) { -%>
+                  <%_ } else if(enumMapping) { -%>
             let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]))
 
             guard let otherValue = <%-enumMapping%>(<%-parameter.name%>JSON) else {
@@ -585,7 +588,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             }
 
             let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: otherValue)
-                  <%
+                  <%_
                   }
                 }
 
