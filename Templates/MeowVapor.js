@@ -33,7 +33,7 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
-let supportedReturnTypes = ["JSONObject", "JSONArray", "JSON", "Response", "ResponseRepresentable"];
+let supportedReturnTypes = ["JSONObject", "JSONArray", "String", "JSON", "Response", "ResponseRepresentable"];
 let bsonJsonMap = {
     "Int": "Int",
     "Int32": "Int",
@@ -103,52 +103,76 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     model.allMethods.forEach(method => {
         let basicReturnType = supportedReturnTypes.includes(method.unwrappedReturnTypeName);
         let permissions = method.annotations["permissions"];
+        let httpMethod;
+        let parametersText = undefined;
 
-        if((!basicReturnType && !method.returnType.based.ResponseRepresentable && !method.isInitializer) || !permissions) {
+        if((!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer) || !permissions) {
             return;
         }
 
+        httpMethod = method.annotations["method"];
+
+        if(httpMethod) {
+            httpMethod = httpMethod.toLowerCase();
+            if(!["get", "put", "post", "delete", "patch"].includes(httpMethod)) {
+                return;
+            }
+        }
+
         // Create/POST
-        if(method.isInitializer && !hasInitializer) {
+        if(method.isInitializer) {
+            if(hasInitializer) { return; }
+
             hasInitializer = true;
             let parametersText = undefined;
+            httpMethod = "post";
+        } else {
+            if(!httpMethod) { return; }
+        }
         %>
-        droplet.post("<%-plural(model.name.toLowerCase())%>") { request in<%
-            if(method.parameters.length > 0) {%>
+
+        <% if(method.isStatic || method.isInitializer) { %>
+        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
+        <% } else { %>
+        <%-method.returnType%>
+        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self, "<%-method.shortName%>") { request, subject in
+        <%}
+
+        if(method.parameters.length > 0) {%>
             guard let object = request.jsonObject else {
                 throw Abort(.badRequest, reason: "No JSON object provided")
             }
             <%
-                method.parameters.forEach(parameter => {
-                    let parameterText = parameter.name + ": " + parameter.name;
-                    let basicMapping = bsonJsonMap[parameter.unwrappedTypeName];
+            method.parameters.forEach(parameter => {
+                let parameterText = parameter.name + ": " + parameter.name;
+                let basicMapping = bsonJsonMap[parameter.unwrappedTypeName];
 
-                    if(basicMapping && basicMapping == parameter.unwrappedTypeName) {%>
+                if(basicMapping && basicMapping == parameter.unwrappedTypeName) {%>
             guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(object["<%-parameter.name%>"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
-                    <% } else if(basicMapping) {%>
+                <% } else if(basicMapping) {%>
             let <%-parameter.name%>JSON = <%-basicMapping%>(object["<%-parameter.name%>"]))
 
             guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(<%-parameter.name%>JSON as Primitive?) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
-                  <%} else if(parameter.type && serializables.includes(parameter.type) && parameter.type.kind == "enum") {
-                      let enumMapping;
+              <%} else if(parameter.type && serializables.includes(parameter.type) && parameter.type.kind == "enum") {
+                  let enumMapping;
 
-                      if(parameter.type.rawType) {
-                          enumMapping = bsonJsonMap[parameter.type.rawType.name];
-                      } else {
-                          enumMapping = "String";
-                      }
+                  if(parameter.type.rawType) {
+                      enumMapping = bsonJsonMap[parameter.type.rawType.name];
+                  } else {
+                      enumMapping = "String";
+                  }
 
-                      if(enumMapping == "String" || enumMapping == parameter.type.rawType.name) {%>
+                  if(enumMapping == "String" || enumMapping == parameter.type.rawType.name) {%>
             guard let otherValue = <%-enumMapping%>(object["<%-parameter.name%>"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
 
             let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: otherValue)
-                      <% } else if(enumMapping) { -%>
+                  <% } else if(enumMapping) { -%>
             let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]))
 
             guard let otherValue = <%-enumMapping%>(<%-parameter.name%>JSON) else {
@@ -156,38 +180,35 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             }
 
             let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: otherValue)
-                      <%
-                      }
-                    }
+                  <%
+                  }
+                }
 
-                    if(parametersText == undefined || parametersText == null) {
-                        parametersText = parameterText;
-                    } else {
-                        parametersText += ", " + parameterText;
-                    }
-                // Parse parameter keys and types and query the JSONObject for a key that can be converted to this type
-                });
+                if(parametersText == undefined || parametersText == null) {
+                    parametersText = parameterText;
+                } else {
+                    parametersText += ", " + parameterText;
+                }
+              // Parse parameter keys and types and query the JSONObject for a key that can be converted to this type
+              });
             }-%>
 
-            let <%-model.name.toLowerCase()%> = <%-model.name%>(<%-parametersText ? parametersText : ""%>)
+            <% if(method.isStatic || method.isInitializer) { %>
+            let subject = <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
+            <% if(method.isInitializer){ %>try subject.save() <% } -%>
 
-            try user.save()
-
-            return <%-model.name.toLowerCase()%>
-        }
-        <% } else if(method.isStatic) {
-            // Find/Factory Create (GET, POST)
-        } else {
-            // Update/Delete (PUT, PATCH, DELETE)
-            // Needs an instance
-        }
-
-        methods.push(method);
+            return subject
+            <% } else { -%>
+            return subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
+            <% } -%>
+          }
+        <%
+            methods.push(method);
     });
     %>
     }
 }
-<% } %>
+<% } -%>
 
 extension Meow {
     public static func integrate(with droplet: Droplet) {<%
@@ -227,4 +248,4 @@ public enum ExposedMethods : String {
     }
 %>
 }
-<%}%>
+<%}-%>

@@ -379,7 +379,10 @@ extension User : StringInitializable, ResponseRepresentable {
     }
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
+
+        
         droplet.post("users") { request in
+        
             guard let object = request.jsonObject else {
                 throw Abort(.badRequest, reason: "No JSON object provided")
             }
@@ -387,32 +390,37 @@ extension User : StringInitializable, ResponseRepresentable {
             guard let email = String(object["email"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"email\"")
             }
-                    
+                
             guard let name = String(object["name"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"name\"")
             }
-                    
+                
             guard let otherValue = String(object["gender"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"gender\"")
             }
 
             let gender = try Gender(meowValue: otherValue)
-                      
-            let user = User(email: email, name: name, gender: gender)
+                  
+            
+            let subject = User.init(email: email, name: name, gender: gender)
+            try subject.save() 
+            return subject
+                      }
+        
 
-            try user.save()
-
-            return user
-        }
+        
+        
+        droplet.get("users", User.self, "getName") { request, subject in
+        
+                        return subject.getName()
+                      }
         
     }
 }
-
 
 extension Meow {
     public static func integrate(with droplet: Droplet) {
         User.integrate(with: droplet)
     }
 }
-
 

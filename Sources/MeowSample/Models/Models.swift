@@ -30,6 +30,11 @@ final class User: Model {
         self.genders = [gender]
     }
     
+    // sourcery: permissions = "anonymous", method = "GET"
+    func getName() -> String {
+        return self.name
+    }
+    
     // sourcery:inline:User.Meow
       init(meowDocument source: Document) throws {
           self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")
