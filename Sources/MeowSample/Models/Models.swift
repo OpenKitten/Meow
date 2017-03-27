@@ -15,16 +15,19 @@ struct Address {
 
 final class User: Model {
     var email: String
+    
+    // sourcery: public
     var name: String
+    
     var genders: [Gender]
     var favoriteNumbers: [Int] = []
     var address: Address?
     
     // sourcery: permissions = "anonymous"
-    init(email: String, name: String, gender: Gender) {
+    init(email: String, name: String) {
         self.email = email
         self.name = name
-        self.genders = [gender]
+        self.genders = []
     }
     
     // sourcery:inline:User.Meow

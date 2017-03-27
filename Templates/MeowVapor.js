@@ -2,6 +2,8 @@ import Foundation
 import Meow
 import MeowVapor
 import Vapor
+import Cheetah
+import HTTP
 
 <%
     // helpers
@@ -53,7 +55,22 @@ import Vapor
         modelIndex++;
         generatedModels.push(model);
 %>
-extension <%- model.name %> : StringInitializable {
+extension <%- model.name %> : StringInitializable, ResponseRepresentable {
+    public func makeResponse() throws -> Response {
+        var object: JSONObject = [
+            "id": self._id.hexString
+        ]
+        <%model.variables.forEach(variable => {
+            if(!variable.annotations["public"]) {
+                return;
+            }
+            %>
+        object["<%-variable.name%>"] = self.<%-variable.name%>
+        <%});-%>
+
+        return try object.makeResponse()
+    }
+
     public convenience init?(from string: String) throws {
         let objectId = try ObjectId(string)
         
@@ -71,7 +88,7 @@ extension <%- model.name %> : StringInitializable {
         return;
     }
     %>
-    
+
     public static func by<%-capitalizeFirstLetter(variable.name)%>(_ string: String) throws -> <%-model.name%>? {
         let value = <%-primitive ? "" : "try" %> <%-variable.typeName.unwrappedTypeName%>(<%- primitive ? "" : "meowValue: " %>string as Primitive?)
         
@@ -112,13 +129,15 @@ extension <%- model.name %> : StringInitializable {
             guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(object["<%-parameter.name%>"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
-                    <% } else if (basicMapping) {%>
+                    <% } else if(basicMapping) {%>
             let <%-parameter.name%>JSON = <%-basicMapping%>(object["<%-parameter.name%>"]))
 
             guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(<%-parameter.name%>JSON as Primitive?) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
             <%
+                    } else if(parameter.type.based) {
+
                     }
 
                     if(parametersText == undefined || parametersText == null) {
@@ -134,7 +153,7 @@ extension <%- model.name %> : StringInitializable {
 
             try user.save()
 
-            return <%-model.name.toLowerCase()%>.makeResponse()
+            return <%-model.name.toLowerCase()%>
         }
         <% } else if(method.isStatic) {
             // Find/Factory Create (GET, POST)

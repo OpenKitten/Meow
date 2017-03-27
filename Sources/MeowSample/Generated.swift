@@ -6,9 +6,21 @@ import Foundation
 import Meow
 import MeowVapor
 import Vapor
+import Cheetah
+import HTTP
 
 
-extension User : StringInitializable {
+extension User : StringInitializable, ResponseRepresentable {
+    public func makeResponse() throws -> Response {
+        var object: JSONObject = [
+            "id": self._id.hexString
+        ]
+        
+        object["name"] = self.name
+        
+        return try object.makeResponse()
+    }
+
     public convenience init?(from string: String) throws {
         let objectId = try ObjectId(string)
         
@@ -33,11 +45,11 @@ extension User : StringInitializable {
                 throw Abort(.badRequest, reason: "Invalid key \"name\"")
             }
                     
-            let user = User(email: email, name: name, gender: gender)
+            let user = User(email: email, name: name)
 
             try user.save()
 
-            return user.makeResponse()
+            return user
         }
         
     }
