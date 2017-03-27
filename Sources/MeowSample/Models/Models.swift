@@ -24,10 +24,10 @@ final class User: Model {
     var address: Address?
     
     // sourcery: permissions = "anonymous"
-    init(email: String, name: String) {
+    init(email: String, name: String, gender: Gender) {
         self.email = email
         self.name = name
-        self.genders = []
+        self.genders = [gender]
     }
     
     // sourcery:inline:User.Meow

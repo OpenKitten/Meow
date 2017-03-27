@@ -4,66 +4,6 @@
 
 import Foundation
 import Meow
-import MeowVapor
-import Vapor
-import Cheetah
-import HTTP
-
-
-extension User : StringInitializable, ResponseRepresentable {
-    public func makeResponse() throws -> Response {
-        var object: JSONObject = [
-            "id": self._id.hexString
-        ]
-        
-        object["name"] = self.name
-        
-        return try object.makeResponse()
-    }
-
-    public convenience init?(from string: String) throws {
-        let objectId = try ObjectId(string)
-        
-        guard let selfDocument = try User.meowCollection.findOne("_id" == objectId) else {
-            return nil
-        }
-        
-        try self.init(meowDocument: selfDocument)
-    }
-    
-    fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-        droplet.post("users") { request in
-            guard let object = request.jsonObject else {
-                throw Abort(.badRequest, reason: "No JSON object provided")
-            }
-            
-            guard let email = String(object["email"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"email\"")
-            }
-                    
-            guard let name = String(object["name"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"name\"")
-            }
-                    
-            let user = User(email: email, name: name)
-
-            try user.save()
-
-            return user
-        }
-        
-    }
-}
-
-extension Meow {
-    public static func integrate(with droplet: Droplet) {
-        User.integrate(with: droplet)
-    }
-}
-
-
-import Foundation
-import Meow
 
 
 
@@ -409,3 +349,70 @@ import Meow
   
 // Serializables parsed: User,Gender,Address
 // Tuples parsed: 
+import Foundation
+import Meow
+import MeowVapor
+import Vapor
+import Cheetah
+import HTTP
+
+
+extension User : StringInitializable, ResponseRepresentable {
+    public func makeResponse() throws -> Response {
+        var object: JSONObject = [
+            "id": self._id.hexString
+        ]
+        
+        object["name"] = self.name
+        
+        return try object.makeResponse()
+    }
+
+    public convenience init?(from string: String) throws {
+        let objectId = try ObjectId(string)
+
+        guard let selfDocument = try User.meowCollection.findOne("_id" == objectId) else {
+            return nil
+        }
+
+        try self.init(meowDocument: selfDocument)
+    }
+
+    fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
+        droplet.post("users") { request in
+            guard let object = request.jsonObject else {
+                throw Abort(.badRequest, reason: "No JSON object provided")
+            }
+            
+            guard let email = String(object["email"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"email\"")
+            }
+                    
+            guard let name = String(object["name"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"name\"")
+            }
+                    
+            guard let otherValue = String(object["gender"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"gender\"")
+            }
+
+            let gender = try Gender(meowValue: otherValue)
+                      
+            let user = User(email: email, name: name, gender: gender)
+
+            try user.save()
+
+            return user
+        }
+        
+    }
+}
+
+
+extension Meow {
+    public static func integrate(with droplet: Droplet) {
+        User.integrate(with: droplet)
+    }
+}
+
+
