@@ -1,5 +1,8 @@
-<%
+import Foundation
+import Meow
+import Vapor
 
+<%
 // Selects all classes and structs that are either based on a model or embeddable protocol
 let models = (types.based["Model"] || []);
 let embeddables = (types.based["Embeddable"] || []);

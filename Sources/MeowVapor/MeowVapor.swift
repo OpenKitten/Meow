@@ -1,6 +1,12 @@
-import Meow
-import class Vapor.Droplet
+import HTTP
+import Cheetah
 
-public struct Permissions {
-    
+extension Request {
+    public var jsonObject: JSONObject? {
+        guard let bytes = self.body.bytes else {
+            return nil
+        }
+        
+        return try? JSONObject(from: bytes)
+    }
 }

@@ -30,8 +30,18 @@ import Vapor
         }
     }
 
+    let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
     let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
     let supportedReturnTypes = ["JSONObject", "JSONArray", "JSON", "Response", "ResponseRepresentable"];
+    let bsonJsonMap = {
+        "Int": "Int",
+        "Int32": "Int",
+        "Bool": "Bool",
+        "Double": "Double",
+        "String": "String",
+        "ObjectId": "String",
+        "RegularExpression": "String"
+    };
     let models = (types.based["Model"] || []);
     let exposedMethods = {};
 
@@ -42,7 +52,6 @@ import Vapor
         let model = models[modelIndex];
         modelIndex++;
         generatedModels.push(model);
-        
 %>
 extension <%- model.name %> : StringInitializable {
     public convenience init?(from string: String) throws {
@@ -74,6 +83,8 @@ extension <%- model.name %> : StringInitializable {
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {<%
 
     let methods = [];
+    let hasInitializer = false;
+
     model.allMethods.forEach(method => {
         let basicReturnType = supportedReturnTypes.includes(method.unwrappedReturnTypeName);
         let permissions = method.annotations["permissions"];
@@ -83,9 +94,47 @@ extension <%- model.name %> : StringInitializable {
         }
 
         // Create/POST
-        if(method.isInitializer) {%>
-        droplet.post("<%-plural(model.name.toLowerCase())%>") { request in
-            return "";
+        if(method.isInitializer && !hasInitializer) {
+            hasInitializer = true;
+            let parametersText = undefined;
+        %>
+        droplet.post("<%-plural(model.name.toLowerCase())%>") { request in<%
+            if(method.parameters.length > 0) {%>
+            guard let object = request.jsonObject else {
+                throw Abort(.badRequest, reason: "No JSON object provided")
+            }
+            <%
+                method.parameters.forEach(parameter => {
+                    let parameterText = parameter.name + ": " + parameter.name;
+                    let basicMapping = bsonJsonMap[parameter.unwrappedTypeName];
+
+                    if(basicMapping && basicMapping == parameter.unwrappedTypeName) {%>
+            guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(object["<%-parameter.name%>"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+            }
+                    <% } else if (basicMapping) {%>
+            let <%-parameter.name%>JSON = <%-basicMapping%>(object["<%-parameter.name%>"]))
+
+            guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(<%-parameter.name%>JSON as Primitive?) else {
+                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+            }
+            <%
+                    }
+
+                    if(parametersText == undefined || parametersText == null) {
+                        parametersText = parameterText;
+                    } else {
+                        parametersText += ", " + parameterText;
+                    }
+                // Parse parameter keys and types and query the JSONObject for a key that can be converted to this type
+                });
+            }-%>
+
+            let <%-model.name.toLowerCase()%> = <%-model.name%>(<%-parametersText%>)
+
+            try user.save()
+
+            return <%-model.name.toLowerCase()%>.makeResponse()
         }
         <% } else if(method.isStatic) {
             // Find/Factory Create (GET, POST)

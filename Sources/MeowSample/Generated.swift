@@ -21,7 +21,23 @@ extension User : StringInitializable {
     
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
         droplet.post("users") { request in
-            return "";
+            guard let object = request.jsonObject else {
+                throw Abort(.badRequest, reason: "No JSON object provided")
+            }
+            
+            guard let email = String(object["email"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"email\"")
+            }
+                    
+            guard let name = String(object["name"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"name\"")
+            }
+                    
+            let user = User(email: email, name: name, gender: gender)
+
+            try user.save()
+
+            return user.makeResponse()
         }
         
     }
@@ -33,6 +49,10 @@ extension Meow {
     }
 }
 
+
+import Foundation
+import Meow
+import Vapor
 
 
 

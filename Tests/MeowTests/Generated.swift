@@ -2,44 +2,9 @@
 // DO NOT EDIT
 
 
+undefined
 import Foundation
 import Meow
-import MeowVapor
-import Vapor
-
-
-extension User : StringInitializable {
-    public convenience init?(from string: String) throws {
-        let objectId = try ObjectId(string)
-        
-        guard let selfDocument = try User.meowCollection.findOne("_id" == objectId) else {
-            return nil
-        }
-        
-        try self.init(meowDocument: selfDocument)
-    }
-    
-    public static func byUsername(_ string: String) throws -> User? {
-        let value =  String(string as Primitive?)
-        
-        return try User.findOne { model in
-           return model.username == value
-        }
-    }
-    
-    public static func byEmail(_ string: String) throws -> User? {
-        let value =  String(string as Primitive?)
-        
-        return try User.findOne { model in
-           return model.email == value
-        }
-    }
-    
-    func integrate(with droplet: Droplet) {
-    
-    }
-}
-
 
 
 
