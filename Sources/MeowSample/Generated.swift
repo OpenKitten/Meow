@@ -383,6 +383,12 @@ extension User : StringInitializable, ResponseRepresentable {
         return subject
       }
 
+      drop.delete("users", User.self) { request, subject in
+        try subject.delete()
+
+        return subject
+      }
+
         droplet.post("users") { request in
             guard let object = request.jsonObject else {
                 throw Abort(.badRequest, reason: "No JSON object provided")

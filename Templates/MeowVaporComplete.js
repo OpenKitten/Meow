@@ -505,6 +505,12 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
       drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self) { request, subject in
         return subject
       }
+
+      drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self) { request, subject in
+        try subject.delete()
+
+        return subject
+      }
 <%
     let methods = [];
     let hasInitializer = false;
