@@ -129,16 +129,15 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         } else {
             if(!httpMethod) { return; }
         }
-        %>
-
-        <% if(method.isStatic || method.isInitializer) { %>
+        -%>
+        <%_ if(method.isStatic || method.isInitializer) { %>
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
-        <% } else { %>
+        <%_} else { %>
         <%-method.returnType%>
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self, "<%-method.shortName%>") { request, subject in
-        <%}
+        <%_}
 
-        if(method.parameters.length > 0) {%>
+        if(method.parameters.length > 0) {-%>
             guard let object = request.jsonObject else {
                 throw Abort(.badRequest, reason: "No JSON object provided")
             }
@@ -191,18 +190,16 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
                 }
               // Parse parameter keys and types and query the JSONObject for a key that can be converted to this type
               });
-            }-%>
-
-            <% if(method.isStatic || method.isInitializer) { %>
+            }
+            if(method.isStatic || method.isInitializer) { _%>
             let subject = <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
-            <% if(method.isInitializer){ %>try subject.save() <% } -%>
+            <% if(method.isInitializer){ %>try subject.save() <%_ } _%>
 
             return subject
-            <% } else { -%>
+            <%_ } else { -%>
             return subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
-            <% } -%>
-          }
-        <%
+            <%_ } -%>
+        }<%
             methods.push(method);
     });
     %>

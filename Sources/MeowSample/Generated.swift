@@ -379,10 +379,7 @@ extension User : StringInitializable, ResponseRepresentable {
     }
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-
-        
         droplet.post("users") { request in
-        
             guard let object = request.jsonObject else {
                 throw Abort(.badRequest, reason: "No JSON object provided")
             }
@@ -400,21 +397,14 @@ extension User : StringInitializable, ResponseRepresentable {
             }
 
             let gender = try Gender(meowValue: otherValue)
-                  
-            
-            let subject = User.init(email: email, name: name, gender: gender)
-            try subject.save() 
+                              let subject = User.init(email: email, name: name, gender: gender)
+            try subject.save()
             return subject
-                      }
-        
-
-        
+        }
         
         droplet.get("users", User.self, "getName") { request, subject in
-        
-                        return subject.getName()
-                      }
-        
+            return subject.getName()
+        }
     }
 }
 
