@@ -52,7 +52,6 @@ extension Meow {
 
 import Foundation
 import Meow
-import Vapor
 
 
 
@@ -339,6 +338,8 @@ import Vapor
           
         
           self.streetName = try Meow.Helpers.requireValue(String(source["streetName"]), keyForError: "streetName")  /* String */ 
+
+        
       }
       
 

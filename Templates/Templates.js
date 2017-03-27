@@ -1,6 +1,5 @@
 import Foundation
 import Meow
-import Vapor
 
 <%
 // Selects all classes and structs that are either based on a model or embeddable protocol
@@ -252,6 +251,8 @@ function generateSerializables() {
         <% serializable.variables.forEach(variable => { %>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
+
+        <% if (serializable.based["Model"]) { %>Meow.pool.pool(self)<% } %>
       }
       <% if (serializable.kind == "class") { %>
         <% if (serializable.based["Model"]) { %>var _id = ObjectId()<% } %>

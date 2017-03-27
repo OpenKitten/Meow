@@ -36,6 +36,8 @@ final class User: Model {
           self.genders = try Meow.Helpers.requireValue(meowReinstantiateGenderArray(from: source["genders"]), keyForError: "genders")  /* [Gender] */ 
           self.favoriteNumbers = try Meow.Helpers.requireValue(meowReinstantiateIntArray(from: source["favoriteNumbers"]), keyForError: "favoriteNumbers")  /* [Int] */ 
           self.address = try Address(meowValue: source["address"])  /* Address? */ 
+
+        Meow.pool.pool(self)
       }
       
         var _id = ObjectId()
