@@ -359,13 +359,17 @@ import HTTP
 
 extension User : StringInitializable, ResponseRepresentable {
     public func makeResponse() throws -> Response {
+        return try makeJSONObject().makeResponse()
+    }
+
+    public func makeJSONObject() -> JSONObject {
         var object: JSONObject = [
             "id": self._id.hexString
         ]
         
         object["name"] = self.name
         
-        return try object.makeResponse()
+        return object
     }
 
     public convenience init?(from string: String) throws {
@@ -409,7 +413,11 @@ extension User : StringInitializable, ResponseRepresentable {
             let gender = try Gender(meowValue: otherValue)
             let subject = User.init(email: email, name: name, gender: gender)
             try subject.save()
-            return subject
+            let jsonResponse = subject.makeJSONObject()
+
+            return Response(status: .created, headers: [
+                "Content-Type": "application/json; charset=utf-8"
+            ], body: Body(jsonResponse.serialize()))
         }
         
         droplet.get("users", User.self, "getName") { request, subject in

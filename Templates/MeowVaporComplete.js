@@ -461,6 +461,10 @@ while(models.length > generatedModels.length) {
 %>
 extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     public func makeResponse() throws -> Response {
+        return try makeJSONObject().makeResponse()
+    }
+
+    public func makeJSONObject() -> JSONObject {
         var object: JSONObject = [
             "id": self._id.hexString
         ]
@@ -472,7 +476,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         object["<%-variable.name%>"] = self.<%-variable.name%>
         <%});-%>
 
-        return try object.makeResponse()
+        return object
     }
 
     public convenience init?(from string: String) throws {
@@ -608,9 +612,13 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             }
             if(method.isStatic || method.isInitializer) { _%>
             let subject = <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
-            <% if(method.isInitializer){ %>try subject.save() <%_ } _%>
+            <% if(method.isInitializer){ %>try subject.save()
+            let jsonResponse = subject.makeJSONObject()
 
-            return subject
+            return Response(status: .created, headers: [
+                "Content-Type": "application/json; charset=utf-8"
+            ], body: Body(jsonResponse.serialize()))<%_ } else { _%>
+            return subject<% } %>
             <%_ } else { -%>
             return subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
             <%_ } -%>
