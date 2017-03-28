@@ -506,11 +506,11 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     }<% }); %>
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-      drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self) { request, subject in
+      drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
         return subject
       }
 
-      drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self) { request, subject in
+      drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
         try subject.delete()
 
         return subject
@@ -553,7 +553,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
         <%_} else { %>
         <%-method.returnType%>
-        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.self, "<%-method.shortName%>") { request, subject in
+        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-method.shortName%>") { request, subject in
         <%_}
 
         if(method.parameters.length > 0) {-%>

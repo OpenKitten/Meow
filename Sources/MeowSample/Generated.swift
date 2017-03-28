@@ -382,12 +382,20 @@ extension User : StringInitializable, ResponseRepresentable {
         try self.init(meowDocument: selfDocument)
     }
 
+    public static func byName(_ string: String) throws -> User? {
+        let value =  String(string as Primitive?)
+
+        return try User.findOne { model in
+           return model.name == value
+        }
+    }
+
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-      drop.get("users", User.self) { request, subject in
+      drop.get("users", User.init) { request, subject in
         return subject
       }
 
-      drop.delete("users", User.self) { request, subject in
+      drop.delete("users", User.init) { request, subject in
         try subject.delete()
 
         return subject
@@ -420,7 +428,7 @@ extension User : StringInitializable, ResponseRepresentable {
             ], body: Body(jsonResponse.serialize()))
         }
         
-        droplet.get("users", User.self, "getName") { request, subject in
+        droplet.get("users", User.init, "getName") { request, subject in
             return subject.getName()
         }
     }

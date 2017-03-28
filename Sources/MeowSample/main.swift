@@ -7,6 +7,6 @@ try Meow.database.drop()
 let drop = try Droplet()
 Meow.integrate(with: drop)
 
-drop.get("users/by-username", User.user)
+drop.get("users/by-username", User.byName)
 
 try drop.run()

@@ -16,7 +16,7 @@ struct Address {
 final class User: Model {
     var email: String
     
-    // sourcery: public
+    // sourcery: public, unique
     var name: String
     
     var genders: [Gender]
