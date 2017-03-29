@@ -439,6 +439,11 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
+
+// TODO: Return (other) models and embeddables
+// TODO: Return many models/embeddables
+// TODO: Return tuples
+// TODO: Return file
 let supportedReturnTypes = ["JSONObject", "JSONArray", "String", "JSON", "Response", "ResponseRepresentable"];
 let bsonJsonMap = {
     "Int": "Int",

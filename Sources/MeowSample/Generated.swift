@@ -150,6 +150,7 @@ import Meow
             document["genders"] = self.genders.map { $0.meowSerialize() } 
             document["favoriteNumbers"] = self.favoriteNumbers 
             document["address"] = self.address?.meowSerialize() 
+            document["admin"] = self.admin 
           return document
         }
 
@@ -172,6 +173,8 @@ import Meow
              
              /// address: Address?
              
+             /// admin: Bool
+              var admin: VirtualBool { return VirtualBool(name: keyPrefix + "admin") } 
 
           init(keyPrefix: String = "") {
             self.keyPrefix = keyPrefix
@@ -185,6 +188,7 @@ import Meow
             case genders          
             case favoriteNumbers          
             case address          
+            case admin          
 
 
         }

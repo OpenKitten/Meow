@@ -1,5 +1,8 @@
 import HTTP
 import Cheetah
+import Meow
+import Vapor
+import Sessions
 
 extension Request {
     public var jsonObject: JSONObject? {
@@ -24,5 +27,16 @@ extension JSONArray : ResponseRepresentable {
         return Response(status: .ok, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], body: Body(self.serialize()))
+    }
+}
+
+extension Meow {
+    public static func integrateAuthentication(with droplet: Droplet, sessions: SessionsProtocol = MongoSessions(in: Meow.database["_sessions"])) {
+        droplet.middleware = [
+            SessionsMiddleware(sessions),
+            ContextAwarenessMiddleware(),
+            DateMiddleware(),
+            FileMiddleware(publicDir: droplet.workDir + "Public/"),
+        ]
     }
 }

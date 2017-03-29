@@ -1,4 +1,5 @@
 import Meow
+import MeowVapor
 import Foundation
 
 enum Gender {
@@ -13,15 +14,19 @@ struct Address {
     }
 }
 
-final class User: Model {
+final class User: Model, Account {
     var email: String
     
     // sourcery: public, unique
     var name: String
     
     var genders: [Gender]
+    
     var favoriteNumbers: [Int] = []
+    
     var address: Address?
+    
+    var admin: Bool = false
     
     // sourcery: permissions = "anonymous"
     init(email: String, name: String, gender: Gender) {
@@ -44,6 +49,7 @@ final class User: Model {
           self.genders = try Meow.Helpers.requireValue(meowReinstantiateGenderArray(from: source["genders"]), keyForError: "genders")  /* [Gender] */ 
           self.favoriteNumbers = try Meow.Helpers.requireValue(meowReinstantiateIntArray(from: source["favoriteNumbers"]), keyForError: "favoriteNumbers")  /* [Int] */ 
           self.address = try Address(meowValue: source["address"])  /* Address? */ 
+          self.admin = try Meow.Helpers.requireValue(Bool(source["admin"]), keyForError: "admin")  /* Bool */ 
 
         Meow.pool.pool(self)
       }
