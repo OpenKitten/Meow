@@ -14,7 +14,7 @@ struct Address {
     }
 }
 
-final class User: Model, Account {
+final class User: Model {
     var email: String
     
     // sourcery: public, unique
@@ -28,7 +28,6 @@ final class User: Model, Account {
     
     var admin: Bool = false
     
-    // sourcery: permissions = "anonymous"
     init(email: String, name: String, gender: Gender) {
         self.email = email
         self.name = name

@@ -11,14 +11,6 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-Object.size = function(obj) {
-    var size = 0, key;
-    for (key in obj) {
-        if (obj.hasOwnProperty(key)) size++;
-    }
-    return size;
-};
-
 function plural(name) {
     let lastLetter = name.slice(-1);
     name = name.substring(0, name.length - 1);
@@ -48,8 +40,7 @@ let bsonJsonMap = {
     "ObjectId": "String",
     "RegularExpression": "String"
 };
-let exposedMethods = {};
-
+let exposedMethods = [];
 let generatedModels = [];
 let modelIndex = 0;
 
@@ -120,11 +111,10 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
 
     model.allMethods.forEach(method => {
         let basicReturnType = supportedReturnTypes.includes(method.unwrappedReturnTypeName);
-        let permissions = method.annotations["permissions"];
         let httpMethod;
         let parametersText = undefined;
 
-        if((!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer) || !permissions) {
+        if(!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer) {
             return;
         }
 
@@ -222,7 +212,8 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             return subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
             <%_ } -%>
         }<%
-            methods.push(method);
+        methods.push(method);
+        exposedMethods.push(`${model.name}_${method.shortName}`);
     });
     %>
     }
@@ -239,32 +230,15 @@ extension Meow {
     }
 }
 
-<% if(Object.size(exposedMethods) > 0) { %>
-public enum ExposedMethods : String {
-    <%
-    function makeMethodSignature(method) {
-        return method.parameters.map(p => ((p.name || "") + p.unwrappedTypeName)).join("And");
-    }
-
-    function makeExposedMethodName(typeName, method) {
-        return "exposedAPIMethod" + makeMethodSignature(method) + "For" + typeName;
-    }
-
-    let key;
-
-    for(key in exposedMethods) {
-        if(!exposedMethods.hasOwnProperty(key)) {
-            continue;
-        }
-
-        let methodPosition = 0;
-        let methods = exposedMethods[key];
-
-        while(methodPosition < methods.length) {
-            %>case <%-key%> = "<%-makeExposedMethodName(key, methods[methodPosition])%>"
-            <%
-        }
-    }
+<%
+if(exposedMethods.length > 0) {
+  let methodPosition = 0;-%>
+public enum ExposedMethods : String {<%
+  while(methodPosition < exposedMethods.length) {
+    let methodName = exposedMethods[methodPosition];
+    methodPosition++;%>
+    case <%-methodName%><%
+  }
 %>
 }
 <%}-%>

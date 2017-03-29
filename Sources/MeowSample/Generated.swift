@@ -444,3 +444,7 @@ extension Meow {
     }
 }
 
+public enum ExposedMethods : String {
+    case User_init
+    case User_getName
+}
