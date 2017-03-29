@@ -35,19 +35,3 @@ extension Account where Self : ConcreteModel {
         return self._id.hexString
     }
 }
-
-public protocol Permissions {
-    init?(for request: Request) throws
-}
-
-extension Permissions {
-    public var current: Self? {
-        guard let request = (Thread.current as? ContextThread)?.request else {
-            return nil
-        }
-        
-        do {
-            return try Self(for: request)
-        } catch { return nil }
-    }
-}

@@ -31,9 +31,9 @@ extension JSONArray : ResponseRepresentable {
 }
 
 extension Meow {
-    public static func integrateAuthentication(with droplet: Droplet, sessions: SessionsProtocol = MongoSessions(in: Meow.database["_sessions"])) {
+    public static func integrateAuthentication(with droplet: Droplet, sessionManager: SessionsProtocol = MongoSessions(in: Meow.database["_sessions"])) {
         droplet.middleware = [
-            SessionsMiddleware(sessions),
+            SessionsMiddleware(sessionManager),
             ContextAwarenessMiddleware(),
             DateMiddleware(),
             FileMiddleware(publicDir: droplet.workDir + "Public/"),
