@@ -3,52 +3,35 @@ import MeowVapor
 import Foundation
 
 enum Gender {
-    case male, female, undecided
+    case male, female
 }
 
-struct Address {
-    var streetName: String
-    
-    init(streetName: String) {
-        self.streetName = streetName
-    }
+struct Profile {
+    var name: String
+    var age: Int
 }
 
 final class User: Model {
-    var email: String
+    // sourcery: public, unique
+    var username: String
     
     // sourcery: public, unique
-    var name: String
+    var email: String
     
-    var genders: [Gender]
+    // sourcery: public
+    var gender: Gender
     
-    var favoriteNumbers: [Int] = []
-    
-    var address: Address?
-    
-    var admin: Bool = false
-    
-    init(email: String, name: String, gender: Gender) {
-        self.email = email
-        self.name = name
-        self.genders = [gender]
-    }
-    
-    // sourcery: permissions = "anonymous", method = "GET"
-    func getName() -> String {
-        return self.name
-    }
+    // sourcery: public
+    var profile: Profile
     
     // sourcery:inline:User.Meow
       init(meowDocument source: Document) throws {
           self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")
         
+          self.username = try Meow.Helpers.requireValue(String(source["username"]), keyForError: "username")  /* String */ 
           self.email = try Meow.Helpers.requireValue(String(source["email"]), keyForError: "email")  /* String */ 
-          self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
-          self.genders = try Meow.Helpers.requireValue(meowReinstantiateGenderArray(from: source["genders"]), keyForError: "genders")  /* [Gender] */ 
-          self.favoriteNumbers = try Meow.Helpers.requireValue(meowReinstantiateIntArray(from: source["favoriteNumbers"]), keyForError: "favoriteNumbers")  /* [Int] */ 
-          self.address = try Address(meowValue: source["address"])  /* Address? */ 
-          self.admin = try Meow.Helpers.requireValue(Bool(source["admin"]), keyForError: "admin")  /* Bool */ 
+          self.gender = try Meow.Helpers.requireValue(Gender(meowValue: source["gender"]), keyForError: "gender")  /* Gender */ 
+          self.profile = try Meow.Helpers.requireValue(Profile(meowValue: source["profile"]), keyForError: "profile")  /* Profile */ 
 
         Meow.pool.pool(self)
       }

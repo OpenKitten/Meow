@@ -293,7 +293,7 @@ function generateSerializables() {
                } else {
                  %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + "<%-variable.name%>") } <%
                }
-             } else if (variable.type && variable.type.kind == "enum") {
+             } else if ((variable.type && variable.type.kind == "enum") || serializables.includes(variable.type)) {
                ensureSerializable(variable.type);
                %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + "<%-variable.name%>") } <%
              }

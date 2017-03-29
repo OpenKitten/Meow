@@ -23,7 +23,7 @@
       "package": "CTLS",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/ctls.git",
-      "version": "1.0.0-beta.2"
+      "version": "1.0.0-beta.4"
     },
     {
       "package": "Cheetah",
@@ -35,7 +35,7 @@
       "package": "Console",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/console.git",
-      "version": "2.0.0-beta.1"
+      "version": "2.0.0-beta.2"
     },
     {
       "package": "Core",
@@ -84,6 +84,12 @@
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/KittenCore.git",
       "version": "0.2.3"
+    },
+    {
+      "package": "KittenTemplating",
+      "reason": null,
+      "repositoryURL": "https://github.com/OpenKitten/KittenTemplating.git",
+      "version": "0.6.3"
     },
     {
       "package": "MongoKitten",

@@ -145,12 +145,10 @@ import Meow
           var document = Document()
             document["_id"] = self._id
           
+            document["username"] = self.username 
             document["email"] = self.email 
-            document["name"] = self.name 
-            document["genders"] = self.genders.map { $0.meowSerialize() } 
-            document["favoriteNumbers"] = self.favoriteNumbers 
-            document["address"] = self.address?.meowSerialize() 
-            document["admin"] = self.admin 
+            document["gender"] = self.gender.meowSerialize() 
+            document["profile"] = self.profile.meowSerialize() 
           return document
         }
 
@@ -163,18 +161,14 @@ import Meow
           var keyPrefix: String
 
           
+             /// username: String
+              var username: VirtualString { return VirtualString(name: keyPrefix + "username") } 
              /// email: String
               var email: VirtualString { return VirtualString(name: keyPrefix + "email") } 
-             /// name: String
-              var name: VirtualString { return VirtualString(name: keyPrefix + "name") } 
-             /// genders: [Gender]
-             
-             /// favoriteNumbers: [Int]
-             
-             /// address: Address?
-             
-             /// admin: Bool
-              var admin: VirtualBool { return VirtualBool(name: keyPrefix + "admin") } 
+             /// gender: Gender
+              var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: keyPrefix + "gender") } 
+             /// profile: Profile
+              var profile: Profile.VirtualInstance { return Profile.VirtualInstance(keyPrefix: keyPrefix + "profile") } 
 
           init(keyPrefix: String = "") {
             self.keyPrefix = keyPrefix
@@ -183,12 +177,10 @@ import Meow
 
         enum Key : String {            case _id
           
+            case username          
             case email          
-            case name          
-            case genders          
-            case favoriteNumbers          
-            case address          
-            case admin          
+            case gender          
+            case profile          
 
 
         }
@@ -241,7 +233,6 @@ import Meow
             switch rawValue {
                case "male": self = .male
                case "female": self = .female
-               case "undecided": self = .undecided
               
               default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
             }
@@ -257,7 +248,6 @@ import Meow
             switch self {
                case .male: return "male"
                case .female: return "female"
-               case .undecided: return "undecided"
               
             }
           
@@ -288,12 +278,13 @@ import Meow
     }
   
       // Struct or Class extension
-      extension Address : ConcreteSerializable {
+      extension Profile : ConcreteSerializable {
       
       init(meowDocument source: Document) throws {
           
         
-          self.streetName = try Meow.Helpers.requireValue(String(source["streetName"]), keyForError: "streetName")  /* String */ 
+          self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
+          self.age = try Meow.Helpers.requireValue(Int(source["age"]), keyForError: "age")  /* Int */ 
 
         
       }
@@ -311,7 +302,8 @@ import Meow
           var document = Document()
             
           
-            document["streetName"] = self.streetName 
+            document["name"] = self.name 
+            document["age"] = self.age 
           return document
         }
 
@@ -324,8 +316,10 @@ import Meow
           var keyPrefix: String
 
           
-             /// streetName: String
-              var streetName: VirtualString { return VirtualString(name: keyPrefix + "streetName") } 
+             /// name: String
+              var name: VirtualString { return VirtualString(name: keyPrefix + "name") } 
+             /// age: Int
+              var age: VirtualNumber { return VirtualNumber(name: keyPrefix + "age") } 
 
           init(keyPrefix: String = "") {
             self.keyPrefix = keyPrefix
@@ -334,24 +328,25 @@ import Meow
 
         enum Key : String {            case _id
           
-            case streetName          
+            case name          
+            case age          
 
 
         }
 
-      } // end struct or class extension of Address
+      } // end struct or class extension of Profile
   
-    func meowReinstantiateAddressArray(from source: Primitive?) throws -> [Address]? {
+    func meowReinstantiateProfileArray(from source: Primitive?) throws -> [Profile]? {
         guard let document = Document(source) else {
           return nil
         }
 
-        return try document.map { index, rawValue -> Address in
-            return try Meow.Helpers.requireValue(Address(meowValue: rawValue), keyForError: "index \(index) on array of Address")
+        return try document.map { index, rawValue -> Profile in
+            return try Meow.Helpers.requireValue(Profile(meowValue: rawValue), keyForError: "index \(index) on array of Profile")
         }
     }
   
-// Serializables parsed: User,Gender,Address
+// Serializables parsed: User,Gender,Profile
 // Tuples parsed: 
 import Foundation
 import Meow
@@ -360,20 +355,34 @@ import Vapor
 import Cheetah
 import HTTP
 
+extension User {
+  public func makeJSONObject() -> JSONObject {
+    var object: JSONObject = [
+        "id": self._id.hexString
+    ]
+
+      object["username"] = self.username
+      object["email"] = self.email
+      object["gender"] = self.gender.meowSerialize() as? Cheetah.Value
+      object["profile"] = self.profile.makeJSONObject()
+
+      return object
+  }
+}
+
+extension Profile {
+  public func makeJSONObject() -> JSONObject {
+    var object: JSONObject = [:]
+
+
+      return object
+  }
+}
+
 
 extension User : StringInitializable, ResponseRepresentable {
     public func makeResponse() throws -> Response {
         return try makeJSONObject().makeResponse()
-    }
-
-    public func makeJSONObject() -> JSONObject {
-        var object: JSONObject = [
-            "id": self._id.hexString
-        ]
-        
-        object["name"] = self.name
-        
-        return object
     }
 
     public convenience init?(from string: String) throws {
@@ -386,11 +395,19 @@ extension User : StringInitializable, ResponseRepresentable {
         try self.init(meowDocument: selfDocument)
     }
 
-    public static func byName(_ string: String) throws -> User? {
+    public static func byUsername(_ string: String) throws -> User? {
         let value =  String(string as Primitive?)
 
         return try User.findOne { model in
-           return model.name == value
+           return model.username == value
+        }
+    }
+
+    public static func byEmail(_ string: String) throws -> User? {
+        let value =  String(string as Primitive?)
+
+        return try User.findOne { model in
+           return model.email == value
         }
     }
 
@@ -405,36 +422,6 @@ extension User : StringInitializable, ResponseRepresentable {
         return subject
       }
 
-        droplet.post("users") { request in
-            guard let object = request.jsonObject else {
-                throw Abort(.badRequest, reason: "No JSON object provided")
-            }
-            
-            guard let email = String(object["email"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"email\"")
-            }
-                
-            guard let name = String(object["name"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"name\"")
-            }
-                
-            guard let otherValue = String(object["gender"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"gender\"")
-            }
-
-            let gender = try Gender(meowValue: otherValue)
-            let subject = User.init(email: email, name: name, gender: gender)
-            try subject.save()
-            let jsonResponse = subject.makeJSONObject()
-
-            return Response(status: .created, headers: [
-                "Content-Type": "application/json; charset=utf-8"
-            ], body: Body(jsonResponse.serialize()))
-        }
-        
-        droplet.get("users", User.init, "getName") { request, subject in
-            return subject.getName()
-        }
     }
 }
 
@@ -444,7 +431,3 @@ extension Meow {
     }
 }
 
-public enum ExposedMethods : String {
-    case User_init
-    case User_getName
-}

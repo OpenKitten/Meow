@@ -293,7 +293,7 @@ function generateSerializables() {
                } else {
                  %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + "<%-variable.name%>") } <%
                }
-             } else if (variable.type && variable.type.kind == "enum") {
+             } else if ((variable.type && variable.type.kind == "enum") || serializables.includes(variable.type)) {
                ensureSerializable(variable.type);
                %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + "<%-variable.name%>") } <%
              }
@@ -450,6 +450,46 @@ let exposedMethods = [];
 let generatedModels = [];
 let modelIndex = 0;
 
+serializables.forEach(serializable => {
+  if(serializable.kind == "enum") { return; }
+  -%>
+extension <%- serializable.name %> {
+  public func makeJSONObject() -> JSONObject {
+    <%_
+    let type = (serializable.allVariables.length > 0) ? "var" : "let";
+    if(models.includes(serializable)) { -%>
+    <%-type%> object: JSONObject = [
+        "id": self._id.hexString
+    ]
+    <%_ } else { -%>
+    <%-type%> object: JSONObject = [:]
+    <%_ } -%>
+
+      <%_ serializable.allVariables.forEach(variable => {
+          if(!variable.annotations["public"] || variable.isStatic) {
+              return;
+          }
+
+          if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {
+          -%>
+      object["<%-variable.name%>"] = self.<%-variable.name%>
+          <%_ } else if(serializables.includes(variable.type)) {
+            if(variable.type.kind == "enum") { -%>
+      object["<%-variable.name%>"] = self.<%-variable.name%>.meowSerialize() as? Cheetah.Value
+          <%_ } else { -%>
+      object["<%-variable.name%>"] = self.<%-variable.name%>.makeJSONObject()
+          <%_ }
+          } else if(bsonJsonMap[variable.type.name]) { -%>
+      object["<%-variable.name%>"] = <%-bsonJsonMap[variable.type.name]%>(self.<%-variable.name%>)
+          <% } -%>
+      <%_ }); -%>
+
+      return object
+  }
+}
+
+<%});
+
 while(models.length > generatedModels.length) {
     let model = models[modelIndex];
     modelIndex++;
@@ -458,21 +498,6 @@ while(models.length > generatedModels.length) {
 extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     public func makeResponse() throws -> Response {
         return try makeJSONObject().makeResponse()
-    }
-
-    public func makeJSONObject() -> JSONObject {
-        var object: JSONObject = [
-            "id": self._id.hexString
-        ]
-        <%model.allVariables.forEach(variable => {
-            if(!variable.annotations["public"] || variable.isStatic) {
-                return;
-            }
-            %>
-        object["<%-variable.name%>"] = self.<%-variable.name%>
-        <%});-%>
-
-        return object
     }
 
     public convenience init?(from string: String) throws {
