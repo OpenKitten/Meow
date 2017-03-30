@@ -12,6 +12,9 @@ extension Meow {
         }
         set {
             (Thread.current as? ContextThread)?.request.storage["meowUser"] = newValue
+            do {
+                try (Thread.current as? ContextThread)?.request.session().document["meow"]["user"] = newValue?._id
+            } catch { }
         }
     }
 }
