@@ -13,7 +13,16 @@ Meow.checkPermissions { route in
         return User.current != nil
     case .User_delete(let removedUser):
         return User.current == removedUser
-    case .User_init:
+    default:
+        return true
+    }
+}
+
+Meow.requireAuthentication { route in
+    switch route {
+    case .User_init, .User_static_authenticate:
+        return false
+    default:
         return true
     }
 }

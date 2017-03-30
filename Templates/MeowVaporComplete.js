@@ -206,12 +206,18 @@ function generateSerializables() {
       // Enum extension
       extension <%- serializable.name %> : ConcreteSingleValueSerializable {
         /// Creates a `<%- serializable.name %>` from a BSON Primtive
-        init(meowValue: Primitive?) throws {
+        init?(meowValue: Primitive?) throws {
           <% if (serializable.typeName) { %>
-            let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(meowValue), keyForError: "enum <%- serializable.name %>")
+            guard let rawValue = <%- serializable.rawTypeName.name %>(meowValue) else {
+                return nil
+            }
+
             self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
           <% } else if (!serializable.hasAssociatedValues) { %>
-            let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum <%- serializable.name %>")
+            guard let rawValue = String(meowValue) else {
+                return nil
+            }
+            
             switch rawValue {
               <% serializable.cases.forEach(enumCase => {
                 %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
@@ -460,17 +466,19 @@ let bsonJsonMap = {
 };
 let exposedMethods = [];
 let generatedModels = [];
+let authenticables = [];
 let modelIndex = 0;
 
 serializables.forEach(serializable => {
-  if(serializable.annotations["user"] && models.includes(serializable)) {-%>
+  if(serializable.annotations["user"] && models.includes(serializable)) {
+    authenticables.push(serializable.name); -%>
 extension <%-serializable.name %> : Authenticatable {
     public static func resolve(byId identifier: ObjectId) throws -> <%-serializable.name%>? {
         guard let document = try <%-serializable.name%>.meowCollection.findOne("_id" == identifier) else {
             return nil
         }
 
-        return try <%-serializable.name%>(meowDocument: document)
+        return try Meow.pool.instantiateIfNeeded(type: <%-serializable.name%>.self, document: document)
     }
 }
 <%}
@@ -499,7 +507,7 @@ extension <%- serializable.name %> {
     public <%-serializable.kind == "class" ? "convenience " : ""%>init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-        try self.init(meowDocument: Document())
+        try self.init(meowDocument: document)
     }
 }
 <% } -%>
@@ -580,16 +588,16 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
       drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get) { request in
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
             return subject
           }
         }
       }
 
       drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete) { request in
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
             try subject.delete()
             return Response(status: .ok)
           }
@@ -607,7 +615,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         let httpMethod;
         let parametersText = undefined;
 
-        if(!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer) {
+        if(!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer && !serializables.includes(method.returnType)) {
             return;
         }
 
@@ -679,13 +687,24 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
                       enumMapping = "String";
                   }
 
-                  if(enumMapping == "String" || enumMapping == parameter.type.rawType.name) {%>
+                  if(enumMapping == "String" || enumMapping == parameter.type.rawType.name) {
+                      if(parameter.typeName.isOptional) {%>
+                    let <%-parameter.name%>: <%-parameter.typeName.name%>
+
+                    if let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]) {
+                        <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
+                    } else {
+                        <%-parameter.name%> = nil
+                    }
+                      <% } else { %>
                     guard let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]) else {
                         throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
                     }
 
                     let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
-                  <%_ } else if(enumMapping) { -%>
+                  <%_
+                      }
+                    } else if(enumMapping) { -%>
                     let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]))
 
                     guard let <%-parameter.name%>JSON = <%-enumMapping%>(<%-parameter.name%>JSON) else {
@@ -694,9 +713,19 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
 
                     let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
                   <%_ }
-                  } else if(serializables.includes(parameter.type)) { %>
+                  } else if(serializables.includes(parameter.type)) {
+                    if(parameter.typeName.isOptional) {%>
+                    let <%-parameter.name%>: <%-parameter.typeName.name%>
+
+                    if let <%-parameter.name%>JSON = object["<%-parameter.name%>"] {
+                        <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonValue: <%-parameter.name%>JSON)
+                    } else {
+                        <%-parameter.name%> = nil
+                    }
+                    <%_ } else { %>
                     let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonValue: object["<%-parameter.name%>"])
-                <%_ }
+                    <%_ }
+                }
 
                 if(parametersText == undefined || parametersText == null) {
                     parametersText = parameterText;
@@ -750,6 +779,11 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
 extension Meow {
     public static func integrate(with droplet: Droplet) {<%
         modelIndex = 0;
+
+        authenticables.forEach(authenticable => {%>
+        AuthenticationMiddleware.default.models.append(<%-authenticable%>.self)
+        <%});
+
         while(modelIndex < generatedModels.length) {
             let model = generatedModels[modelIndex];
             modelIndex++; %>

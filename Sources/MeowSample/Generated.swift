@@ -231,9 +231,12 @@ import Meow
       // Enum extension
       extension Gender : ConcreteSingleValueSerializable {
         /// Creates a `Gender` from a BSON Primtive
-        init(meowValue: Primitive?) throws {
+        init?(meowValue: Primitive?) throws {
           
-            let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum Gender")
+            guard let rawValue = String(meowValue) else {
+                return nil
+            }
+            
             switch rawValue {
                case "male": self = .male
                case "female": self = .female
@@ -372,14 +375,14 @@ extension User : Authenticatable {
             return nil
         }
 
-        return try User(meowDocument: document)
+        return try Meow.pool.instantiateIfNeeded(type: User.self, document: document)
     }
 }
 extension User {
     public convenience init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-        try self.init(meowDocument: Document())
+        try self.init(meowDocument: document)
     }
 }
 extension User {
@@ -424,7 +427,7 @@ extension Profile {
     public init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-        try self.init(meowDocument: Document())
+        try self.init(meowDocument: document)
     }
 }
 extension Profile {
@@ -473,21 +476,44 @@ extension User : StringInitializable, ResponseRepresentable {
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
       drop.get("users", User.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_get) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_get) { request in
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_get(subject)) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_get(subject)) { request in
             return subject
           }
         }
       }
 
       drop.delete("users", User.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_get) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_delete) { request in
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_delete(subject)) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_delete(subject)) { request in
             try subject.delete()
             return Response(status: .ok)
           }
         }
       }
+
+        droplet.post("users", "authenticate") { request in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_static_authenticate) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_static_authenticate) { request in
+                    guard let object = request.jsonObject else {
+                        throw Abort(.badRequest, reason: "No JSON object provided")
+                    }
+            
+                    guard let username = String(object["username"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"username\"")
+                    }
+                
+                    guard let password = String(object["password"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"password\"")
+                    }
+                                    guard let subject = try User.authenticate(username: username, password: password) else {
+                        throw Abort(.badRequest, reason: "Unknown error")
+                    }
+
+                    return subject
+                }
+            }
+        }
 
         droplet.post("users") { request in
             return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
@@ -508,13 +534,21 @@ extension User : StringInitializable, ResponseRepresentable {
                         throw Abort(.badRequest, reason: "Invalid key \"email\"")
                     }
                 
-                    guard let genderJSON = String(object["gender"]) else {
-                        throw Abort(.badRequest, reason: "Invalid key \"gender\"")
+                    let gender: Gender?
+
+                    if let genderJSON = String(object["gender"]) {
+                        gender = try Gender(meowValue: genderJSON)
+                    } else {
+                        gender = nil
                     }
+                      
+                    let profile: Profile?
 
-                    let gender = try Gender(meowValue: genderJSON)
-
-                    let profile = try Profile(jsonValue: object["profile"])
+                    if let profileJSON = object["profile"] {
+                        profile = try Profile(jsonValue: profileJSON)
+                    } else {
+                        profile = nil
+                    }
 
                     guard let subject = try User.init(username: username, password: password, email: email, gender: gender, profile: profile) else {
                         // TODO: Replace with JSON Errors
@@ -534,6 +568,8 @@ extension User : StringInitializable, ResponseRepresentable {
 
 extension Meow {
     public static func integrate(with droplet: Droplet) {
+        AuthenticationMiddleware.default.models.append(User.self)
+        
         User.integrate(with: droplet)
     }
 }
@@ -541,6 +577,7 @@ extension Meow {
 enum MeowRoutes {
     case User_get(User)
     case User_delete(User)
+    case User_static_authenticate
     case User_init
 }
 

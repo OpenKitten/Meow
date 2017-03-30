@@ -69,7 +69,7 @@ public class AuthenticationMiddleware {
             }
         }
         
-        guard let userSession = Document(try request.session().document["meow"]["user"]), let authenticationID = ObjectId(userSession["_id"]) else {
+        guard let authenticationID = ObjectId(try request.session().document["meow"]["user"]) else {
             return try fail()
         }
         

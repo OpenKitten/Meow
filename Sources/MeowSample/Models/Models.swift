@@ -33,7 +33,7 @@ final class User: Model {
     
     var password: Data
     
-    // sourcery: public, method = POST
+    // sourcery: public, method = "POST"
     static func authenticate(username: String, password: String) throws -> User? {
         guard let user = try User.findOne({ user in
             return user.username == username
@@ -41,7 +41,7 @@ final class User: Model {
             return nil
         }
         
-        guard try BCrypt.Hash.verify(message: user.password, matches: password) else {
+        guard try BCrypt.Hash.verify(message: password, matches: user.password) else {
             return nil
         }
         

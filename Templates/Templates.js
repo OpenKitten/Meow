@@ -206,12 +206,18 @@ function generateSerializables() {
       // Enum extension
       extension <%- serializable.name %> : ConcreteSingleValueSerializable {
         /// Creates a `<%- serializable.name %>` from a BSON Primtive
-        init(meowValue: Primitive?) throws {
+        init?(meowValue: Primitive?) throws {
           <% if (serializable.typeName) { %>
-            let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(meowValue), keyForError: "enum <%- serializable.name %>")
+            guard let rawValue = <%- serializable.rawTypeName.name %>(meowValue) else {
+                return nil
+            }
+
             self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
           <% } else if (!serializable.hasAssociatedValues) { %>
-            let rawValue = try Meow.Helpers.requireValue(String(meowValue), keyForError: "enum <%- serializable.name %>")
+            guard let rawValue = String(meowValue) else {
+                return nil
+            }
+            
             switch rawValue {
               <% serializable.cases.forEach(enumCase => {
                 %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
