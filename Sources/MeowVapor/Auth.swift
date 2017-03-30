@@ -6,24 +6,22 @@ import Meow
 public typealias RequirementsChecker = ((Any) throws -> (Bool))
 
 extension Meow {
-    public static func currentUser() -> Authenticatable? {
-        return (Thread.current as? ContextThread)?.request.storage["meowUser"] as? Authenticatable
-    }
-}
-
-extension Request {
-    public var authenticationRequired: Bool {
-        return true
+    public static var currentUser: Authenticatable? {
+        get {
+            return (Thread.current as? ContextThread)?.request.storage["meowUser"] as? Authenticatable
+        }
+        set {
+            (Thread.current as? ContextThread)?.request.storage["meowUser"] = newValue
+        }
     }
 }
 
 public protocol Authenticatable : Model {
-    static func authenticate(_ request: Request) throws -> Self
-    static func byIdentifier(_ id: ObjectId) throws -> Self?
+    static func resolve(byId identifier: ObjectId) throws -> Self?
 }
 
 extension Authenticatable {
-    public func current() -> Self? {
+    public static var current: Self? {
         return Meow.currentUser as? Self
     }
 }
@@ -37,11 +35,21 @@ public class AuthenticationMiddleware {
     
     public var enabled: Bool = false
     
+    public var models = [Authenticatable.Type]()
+    
+    public subscript(id: ObjectId) -> Authenticatable? {
+        for model in models {
+            if let entity = try? model.resolve(byId: id) {
+                return entity
+            }
+        }
+        
+        return nil
+    }
+    
     public var authenticationRequired: RequirementsChecker = { _ in
         return true
     }
-    
-    public var authenticables = [String: Authenticatable.Type]()
     
     init() { }
     
@@ -51,22 +59,18 @@ public class AuthenticationMiddleware {
         }
         
         func fail() throws -> ResponseRepresentable {
-            if request.authenticationRequired {
+            if try self.authenticationRequired(route) {
                 return try onAuthenticationRequired(route)
             } else {
                 return try next(request)
             }
         }
         
-        guard let userSession = Document(try request.session().document["meow"]["user"]), let authenticationID = ObjectId(userSession["_id"]), let typeName = String(userSession["type"]) else {
+        guard let userSession = Document(try request.session().document["meow"]["user"]), let authenticationID = ObjectId(userSession["_id"]) else {
             return try fail()
         }
         
-        guard let type = authenticables[typeName] else {
-            return try fail()
-        }
-        
-        guard let user = try type.byIdentifier(authenticationID) else {
+        guard let user = self[authenticationID] else {
             return try fail()
         }
         

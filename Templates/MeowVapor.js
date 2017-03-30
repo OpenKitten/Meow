@@ -47,6 +47,18 @@ let generatedModels = [];
 let modelIndex = 0;
 
 serializables.forEach(serializable => {
+  if(serializable.annotations["user"] && models.includes(serializable)) {-%>
+extension <%-serializable.name %> : Authenticatable {
+    public static func resolve(byId identifier: ObjectId) throws -> <%-serializable.name%>? {
+        guard let document = try <%-serializable.name%>.meowCollection.findOne("_id" == identifier) else {
+            return nil
+        }
+
+        return try <%-serializable.name%>(meowDocument: document)
+    }
+}
+<%}
+
   if(serializable.kind == "enum") {%>
 extension <%- serializable.name %> {
     public init(jsonValue: Cheetah.Value?) throws {
@@ -168,8 +180,8 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         }
       }<%
 
-    exposedMethods.push(`${model.name}_get`);
-    exposedMethods.push(`${model.name}_delete`);
+    exposedMethods.push(`${model.name}_get(${model.name})`);
+    exposedMethods.push(`${model.name}_delete(${model.name})`);
 
     let methods = [];
     let hasInitializer = false;
@@ -330,14 +342,14 @@ extension Meow {
 }
 
 <% if(exposedMethods.length > 0) {-%>
-public enum MeowRoutes {
+enum MeowRoutes {
   <%_ exposedMethods.forEach(method => {-%>
     case <%-method%>
   <%_ }); -%>
 }
 
 extension Meow {
-    public static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+    static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
         AuthorizationMiddleware.default.permissionChecker = { route in
             guard let route = route as? MeowRoutes else {
                 return false
@@ -347,7 +359,7 @@ extension Meow {
         }
     }
 
-    public static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+    static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
         AuthenticationMiddleware.default.authenticationRequired = { route in
             guard let route = route as? MeowRoutes else {
                 return false

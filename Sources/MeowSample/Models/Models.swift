@@ -1,4 +1,4 @@
-import Meow
+import BCrypt
 import MeowVapor
 import Foundation
 
@@ -17,6 +17,7 @@ struct Profile {
     var picture: File?
 }
 
+// sourcery: user
 final class User: Model {
     // sourcery: public, unique
     var username: String
@@ -30,14 +31,29 @@ final class User: Model {
     // sourcery: public
     var profile: Profile?
     
-    // sourcery: public, method = GET
-    static func cheese() -> String {
-        return "cheese"
+    var password: Data
+    
+    // sourcery: public, method = POST
+    static func authenticate(username: String, password: String) throws -> User? {
+        guard let user = try User.findOne({ user in
+            return user.username == username
+        }) else {
+            return nil
+        }
+        
+        guard try BCrypt.Hash.verify(message: user.password, matches: password) else {
+            return nil
+        }
+        
+        Meow.currentUser = user
+        
+        return user
     }
     
-    init?(username: String, email: String, gender: Gender? = nil, profile: Profile? = nil) throws {
+    init?(username: String, password: String, email: String, gender: Gender? = nil, profile: Profile? = nil) throws {
         self.username = username
         self.email = email
+        self.password = Data(try BCrypt.Hash.make(message: password))
         self.gender = gender
         self.profile = profile
     }
@@ -50,6 +66,7 @@ final class User: Model {
           self.email = try Meow.Helpers.requireValue(String(source["email"]), keyForError: "email")  /* String */ 
           self.gender = try Gender(meowValue: source["gender"])  /* Gender? */ 
           self.profile = try Profile(meowValue: source["profile"])  /* Profile? */ 
+          self.password = try Meow.Helpers.requireValue(Data(source["password"]), keyForError: "password")  /* Data */ 
 
         Meow.pool.pool(self)
       }

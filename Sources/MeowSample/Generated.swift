@@ -149,6 +149,7 @@ import Meow
             document["email"] = self.email 
             document["gender"] = self.gender?.meowSerialize() 
             document["profile"] = self.profile?.meowSerialize() 
+            document["password"] = self.password 
           return document
         }
 
@@ -169,6 +170,8 @@ import Meow
               var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: keyPrefix + "gender") } 
              /// profile: Profile?
               var profile: Profile.VirtualInstance { return Profile.VirtualInstance(keyPrefix: keyPrefix + "profile") } 
+             /// password: Data
+              var password: VirtualData { return VirtualData(name: keyPrefix + "password") } 
 
           init(keyPrefix: String = "") {
             self.keyPrefix = keyPrefix
@@ -181,6 +184,7 @@ import Meow
             case email          
             case gender          
             case profile          
+            case password          
 
 
         }
@@ -362,6 +366,15 @@ import HTTP
 import Cheetah
 import ExtendedJSON
 
+extension User : Authenticatable {
+    public static func resolve(byId identifier: ObjectId) throws -> User? {
+        guard let document = try User.meowCollection.findOne("_id" == identifier) else {
+            return nil
+        }
+
+        return try User(meowDocument: document)
+    }
+}
 extension User {
     public convenience init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
@@ -476,14 +489,6 @@ extension User : StringInitializable, ResponseRepresentable {
         }
       }
 
-        droplet.get("users", "cheese") { request in
-            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_static_cheese) { request in
-                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_static_cheese) { request in
-                    return try User.cheese()
-                }
-            }
-        }
-
         droplet.post("users") { request in
             return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
                 return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
@@ -493,6 +498,10 @@ extension User : StringInitializable, ResponseRepresentable {
             
                     guard let username = String(object["username"]) else {
                         throw Abort(.badRequest, reason: "Invalid key \"username\"")
+                    }
+                
+                    guard let password = String(object["password"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"password\"")
                     }
                 
                     guard let email = String(object["email"]) else {
@@ -507,7 +516,7 @@ extension User : StringInitializable, ResponseRepresentable {
 
                     let profile = try Profile(jsonValue: object["profile"])
 
-                    guard let subject = try User.init(username: username, email: email, gender: gender, profile: profile) else {
+                    guard let subject = try User.init(username: username, password: password, email: email, gender: gender, profile: profile) else {
                         // TODO: Replace with JSON Errors
                         throw Abort(.badRequest, reason: "Unknown error")
                     }
@@ -529,15 +538,14 @@ extension Meow {
     }
 }
 
-public enum MeowRoutes {
-    case User_get
-    case User_delete
-    case User_static_cheese
+enum MeowRoutes {
+    case User_get(User)
+    case User_delete(User)
     case User_init
 }
 
 extension Meow {
-    public static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+    static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
         AuthorizationMiddleware.default.permissionChecker = { route in
             guard let route = route as? MeowRoutes else {
                 return false
@@ -547,7 +555,7 @@ extension Meow {
         }
     }
 
-    public static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+    static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
         AuthenticationMiddleware.default.authenticationRequired = { route in
             guard let route = route as? MeowRoutes else {
                 return false

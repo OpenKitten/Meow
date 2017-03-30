@@ -1,7 +1,8 @@
 import HTTP
 import Cheetah
-import Meow
-import Vapor
+@_exported import Meow
+@_exported import Vapor
+@_exported import BSON
 import Sessions
 
 extension Request {

@@ -8,6 +8,20 @@ public protocol Model : class, Serializable {
     var _id: ObjectId { get set }
 }
 
+extension Model {
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
+        return lhs._id == rhs._id
+    }
+    
+    public static func ==(lhs: Self?, rhs: Self) -> Bool {
+        return lhs?._id == rhs._id
+    }
+    
+    public static func ==(lhs: Self, rhs: Self?) -> Bool {
+        return lhs._id == rhs?._id
+    }
+}
+
 public typealias ReferenceValues = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
 /// Should be implemented in an extension by the generator
