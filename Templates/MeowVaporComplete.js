@@ -421,6 +421,7 @@ import Vapor
 import Cheetah
 import HTTP
 import Cheetah
+import ExtendedJSON
 
 <%
 // helpers
@@ -439,48 +440,6 @@ function plural(name) {
     } else {
         return name + lastLetter + "s"
     }
-}
-
-function deserializeFromCheetahValue(name, type, typeName, accessor) {
-  if (supportedPrimitives.includes(typeName.unwrappedTypeName)) {
-    if (typeName.isOptional) {
-      %> <%- typeName.unwrappedTypeName %>(<%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(<%-typeName.name%>(<%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if (type) {
-    // Embed a custom type
-    ensureSerializable(type);
-
-    if (typeName.isOptional) {
-      %> try <%-typeName.unwrappedTypeName-%>(jsonValue: <%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(<%-typeName.unwrappedTypeName-%>(jsonValue: <%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if (typeName.isArray) {
-    let elementTypeNameString = ensureSerializableArray(typeName);
-
-    if (typeName.isOptional) {
-      %> try meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if (typeName.isTuple) {
-    ensureSerializable(typeName);
-    if (typeName.isOptional) {
-      %> try <%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(<%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if(typeName.unwrappedTypeName == "File") {
-    if (typeName.isOptional) {
-      %> try File(<%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(File(<%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  }
-
-  %> /* <%-typeName.name%> */ <%
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
@@ -506,42 +465,33 @@ let modelIndex = 0;
 serializables.forEach(serializable => {
   if(serializable.kind == "enum") {%>
 extension <%- serializable.name %> {
-  public init(jsonValue: Cheetah.Value?) throws {
+    public init(jsonValue: Cheetah.Value?) throws {
     <% if (serializable.typeName) { %>
-      let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(jsonValue), keyForError: "enum <%- serializable.name %>")
-      self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
+        let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(jsonValue), keyForError: "enum <%- serializable.name %>")
+        self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
     <% } else if (!serializable.hasAssociatedValues) { %>
-      let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum <%- serializable.name %>")
-      switch rawValue {
+        let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum <%- serializable.name %>")
+        switch rawValue {
         <% serializable.cases.forEach(enumCase => {
-          %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
+            %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
         <%})%>
-        default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
-      }
+          default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+        }
     <% } else { %>
-      <# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
+        <# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
     <% } %>
   }
 }
-<%_ } -%>
+<%_ } else { -%>
 extension <%- serializable.name %> {
-  <%_ if(serializable.kind == "struct") { -%>
-  public init(jsonValue source: Cheetah.Value?) throws {
-    let jsonObject = try Meow.Helpers.requireValue(JSONObject(source["_id"]), keyForError: "_id")
+    public <%-serializable.kind == "class" ? "convenience " : ""%>init(jsonValue: Cheetah.Value?) throws {
+        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-    try self.init(jsonObject: jsonObject)
-  }
-
-  public init(jsonObject source: JSONObject) throws {
-      <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
-    <% serializable.variables.forEach(variable => { %>
-      self.<%- variable.name %> =<% deserializeFromCheetahValue(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
-    }); %>
-
-      <% if (serializable.based["Model"]) { %>Meow.pool.pool(self)<% } %>
-  }
-  <%_ } -%>
-
+        try self.init(meowDocument: Document())
+    }
+}
+<% } -%>
+extension <%- serializable.name %> {
   public func makeJSONObject() -> JSONObject {
     <%_
     let type = (serializable.allVariables.length > 0) ? "var" : "let";
@@ -733,11 +683,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
                     let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
                   <%_ }
                   } else if(serializables.includes(parameter.type)) { %>
-                    guard let <%-parameter.name%>JSON = object["<%-parameter.name%>"] as? JSONObject else {
-                        throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
-                    }
-
-                    let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonObject: <%-parameter.name%>JSON)
+                    let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonValue: object["<%-parameter.name%>"])
                 <%_ }
 
                 if(parametersText == undefined || parametersText == null) {

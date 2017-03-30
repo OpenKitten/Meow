@@ -360,9 +360,16 @@ import Vapor
 import Cheetah
 import HTTP
 import Cheetah
+import ExtendedJSON
 
 extension User {
+    public convenience init(jsonValue: Cheetah.Value?) throws {
+        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
+        try self.init(meowDocument: Document())
+    }
+}
+extension User {
   public func makeJSONObject() -> JSONObject {
       var object: JSONObject = [
           "id": self._id.hexString
@@ -379,20 +386,19 @@ extension User {
 
 
 extension Gender {
-  public init(jsonValue: Cheetah.Value?) throws {
+    public init(jsonValue: Cheetah.Value?) throws {
     
-      let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum Gender")
-      switch rawValue {
+        let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum Gender")
+        switch rawValue {
          case "male": self = .male
          case "female": self = .female
         
-        default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
-      }
+          default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
+        }
     
   }
 }
 extension Gender {
-
   public func makeJSONObject() -> JSONObject {
       let object: JSONObject = [:]
 
@@ -402,22 +408,13 @@ extension Gender {
 }
 
 extension Profile {
-  public init(jsonValue source: Cheetah.Value?) throws {
-    let jsonObject = try Meow.Helpers.requireValue(JSONObject(source["_id"]), keyForError: "_id")
+    public init(jsonValue: Cheetah.Value?) throws {
+        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-    try self.init(jsonObject: jsonObject)
-  }
-
-  public init(jsonObject source: JSONObject) throws {
-      
-    
-      self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
-      self.age = try Meow.Helpers.requireValue(Int(source["age"]), keyForError: "age")  /* Int */ 
-      self.picture = try File(source["picture"])  /* File? */ 
-
-      
-  }
-
+        try self.init(meowDocument: Document())
+    }
+}
+extension Profile {
   public func makeJSONObject() -> JSONObject {
       var object: JSONObject = [:]
 
@@ -508,11 +505,7 @@ extension User : StringInitializable, ResponseRepresentable {
 
                     let gender = try Gender(meowValue: genderJSON)
 
-                    guard let profileJSON = object["profile"] as? JSONObject else {
-                        throw Abort(.badRequest, reason: "Invalid key \"profile\"")
-                    }
-
-                    let profile = try Profile(jsonObject: profileJSON)
+                    let profile = try Profile(jsonValue: object["profile"])
 
                     guard let subject = try User.init(username: username, email: email, gender: gender, profile: profile) else {
                         // TODO: Replace with JSON Errors
