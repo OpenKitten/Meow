@@ -202,14 +202,24 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
       drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return subject
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get) { request in
+            return subject
+          }
+        }
       }
 
       drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        try subject.delete()
-
-        return subject
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete) { request in
+            try subject.delete()
+            return Response(status: .ok)
+          }
+        }
       }<%
+
+    exposedMethods.push(`${model.name}_get`);
+    exposedMethods.push(`${model.name}_delete`);
 
     let methods = [];
     let hasInitializer = false;
@@ -242,6 +252,16 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         } else {
             if(!httpMethod) { return; }
         }
+
+        let routeName;
+
+        if(method.isInitializer) {
+          routeName = `${model.name}_init`;
+        } else if(method.isStatic) {
+          routeName = `${model.name}_static_${method.shortName}`;
+        } else {
+            routeName = `${model.name}_${method.shortName}`;
+        }
         %>
         <%_ if(method.isInitializer) { %>
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
@@ -250,27 +270,28 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         <%_} else { %>
         <%-method.returnType%>
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-method.shortName%>") { request, subject in
-        <%_}
-
-        if(method.parameters.length > 0) {-%>
-            guard let object = request.jsonObject else {
-                throw Abort(.badRequest, reason: "No JSON object provided")
-            }
+        <%_} -%>
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-routeName%>) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-routeName%>) { request in
+        <%_ if(method.parameters.length > 0) {-%>
+                    guard let object = request.jsonObject else {
+                        throw Abort(.badRequest, reason: "No JSON object provided")
+                    }
             <%
             method.parameters.forEach(parameter => {
                 let parameterText = parameter.name + ": " + parameter.name;
                 let basicMapping = bsonJsonMap[parameter.unwrappedTypeName];
 
                 if(basicMapping && basicMapping == parameter.unwrappedTypeName) {%>
-            guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(object["<%-parameter.name%>"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
-            }
+                    guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(object["<%-parameter.name%>"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+                    }
                 <% } else if(basicMapping) {%>
-            let <%-parameter.name%>JSON = <%-basicMapping%>(object["<%-parameter.name%>"]))
+                    let <%-parameter.name%>JSON = <%-basicMapping%>(object["<%-parameter.name%>"]))
 
-            guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(<%-parameter.name%>JSON as Primitive?) else {
-                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
-            }
+                    guard let <%-parameter.name%> = <%-parameter.unwrappedTypeName%>(<%-parameter.name%>JSON as Primitive?) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+                    }
               <%} else if(parameter.type && serializables.includes(parameter.type) && parameter.type.kind == "enum") {
                   let enumMapping;
 
@@ -281,26 +302,26 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
                   }
 
                   if(enumMapping == "String" || enumMapping == parameter.type.rawType.name) {%>
-            guard let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
-            }
+                    guard let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+                    }
 
-            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
+                    let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
                   <%_ } else if(enumMapping) { -%>
-            let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]))
+                    let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]))
 
-            guard let <%-parameter.name%>JSON = <%-enumMapping%>(<%-parameter.name%>JSON) else {
-                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
-            }
+                    guard let <%-parameter.name%>JSON = <%-enumMapping%>(<%-parameter.name%>JSON) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+                    }
 
-            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
+                    let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
                   <%_ }
                   } else if(serializables.includes(parameter.type)) { %>
-            guard let <%-parameter.name%>JSON = object["<%-parameter.name%>"] as? JSONObject else {
-                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
-            }
+                    guard let <%-parameter.name%>JSON = object["<%-parameter.name%>"] as? JSONObject else {
+                        throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+                    }
 
-            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonObject: <%-parameter.name%>JSON)
+                    let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonObject: <%-parameter.name%>JSON)
                 <%_ }
 
                 if(parametersText == undefined || parametersText == null) {
@@ -314,35 +335,38 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             if(method.isStatic || method.isInitializer) {
               if(method.isInitializer) {
                 if(method.isFailableInitializer) {%>
-            guard let subject = try <%-model.name%>.init(<%-parametersText ? parametersText : ""%>) else {
-                // TODO: Replace with JSON Errors
-                throw Abort(.badRequest, reason: "Unknown error")
-            }
+                    guard let subject = try <%-model.name%>.init(<%-parametersText ? parametersText : ""%>) else {
+                        // TODO: Replace with JSON Errors
+                        throw Abort(.badRequest, reason: "Unknown error")
+                    }
                 <%_ } else { -%>
-            let subject = try <%-model.name%>.init(<%-parametersText ? parametersText : ""%>)
-                <%_ } -%>
-            try subject.save()
-            let jsonResponse = subject.makeJSONObject()
+                    let subject = try <%-model.name%>.init(<%-parametersText ? parametersText : ""%>)
+                        <%_ } -%>
+                    try subject.save()
+                    let jsonResponse = subject.makeJSONObject()
 
-            return Response(status: .created, headers: [
-                "Content-Type": "application/json; charset=utf-8"
-            ], body: Body(jsonResponse.serialize()))<%_ } else { -%>
-              <%_ if(method.isOptionalReturnType) { -%>
-            guard let subject = try <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>) else {
-                throw Abort(.badRequest, reason: "Unknown error")
-            }
+                    return Response(status: .created, headers: [
+                        "Content-Type": "application/json; charset=utf-8"
+                    ], body: Body(jsonResponse.serialize()))
+              <%_ } else {
+                if(method.isOptionalReturnType) { -%>
+                    guard let subject = try <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>) else {
+                        throw Abort(.badRequest, reason: "Unknown error")
+                    }
 
-            return subject
+                    return subject
               <%_ } else { -%>
-            return try <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
+                    return try <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
               <%_ } -%>
             <%_ } -%>
             <%_ } else { -%>
-            return try subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
+                    return try subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
             <%_ } -%>
+                }
+            }
         }<%
         methods.push(method);
-        exposedMethods.push(`${model.name}_${method.shortName}`);
+        exposedMethods.push(routeName);
     });
     %>
     }
@@ -358,3 +382,33 @@ extension Meow {
         <%-model.name%>.integrate(with: droplet)<% } %>
     }
 }
+
+<% if(exposedMethods.length > 0) {-%>
+public enum MeowRoutes {
+  <%_ exposedMethods.forEach(method => {-%>
+    case <%-method%>
+  <%_ }); -%>
+}
+
+extension Meow {
+    public static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+        AuthorizationMiddleware.default.permissionChecker = { route in
+            guard let route = route as? MeowRoutes else {
+                return false
+            }
+
+            return try closure(route)
+        }
+    }
+
+    public static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+        AuthenticationMiddleware.default.authenticationRequired = { route in
+            guard let route = route as? MeowRoutes else {
+                return false
+            }
+
+            return try closure(route)
+        }
+    }
+}
+<%}-%>

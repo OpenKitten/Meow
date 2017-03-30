@@ -6,21 +6,23 @@ try Meow.database.drop()
 
 let drop = try Droplet()
 Meow.integrate(with: drop)
+Meow.integrateAuthentication(with: drop)
 
-drop.get("users", User.init) { request, user in
-    return user
-}
-
-drop.get("users/by-username", User.byUsername) { request, user in
-    return user
-}
-
-drop.get("users", User.init, "profile-picture") { _, user in
-    guard let profile = user.profile else {
-        throw Abort.notFound
+Meow.checkPermissions { route in
+    switch route {
+    case .User_get:
+        return true
+    case .User_delete:
+        return false
+    case .User_init:
+        return true
+    case .User_static_cheese:
+        return true
     }
-    
-    return try profile.picture.makeResponse()
+}
+
+_ = try User.find { user in
+    return user.profile.age > 20
 }
 
 try drop.run()

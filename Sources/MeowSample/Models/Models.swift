@@ -30,6 +30,11 @@ final class User: Model {
     // sourcery: public
     var profile: Profile?
     
+    // sourcery: public, method = GET
+    static func cheese() -> String {
+        return "cheese"
+    }
+    
     init?(username: String, email: String, gender: Gender? = nil, profile: Profile? = nil) throws {
         self.username = username
         self.email = email

@@ -32,11 +32,14 @@ extension JSONArray : ResponseRepresentable {
 
 extension Meow {
     public static func integrateAuthentication(with droplet: Droplet, sessionManager: SessionsProtocol = MongoSessions(in: Meow.database["_sessions"])) {
+        AuthenticationMiddleware.default.enabled = true
+        AuthorizationMiddleware.default.enabled = true
+        
         droplet.middleware = [
             SessionsMiddleware(sessionManager),
             ContextAwarenessMiddleware(),
             DateMiddleware(),
-            FileMiddleware(publicDir: droplet.workDir + "Public/"),
+            FileMiddleware(publicDir: droplet.workDir + "Public/")
         ]
     }
 }

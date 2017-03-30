@@ -463,55 +463,104 @@ extension User : StringInitializable, ResponseRepresentable {
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
       drop.get("users", User.init) { request, subject in
-        return subject
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_get) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_get) { request in
+            return subject
+          }
+        }
       }
 
       drop.delete("users", User.init) { request, subject in
-        try subject.delete()
-
-        return subject
+        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_get) { request in
+          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_delete) { request in
+            try subject.delete()
+            return Response(status: .ok)
+          }
+        }
       }
 
+        droplet.get("users", "cheese") { request in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_static_cheese) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_static_cheese) { request in
+                    return try User.cheese()
+                }
+            }
+        }
+
         droplet.post("users") { request in
-            guard let object = request.jsonObject else {
-                throw Abort(.badRequest, reason: "No JSON object provided")
-            }
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
+                    guard let object = request.jsonObject else {
+                        throw Abort(.badRequest, reason: "No JSON object provided")
+                    }
             
-            guard let username = String(object["username"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"username\"")
-            }
+                    guard let username = String(object["username"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"username\"")
+                    }
                 
-            guard let email = String(object["email"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"email\"")
-            }
+                    guard let email = String(object["email"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"email\"")
+                    }
                 
-            guard let genderJSON = String(object["gender"]) else {
-                throw Abort(.badRequest, reason: "Invalid key \"gender\"")
+                    guard let genderJSON = String(object["gender"]) else {
+                        throw Abort(.badRequest, reason: "Invalid key \"gender\"")
+                    }
+
+                    let gender = try Gender(meowValue: genderJSON)
+
+                    guard let profileJSON = object["profile"] as? JSONObject else {
+                        throw Abort(.badRequest, reason: "Invalid key \"profile\"")
+                    }
+
+                    let profile = try Profile(jsonObject: profileJSON)
+
+                    guard let subject = try User.init(username: username, email: email, gender: gender, profile: profile) else {
+                        // TODO: Replace with JSON Errors
+                        throw Abort(.badRequest, reason: "Unknown error")
+                    }
+                    try subject.save()
+                    let jsonResponse = subject.makeJSONObject()
+
+                    return Response(status: .created, headers: [
+                        "Content-Type": "application/json; charset=utf-8"
+                    ], body: Body(jsonResponse.serialize()))
+                }
             }
-
-            let gender = try Gender(meowValue: genderJSON)
-
-            guard let profileJSON = object["profile"] as? JSONObject else {
-                throw Abort(.badRequest, reason: "Invalid key \"profile\"")
-            }
-
-            let profile = try Profile(jsonObject: profileJSON)
-
-            guard let subject = try User.init(username: username, email: email, gender: gender, profile: profile) else {
-                // TODO: Replace with JSON Errors
-                throw Abort(.badRequest, reason: "Unknown error")
-            }
-            try subject.save()
-            let jsonResponse = subject.makeJSONObject()
-
-            return Response(status: .created, headers: [
-                "Content-Type": "application/json; charset=utf-8"
-            ], body: Body(jsonResponse.serialize()))        }
+        }
     }
 }
 
 extension Meow {
     public static func integrate(with droplet: Droplet) {
         User.integrate(with: droplet)
+    }
+}
+
+public enum MeowRoutes {
+    case User_get
+    case User_delete
+    case User_static_cheese
+    case User_init
+}
+
+extension Meow {
+    public static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+        AuthorizationMiddleware.default.permissionChecker = { route in
+            guard let route = route as? MeowRoutes else {
+                return false
+            }
+
+            return try closure(route)
+        }
+    }
+
+    public static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
+        AuthenticationMiddleware.default.authenticationRequired = { route in
+            guard let route = route as? MeowRoutes else {
+                return false
+            }
+
+            return try closure(route)
+        }
     }
 }
