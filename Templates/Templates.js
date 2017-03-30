@@ -53,6 +53,12 @@ function deserializeFromPrimitive(name, type, typeName, accessor) {
     } else {
       %> try Meow.Helpers.requireValue(<%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
     }
+  } else if(typeName.unwrappedTypeName == "File") {
+    if (typeName.isOptional) {
+      %> try File(<%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(File(<%- accessor %>), keyForError: "<%-name%>") <%
+    }
   }
 
   %> /* <%-typeName.name%> */ <%
@@ -82,6 +88,8 @@ function serializeToPrimitive(accessor, type, typeName) {
   } else if (typeName.isTuple) {
     ensureSerializable(typeName);
     %> <%- makeTupleSerializeFunctionName(typeName) %>(<%- accessor %>)<%
+  } else if(typeName.unwrappedTypeName == "File") {
+    %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.id <%
   }
 }
 

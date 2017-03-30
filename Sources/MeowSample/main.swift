@@ -24,15 +24,8 @@ drop.delete("users", User.init) { request, user in
     return "OK"
 }
 
-func makeGender(from string: String) throws -> Gender? {
-    switch string {
-    case "male":
-        return .male
-    case "female":
-        return .female
-    default:
-        return nil
-    }
+drop.get("users", User.init, "profile-picture") { _, user in
+    return try user.profile.picture.makeResponse()
 }
 
 try drop.run()

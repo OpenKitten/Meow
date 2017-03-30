@@ -285,6 +285,7 @@ import Meow
         
           self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
           self.age = try Meow.Helpers.requireValue(Int(source["age"]), keyForError: "age")  /* Int */ 
+          self.picture = try File(source["picture"])  /* File? */ 
 
         
       }
@@ -304,6 +305,7 @@ import Meow
           
             document["name"] = self.name 
             document["age"] = self.age 
+            document["picture"] = self.picture?.id 
           return document
         }
 
@@ -320,6 +322,8 @@ import Meow
               var name: VirtualString { return VirtualString(name: keyPrefix + "name") } 
              /// age: Int
               var age: VirtualNumber { return VirtualNumber(name: keyPrefix + "age") } 
+             /// picture: File?
+             
 
           init(keyPrefix: String = "") {
             self.keyPrefix = keyPrefix
@@ -330,6 +334,7 @@ import Meow
           
             case name          
             case age          
+            case picture          
 
 
         }

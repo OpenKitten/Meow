@@ -9,6 +9,7 @@ enum Gender {
 struct Profile {
     var name: String
     var age: Int
+    var picture: File?
 }
 
 final class User: Model {
