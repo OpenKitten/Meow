@@ -147,8 +147,8 @@ import Meow
           
             document["username"] = self.username 
             document["email"] = self.email 
-            document["gender"] = self.gender.meowSerialize() 
-            document["profile"] = self.profile.meowSerialize() 
+            document["gender"] = self.gender?.meowSerialize() 
+            document["profile"] = self.profile?.meowSerialize() 
           return document
         }
 
@@ -165,9 +165,9 @@ import Meow
               var username: VirtualString { return VirtualString(name: keyPrefix + "username") } 
              /// email: String
               var email: VirtualString { return VirtualString(name: keyPrefix + "email") } 
-             /// gender: Gender
+             /// gender: Gender?
               var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: keyPrefix + "gender") } 
-             /// profile: Profile
+             /// profile: Profile?
               var profile: Profile.VirtualInstance { return Profile.VirtualInstance(keyPrefix: keyPrefix + "profile") } 
 
           init(keyPrefix: String = "") {
@@ -359,26 +359,71 @@ import MeowVapor
 import Vapor
 import Cheetah
 import HTTP
+import Cheetah
 
 extension User {
+
   public func makeJSONObject() -> JSONObject {
-    var object: JSONObject = [
-        "id": self._id.hexString
-    ]
+      var object: JSONObject = [
+          "id": self._id.hexString
+      ]
 
       object["username"] = self.username
       object["email"] = self.email
-      object["gender"] = self.gender.meowSerialize() as? Cheetah.Value
-      object["profile"] = self.profile.makeJSONObject()
+      object["gender"] = self.gender?.meowSerialize() as? Cheetah.Value
+      object["profile"] = self.profile?.makeJSONObject()
+
+      return object
+  }
+}
+
+
+extension Gender {
+  public init(jsonValue: Cheetah.Value?) throws {
+    
+      let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum Gender")
+      switch rawValue {
+         case "male": self = .male
+         case "female": self = .female
+        
+        default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
+      }
+    
+  }
+}
+extension Gender {
+
+  public func makeJSONObject() -> JSONObject {
+      let object: JSONObject = [:]
+
 
       return object
   }
 }
 
 extension Profile {
-  public func makeJSONObject() -> JSONObject {
-    var object: JSONObject = [:]
+  public init(jsonValue source: Cheetah.Value?) throws {
+    let jsonObject = try Meow.Helpers.requireValue(JSONObject(source["_id"]), keyForError: "_id")
 
+    try self.init(jsonObject: jsonObject)
+  }
+
+  public init(jsonObject source: JSONObject) throws {
+      
+    
+      self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
+      self.age = try Meow.Helpers.requireValue(Int(source["age"]), keyForError: "age")  /* Int */ 
+      self.picture = try File(source["picture"])  /* File? */ 
+
+      
+  }
+
+  public func makeJSONObject() -> JSONObject {
+      var object: JSONObject = [:]
+
+      object["name"] = self.name
+      object["age"] = self.age
+      object["picture"] = self.picture?.id.hexString
 
       return object
   }
@@ -427,6 +472,41 @@ extension User : StringInitializable, ResponseRepresentable {
         return subject
       }
 
+        droplet.post("users") { request in
+            guard let object = request.jsonObject else {
+                throw Abort(.badRequest, reason: "No JSON object provided")
+            }
+            
+            guard let username = String(object["username"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"username\"")
+            }
+                
+            guard let email = String(object["email"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"email\"")
+            }
+                
+            guard let genderJSON = String(object["gender"]) else {
+                throw Abort(.badRequest, reason: "Invalid key \"gender\"")
+            }
+
+            let gender = try Gender(meowValue: genderJSON)
+
+            guard let profileJSON = object["profile"] as? JSONObject else {
+                throw Abort(.badRequest, reason: "Invalid key \"profile\"")
+            }
+
+            let profile = try Profile(jsonObject: profileJSON)
+
+            guard let subject = try User.init(username: username, email: email, gender: gender, profile: profile) else {
+                // TODO: Replace with JSON Errors
+                throw Abort(.badRequest, reason: "Unknown error")
+            }
+            try subject.save()
+            let jsonResponse = subject.makeJSONObject()
+
+            return Response(status: .created, headers: [
+                "Content-Type": "application/json; charset=utf-8"
+            ], body: Body(jsonResponse.serialize()))        }
     }
 }
 
@@ -435,4 +515,3 @@ extension Meow {
         User.integrate(with: droplet)
     }
 }
-

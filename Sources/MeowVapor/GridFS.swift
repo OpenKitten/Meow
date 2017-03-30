@@ -36,3 +36,7 @@ extension Optional where Wrapped : ResponseRepresentable {
         return try wrapped.makeResponse()
     }
 }
+
+extension Array where Element : ResponseRepresentable {
+    
+}

@@ -106,6 +106,8 @@ function ensureSerializable(type) {
     return;
   }
 
+  if(type.name == "File") { return; }
+
   // check if it is already in the queue, and if it is, return:
   if (serializables.find(t => t.name == type.name)) { return };
   serializables.push(type);

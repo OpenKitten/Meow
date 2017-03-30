@@ -7,8 +7,13 @@ enum Gender {
 }
 
 struct Profile {
+    // sourcery: public
     var name: String
+    
+    // sourcery: public
     var age: Int
+    
+    // sourcery: public
     var picture: File?
 }
 
@@ -20,10 +25,17 @@ final class User: Model {
     var email: String
     
     // sourcery: public
-    var gender: Gender
+    var gender: Gender? = nil
     
     // sourcery: public
-    var profile: Profile
+    var profile: Profile?
+    
+    init?(username: String, email: String, gender: Gender? = nil, profile: Profile? = nil) throws {
+        self.username = username
+        self.email = email
+        self.gender = gender
+        self.profile = profile
+    }
     
     // sourcery:inline:User.Meow
       init(meowDocument source: Document) throws {
@@ -31,8 +43,8 @@ final class User: Model {
         
           self.username = try Meow.Helpers.requireValue(String(source["username"]), keyForError: "username")  /* String */ 
           self.email = try Meow.Helpers.requireValue(String(source["email"]), keyForError: "email")  /* String */ 
-          self.gender = try Meow.Helpers.requireValue(Gender(meowValue: source["gender"]), keyForError: "gender")  /* Gender */ 
-          self.profile = try Meow.Helpers.requireValue(Profile(meowValue: source["profile"]), keyForError: "profile")  /* Profile */ 
+          self.gender = try Gender(meowValue: source["gender"])  /* Gender? */ 
+          self.profile = try Profile(meowValue: source["profile"])  /* Profile? */ 
 
         Meow.pool.pool(self)
       }

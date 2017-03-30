@@ -4,6 +4,7 @@ import MeowVapor
 import Vapor
 import Cheetah
 import HTTP
+import Cheetah
 
 <%
 // helpers
@@ -22,6 +23,48 @@ function plural(name) {
     } else {
         return name + lastLetter + "s"
     }
+}
+
+function deserializeFromCheetahValue(name, type, typeName, accessor) {
+  if (supportedPrimitives.includes(typeName.unwrappedTypeName)) {
+    if (typeName.isOptional) {
+      %> <%- typeName.unwrappedTypeName %>(<%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(<%-typeName.name%>(<%- accessor %>), keyForError: "<%-name%>") <%
+    }
+  } else if (type) {
+    // Embed a custom type
+    ensureSerializable(type);
+
+    if (typeName.isOptional) {
+      %> try <%-typeName.unwrappedTypeName-%>(jsonValue: <%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(<%-typeName.unwrappedTypeName-%>(jsonValue: <%- accessor %>), keyForError: "<%-name%>") <%
+    }
+  } else if (typeName.isArray) {
+    let elementTypeNameString = ensureSerializableArray(typeName);
+
+    if (typeName.isOptional) {
+      %> try meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>), keyForError: "<%-name%>") <%
+    }
+  } else if (typeName.isTuple) {
+    ensureSerializable(typeName);
+    if (typeName.isOptional) {
+      %> try <%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(<%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
+    }
+  } else if(typeName.unwrappedTypeName == "File") {
+    if (typeName.isOptional) {
+      %> try File(<%- accessor %>) <%
+    } else {
+      %> try Meow.Helpers.requireValue(File(<%- accessor %>), keyForError: "<%-name%>") <%
+    }
+  }
+
+  %> /* <%-typeName.name%> */ <%
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
@@ -45,18 +88,53 @@ let generatedModels = [];
 let modelIndex = 0;
 
 serializables.forEach(serializable => {
-  if(serializable.kind == "enum") { return; }
-  -%>
+  if(serializable.kind == "enum") {%>
 extension <%- serializable.name %> {
+  public init(jsonValue: Cheetah.Value?) throws {
+    <% if (serializable.typeName) { %>
+      let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(jsonValue), keyForError: "enum <%- serializable.name %>")
+      self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
+    <% } else if (!serializable.hasAssociatedValues) { %>
+      let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum <%- serializable.name %>")
+      switch rawValue {
+        <% serializable.cases.forEach(enumCase => {
+          %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
+        <%})%>
+        default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+      }
+    <% } else { %>
+      <# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
+    <% } %>
+  }
+}
+<%_ } -%>
+extension <%- serializable.name %> {
+  <%_ if(serializable.kind == "struct") { -%>
+  public init(jsonValue source: Cheetah.Value?) throws {
+    let jsonObject = try Meow.Helpers.requireValue(JSONObject(source["_id"]), keyForError: "_id")
+
+    try self.init(jsonObject: jsonObject)
+  }
+
+  public init(jsonObject source: JSONObject) throws {
+      <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
+    <% serializable.variables.forEach(variable => { %>
+      self.<%- variable.name %> =<% deserializeFromCheetahValue(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
+    }); %>
+
+      <% if (serializable.based["Model"]) { %>Meow.pool.pool(self)<% } %>
+  }
+  <%_ } -%>
+
   public func makeJSONObject() -> JSONObject {
     <%_
     let type = (serializable.allVariables.length > 0) ? "var" : "let";
     if(models.includes(serializable)) { -%>
-    <%-type%> object: JSONObject = [
-        "id": self._id.hexString
-    ]
+      <%-type%> object: JSONObject = [
+          "id": self._id.hexString
+      ]
     <%_ } else { -%>
-    <%-type%> object: JSONObject = [:]
+      <%-type%> object: JSONObject = [:]
     <%_ } -%>
 
       <%_ serializable.allVariables.forEach(variable => {
@@ -64,14 +142,16 @@ extension <%- serializable.name %> {
               return;
           }
 
-          if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {
+          if(variable.typeName.unwrappedTypeName == "File") {-%>
+      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.id.hexString
+          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {
           -%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
             if(variable.type.kind == "enum") { -%>
-      object["<%-variable.name%>"] = self.<%-variable.name%>.meowSerialize() as? Cheetah.Value
+      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.meowSerialize() as? Cheetah.Value
           <%_ } else { -%>
-      object["<%-variable.name%>"] = self.<%-variable.name%>.makeJSONObject()
+      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.makeJSONObject()
           <%_ }
           } else if(bsonJsonMap[variable.type.name]) { -%>
       object["<%-variable.name%>"] = <%-bsonJsonMap[variable.type.name]%>(self.<%-variable.name%>)
@@ -129,8 +209,8 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         try subject.delete()
 
         return subject
-      }
-<%
+      }<%
+
     let methods = [];
     let hasInitializer = false;
 
@@ -162,9 +242,11 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         } else {
             if(!httpMethod) { return; }
         }
-        -%>
-        <%_ if(method.isStatic || method.isInitializer) { %>
+        %>
+        <%_ if(method.isInitializer) { %>
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
+        <%_ } else if(method.isStatic) { %>
+        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", "<%-method.shortName%>") { request in
         <%_} else { %>
         <%-method.returnType%>
         droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-method.shortName%>") { request, subject in
@@ -199,22 +281,27 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
                   }
 
                   if(enumMapping == "String" || enumMapping == parameter.type.rawType.name) {%>
-            guard let otherValue = <%-enumMapping%>(object["<%-parameter.name%>"]) else {
+            guard let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
 
-            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: otherValue)
+            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
                   <%_ } else if(enumMapping) { -%>
             let <%-parameter.name%>JSON = <%-enumMapping%>(object["<%-parameter.name%>"]))
 
-            guard let otherValue = <%-enumMapping%>(<%-parameter.name%>JSON) else {
+            guard let <%-parameter.name%>JSON = <%-enumMapping%>(<%-parameter.name%>JSON) else {
                 throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
             }
 
-            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: otherValue)
-                  <%_
-                  }
-                }
+            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(meowValue: <%-parameter.name%>JSON)
+                  <%_ }
+                  } else if(serializables.includes(parameter.type)) { %>
+            guard let <%-parameter.name%>JSON = object["<%-parameter.name%>"] as? JSONObject else {
+                throw Abort(.badRequest, reason: "Invalid key \"<%-parameter.name%>\"")
+            }
+
+            let <%-parameter.name%> = try <%-parameter.unwrappedTypeName%>(jsonObject: <%-parameter.name%>JSON)
+                <%_ }
 
                 if(parametersText == undefined || parametersText == null) {
                     parametersText = parameterText;
@@ -224,17 +311,34 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
               // Parse parameter keys and types and query the JSONObject for a key that can be converted to this type
               });
             }
-            if(method.isStatic || method.isInitializer) { _%>
-            let subject = <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
-            <% if(method.isInitializer){ %>try subject.save()
+            if(method.isStatic || method.isInitializer) {
+              if(method.isInitializer) {
+                if(method.isFailableInitializer) {%>
+            guard let subject = try <%-model.name%>.init(<%-parametersText ? parametersText : ""%>) else {
+                // TODO: Replace with JSON Errors
+                throw Abort(.badRequest, reason: "Unknown error")
+            }
+                <%_ } else { -%>
+            let subject = try <%-model.name%>.init(<%-parametersText ? parametersText : ""%>)
+                <%_ } -%>
+            try subject.save()
             let jsonResponse = subject.makeJSONObject()
 
             return Response(status: .created, headers: [
                 "Content-Type": "application/json; charset=utf-8"
-            ], body: Body(jsonResponse.serialize()))<%_ } else { _%>
-            return subject<% } %>
+            ], body: Body(jsonResponse.serialize()))<%_ } else { -%>
+              <%_ if(method.isOptionalReturnType) { -%>
+            guard let subject = try <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>) else {
+                throw Abort(.badRequest, reason: "Unknown error")
+            }
+
+            return subject
+              <%_ } else { -%>
+            return try <%-model.name%>.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
+              <%_ } -%>
+            <%_ } -%>
             <%_ } else { -%>
-            return subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
+            return try subject.<%-method.shortName%>(<%-parametersText ? parametersText : ""%>)
             <%_ } -%>
         }<%
         methods.push(method);
@@ -254,16 +358,3 @@ extension Meow {
         <%-model.name%>.integrate(with: droplet)<% } %>
     }
 }
-
-<%
-if(exposedMethods.length > 0) {
-  let methodPosition = 0;-%>
-public enum ExposedMethods : String {<%
-  while(methodPosition < exposedMethods.length) {
-    let methodName = exposedMethods[methodPosition];
-    methodPosition++;%>
-    case <%-methodName%><%
-  }
-%>
-}
-<%}-%>
