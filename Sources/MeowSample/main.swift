@@ -9,12 +9,12 @@ Meow.integrateAuthentication(with: drop)
 
 Meow.checkPermissions { route in
     switch route {
+    case .User_init, .User_static_authenticate:
+        return true
     case .User_get:
         return User.current != nil
     case .User_delete(let removedUser):
         return User.current == removedUser
-    default:
-        return true
     }
 }
 
