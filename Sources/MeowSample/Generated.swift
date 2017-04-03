@@ -236,7 +236,7 @@ import Meow
             guard let rawValue = String(meowValue) else {
                 return nil
             }
-            
+
             switch rawValue {
                case "male": self = .male
                case "female": self = .female
@@ -391,6 +391,8 @@ extension User {
           "id": self._id.hexString
       ]
 
+
+      object["profileURL"] = self.profileURL?.jsonRepresentation
       object["username"] = self.username
       object["email"] = self.email
       object["gender"] = self.gender?.meowSerialize() as? Cheetah.Value
@@ -436,7 +438,8 @@ extension Profile {
 
       object["name"] = self.name
       object["age"] = self.age
-      object["picture"] = self.picture?.id.hexString
+
+      object["picture"] = self.picture?.jsonRepresentation
 
       return object
   }

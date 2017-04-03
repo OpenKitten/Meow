@@ -27,6 +27,7 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
+let specialTypes = ["URL", "File", "Unit"];
 
 // TODO: Return (other) models and embeddables
 // TODO: Return many models/embeddables
@@ -106,10 +107,9 @@ extension <%- serializable.name %> {
               return;
           }
 
-          if(variable.typeName.unwrappedTypeName == "File") {-%>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.id.hexString
-          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {
-          -%>
+          if(specialTypes.includes(variable.typeName.unwrappedTypeName)) { %>
+      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
+          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
             if(variable.type.kind == "enum") { -%>
@@ -149,11 +149,12 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     }<%
 
     model.variables.forEach(variable => {
-    let primitive = supportedPrimitives.includes(variable.typeName.unwrappedTypeName);
+      if(variable.isComputed) { return; }
+      let primitive = supportedPrimitives.includes(variable.typeName.unwrappedTypeName);
 
-    if((!variable.isEnum && !primitive) || !variable.annotations["unique"]) {
-        return;
-    }
+      if((!variable.isEnum && !primitive) || !variable.annotations["unique"]) {
+          return;
+      }
     %>
 
     public static func by<%-capitalizeFirstLetter(variable.name)%>(_ string: String) throws -> <%-model.name%>? {

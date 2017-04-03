@@ -19,6 +19,11 @@ struct Profile {
 
 // sourcery: user
 final class User: Model {
+    // sourcery: public
+    var profileURL: URL? {
+        return URL(string: "http://localhost:8080/users/\(self._id.hexString)/")
+    }
+    
     // sourcery: public, unique
     var username: String
     

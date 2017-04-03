@@ -217,7 +217,7 @@ function generateSerializables() {
             guard let rawValue = String(meowValue) else {
                 return nil
             }
-            
+
             switch rawValue {
               <% serializable.cases.forEach(enumCase => {
                 %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
@@ -264,7 +264,8 @@ function generateSerializables() {
       <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
       init(meowDocument source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
-        <% serializable.variables.forEach(variable => { %>
+        <% serializable.variables.forEach(variable => {
+            if(variable.isComputed) { return; }%>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
 
@@ -286,7 +287,8 @@ function generateSerializables() {
         func meowSerialize() -> Document {
           var document = Document()
             <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
-          <% serializable.variables.forEach(variable => { %>
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; }%>
             document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
           return document
@@ -300,7 +302,8 @@ function generateSerializables() {
         struct VirtualInstance {
           var keyPrefix: String
 
-          <% serializable.variables.forEach(variable => {%>
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; } %>
              /// <%- variable.name %>: <%- variable.typeName.name %>
              <%
              if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
@@ -322,7 +325,8 @@ function generateSerializables() {
 
         enum Key : String {-%>
             case _id
-          <% serializable.variables.forEach(variable => {%>
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; }%>
             case <%- variable.name %>-%>
           <%})%>
 

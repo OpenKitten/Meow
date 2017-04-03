@@ -217,7 +217,7 @@ function generateSerializables() {
             guard let rawValue = String(meowValue) else {
                 return nil
             }
-            
+
             switch rawValue {
               <% serializable.cases.forEach(enumCase => {
                 %> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
@@ -264,7 +264,8 @@ function generateSerializables() {
       <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
       init(meowDocument source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
-        <% serializable.variables.forEach(variable => { %>
+        <% serializable.variables.forEach(variable => {
+            if(variable.isComputed) { return; }%>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
 
@@ -286,7 +287,8 @@ function generateSerializables() {
         func meowSerialize() -> Document {
           var document = Document()
             <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
-          <% serializable.variables.forEach(variable => { %>
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; }%>
             document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
           return document
@@ -300,7 +302,8 @@ function generateSerializables() {
         struct VirtualInstance {
           var keyPrefix: String
 
-          <% serializable.variables.forEach(variable => {%>
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; } %>
              /// <%- variable.name %>: <%- variable.typeName.name %>
              <%
              if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
@@ -322,7 +325,8 @@ function generateSerializables() {
 
         enum Key : String {-%>
             case _id
-          <% serializable.variables.forEach(variable => {%>
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; }%>
             case <%- variable.name %>-%>
           <%})%>
 
@@ -449,6 +453,7 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
+let specialTypes = ["URL", "File", "Unit"];
 
 // TODO: Return (other) models and embeddables
 // TODO: Return many models/embeddables
@@ -528,10 +533,9 @@ extension <%- serializable.name %> {
               return;
           }
 
-          if(variable.typeName.unwrappedTypeName == "File") {-%>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.id.hexString
-          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {
-          -%>
+          if(specialTypes.includes(variable.typeName.unwrappedTypeName)) { %>
+      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
+          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
             if(variable.type.kind == "enum") { -%>
@@ -571,11 +575,12 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     }<%
 
     model.variables.forEach(variable => {
-    let primitive = supportedPrimitives.includes(variable.typeName.unwrappedTypeName);
+      if(variable.isComputed) { return; }
+      let primitive = supportedPrimitives.includes(variable.typeName.unwrappedTypeName);
 
-    if((!variable.isEnum && !primitive) || !variable.annotations["unique"]) {
-        return;
-    }
+      if((!variable.isEnum && !primitive) || !variable.annotations["unique"]) {
+          return;
+      }
     %>
 
     public static func by<%-capitalizeFirstLetter(variable.name)%>(_ string: String) throws -> <%-model.name%>? {
