@@ -166,7 +166,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     }<% }); %>
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-      drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
+      droplet.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
         return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
           return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
             return subject
@@ -174,7 +174,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         }
       }
 
-      drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
+      droplet.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
         return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
           return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
             try subject.delete()
