@@ -194,7 +194,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         let httpMethod;
         let parametersText = undefined;
 
-        if(!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer && !serializables.includes(method.returnType)) {
+        if(!basicReturnType && !method.isInitializer && !serializables.includes(method.returnType) && (!method.returnType || !method.returnType.based["ResponseRepresentable"])) {
             return;
         }
 
@@ -212,7 +212,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             if(hasInitializer) { return; }
 
             hasInitializer = true;
-            let parametersText = undefined;
+            parametersText = undefined;
             httpMethod = "post";
         } else {
             if(!httpMethod) { return; }
