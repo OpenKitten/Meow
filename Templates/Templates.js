@@ -261,7 +261,7 @@ function generateSerializables() {
     <% } else { %>
       // Struct or Class extension
       extension <%- serializable.name %> : ConcreteSerializable {
-      <% if (serializable.kind == "class") { %>// sourcery:inline:<%- serializable.name %>.Meow<% } %>
+      <% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %><% } %>
       init(meowDocument source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
