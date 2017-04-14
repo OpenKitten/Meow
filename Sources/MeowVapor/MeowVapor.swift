@@ -4,6 +4,7 @@ import Cheetah
 @_exported import Vapor
 @_exported import BSON
 import Sessions
+import ExtendedJSON
 
 extension Request {
     public var jsonObject: JSONObject? {
@@ -12,6 +13,26 @@ extension Request {
         }
         
         return try? JSONObject(from: bytes)
+    }
+    
+    public var document: Document? {
+        guard let bytes = self.body.bytes else {
+            return nil
+        }
+        
+        do {
+            return try Document(extendedJSON: bytes)
+        } catch {
+            return nil
+        }
+    }
+}
+
+extension Document : ResponseRepresentable {
+    public func makeResponse() throws -> Response {
+        return Response(status: .ok, headers: [
+            "Content-Type": "application/json; charset=utf-8"
+            ], body: Body(self.makeExtendedJSON().serialize()))
     }
 }
 

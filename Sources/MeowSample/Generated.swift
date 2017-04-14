@@ -4,7 +4,7 @@
 
 import Foundation
 import Meow
-
+import BSON
 
 
   func meowReinstantiateObjectIdArray(from source: Primitive?) throws -> [ObjectId]? {
@@ -149,7 +149,7 @@ import Meow
             document["email"] = self.email 
             document["gender"] = self.gender?.meowSerialize() 
             document["profile"] = self.profile?.meowSerialize() 
-            document["password"] = self.password 
+            document["password"] = Binary(data: self.password, withSubtype: .generic) 
           return document
         }
 
