@@ -41,6 +41,7 @@ public enum Meow {
         case referenceError(id: ObjectId, type: Model.Type)
         case undeletableObject(reason: String)
         case enumCaseNotFound(enum: String, name: String)
+        case fileTooLarge(size: Int, maximum: Int)
     }
     
     public static var pool = ObjectPool()

@@ -265,7 +265,11 @@ function generateSerializables() {
       init(meowDocument source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
-            if(variable.isComputed) { return; }%>
+            if(variable.isComputed) { return; }
+
+            if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
+          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"])
+            <% return; }%>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
 
@@ -288,7 +292,11 @@ function generateSerializables() {
           var document = Document()
             <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
           <% serializable.allVariables.forEach(variable => {
-              if(variable.isComputed) { return; }%>
+              if(variable.isComputed) { return; }
+
+            if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
+            document["<%- variable.name %>"] = <%-variable.name-%>
+            <% return; } %>
             document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
           return document
@@ -326,7 +334,7 @@ function generateSerializables() {
         enum Key : String {-%>
             case _id
           <% serializable.allVariables.forEach(variable => {
-              if(variable.isComputed) { return; }%>
+              if(variable.isComputed || variable.name == "_id") { return; }%>
             case <%- variable.name %>-%>
           <%})%>
 
@@ -453,7 +461,7 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
-let specialTypes = ["URL", "File", "Unit"];
+let specialTypes = ["File"];
 
 // TODO: Return (other) models and embeddables
 // TODO: Return many models/embeddables
@@ -533,8 +541,8 @@ extension <%- serializable.name %> {
               return;
           }
 
-          if(specialTypes.includes(variable.typeName.unwrappedTypeName)) { %>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
+          if(variable.typeName.unwrappedTypeName.startsWith("File<")) { %>
+      //object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
           <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {

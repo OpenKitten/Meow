@@ -6,19 +6,15 @@ import Vapor
 
 extension File : ResponseRepresentable {
     public func makeResponse() throws -> Response {
-        guard let file = try Meow.database.makeGridFS().findOne(byID: id) else {
+        guard let file = try Location.default.readFile(from: specification) else {
             throw Abort.notFound
         }
         
-        var headers: [HeaderKey: String] = [:]
-        
-        if let type = file.contentType {
-            headers["Content-Type"] = type
-        }
+        let headers: [HeaderKey: String] = ["Content-Type": Limits.mimeType]
         
         return Response(status: .ok, headers: headers) { stream in
-            for chunk in try file.chunked() {
-                try stream.write(chunk.data)
+            for chunk in file {
+                try stream.write(chunk)
                 try stream.flush(timingOut: 5)
             }
             
@@ -35,8 +31,4 @@ extension Optional where Wrapped : ResponseRepresentable {
         
         return try wrapped.makeResponse()
     }
-}
-
-extension Array where Element : ResponseRepresentable {
-    
 }

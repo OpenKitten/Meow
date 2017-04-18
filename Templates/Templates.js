@@ -265,7 +265,11 @@ function generateSerializables() {
       init(meowDocument source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
-            if(variable.isComputed) { return; }%>
+            if(variable.isComputed) { return; }
+
+            if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
+          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"])
+            <% return; }%>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
 
@@ -288,7 +292,11 @@ function generateSerializables() {
           var document = Document()
             <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
           <% serializable.allVariables.forEach(variable => {
-              if(variable.isComputed) { return; }%>
+              if(variable.isComputed) { return; }
+
+            if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
+            document["<%- variable.name %>"] = <%-variable.name-%>
+            <% return; } %>
             document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
           return document
@@ -326,7 +334,7 @@ function generateSerializables() {
         enum Key : String {-%>
             case _id
           <% serializable.allVariables.forEach(variable => {
-              if(variable.isComputed) { return; }%>
+              if(variable.isComputed || variable.name == "_id") { return; }%>
             case <%- variable.name %>-%>
           <%})%>
 

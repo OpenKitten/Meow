@@ -27,7 +27,7 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
-let specialTypes = ["URL", "File", "Unit"];
+let specialTypes = ["File"];
 
 // TODO: Return (other) models and embeddables
 // TODO: Return many models/embeddables
@@ -107,8 +107,8 @@ extension <%- serializable.name %> {
               return;
           }
 
-          if(specialTypes.includes(variable.typeName.unwrappedTypeName)) { %>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
+          if(variable.typeName.unwrappedTypeName.startsWith("File<")) { %>
+      //object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
           <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
