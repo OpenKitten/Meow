@@ -102,14 +102,12 @@ extension <%- serializable.name %> {
       <%-type%> object: JSONObject = [:]
     <%_ } -%>
 
-      <%_ serializable.allVariables.forEach(variable => {
-          if(!variable.annotations["public"] || variable.isStatic) {
+      <%_ serializable.variables.forEach(variable => {
+          if(!variable.annotations["public"] || variable.isStatic || variable.typeName.unwrappedTypeName.startsWith("File<")) {
               return;
           }
 
-          if(variable.typeName.unwrappedTypeName.startsWith("File<")) { %>
-      //object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
-          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
+          if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
             if(variable.type.kind == "enum") { -%>
@@ -166,28 +164,55 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     }<% }); %>
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-      droplet.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
-            return subject
-          }
+        droplet.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
+                    return subject
+                }
+            }
         }
-      }
 
-      droplet.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
-            try subject.delete()
-            return Response(status: .ok)
-          }
-        }
-      }<%
+        droplet.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
+                    try subject.delete()
+                    return Response(status: .ok)
+                }
+            }
+        }<%
 
     exposedMethods.push(`${model.name}_get(${model.name})`);
     exposedMethods.push(`${model.name}_delete(${model.name})`);
 
     let methods = [];
     let hasInitializer = false;
+
+    model.allVariables.forEach(variable => {
+      if(!variable.annotations["public"] || variable.isStatic) { return; }
+
+      if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
+
+        droplet.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-variable.name.toLowerCase()%>") { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_download_<%-variable.name%>(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_download_<%-variable.name%>(subject)) { request in
+                    return try subject.<%-variable.name%>.makeResponse()
+                }
+            }
+        }
+
+        droplet.post("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-variable.name.toLowerCase()%>") { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_upload_<%-variable.name%>(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_upload_<%-variable.name%>(subject)) { request in
+                    subject.<%-variable.name%> = try <%-variable.typeName.unwrappedTypeName%>.store(Data(request.body.bytes ?? []))
+                    try subject.save()
+                    return Response(status: .ok)
+                }
+            }
+        }<%
+        exposedMethods.push(`${model.name}_download_${variable.name}(${model.name})`);
+        exposedMethods.push(`${model.name}_upload_${variable.name}(${model.name})`);
+      }
+    });
 
     model.allMethods.forEach(method => {
         let basicReturnType = supportedReturnTypes.includes(method.unwrappedReturnTypeName);

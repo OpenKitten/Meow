@@ -44,7 +44,7 @@ public struct Embedded : StorageMechanism {
         return Embedded()
     }()
     
-    public func readFile(from specification: Data) throws -> AnyIterator<[UInt8]>? {
+    public func readFile(from specification: Binary) throws -> AnyIterator<[UInt8]>? {
         var drained = false
         
         return AnyIterator {
@@ -52,12 +52,12 @@ public struct Embedded : StorageMechanism {
             
             guard !drained else { return nil }
             
-            return Array(specification)
+            return specification.makeBytes()
         }
     }
     
-    public func storeFile(withData data: Data) throws -> Data {
-        return data
+    public func storeFile(withData data: Data) throws -> Binary {
+        return Binary(data: data, withSubtype: .generic)
     }
 }
 
@@ -102,6 +102,14 @@ public struct File<Location: StorageMechanism, Limits: FileLimits> : SimplePrimi
     }
 
     public let specification: Location.Specification
+    
+    public init?(_ specification: Primitive?) {
+        guard let specification = specification as? Location.Specification else {
+            return nil
+        }
+        
+        self.specification = specification
+    }
     
     public init(_ specification: Location.Specification) {
         self.specification = specification

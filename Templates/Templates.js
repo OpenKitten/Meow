@@ -268,8 +268,12 @@ function generateSerializables() {
             if(variable.isComputed) { return; }
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
-          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"])
-            <% return; }%>
+          <%_ if(variable.isOptional) { -%>
+          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"]) /* File */
+          <%_ } else { -%>
+          self.<%- variable.name %> = try Meow.Helpers.requireValue(<%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"]), keyForError: "<%-variable.name%>") /* File */
+          <%_ } -%>
+            <%_ return; }%>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
         }); %>
 
@@ -285,6 +289,7 @@ function generateSerializables() {
           guard let document = Document(meowValue) else {
             return nil
           }
+
           try self.init(meowDocument: document)
         }
 
