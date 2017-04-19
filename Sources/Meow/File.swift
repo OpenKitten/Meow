@@ -3,17 +3,7 @@ import Cheetah
 import MongoKitten
 import Foundation
 
-public protocol StorageMechanism {
-    associatedtype Specification: SimplePrimitive
-    
-    static var `default`: Self { get }
-    
-    func readFile(from specification: Specification) throws -> AnyIterator<[UInt8]>?
-    
-    func storeFile(withData data: Data) throws -> Specification
-}
-
-extension GridFS : StorageMechanism {
+extension GridFS {
     public static let `default`: GridFS = {
         return try! Meow.database.makeGridFS()
     }()
@@ -36,28 +26,6 @@ extension GridFS : StorageMechanism {
     
     public func storeFile(withData data: Data) throws -> ObjectId {
         return try self.store(data: data)
-    }
-}
-
-public struct Embedded : StorageMechanism {
-    public static let `default`: Embedded = {
-        return Embedded()
-    }()
-    
-    public func readFile(from specification: Binary) throws -> AnyIterator<[UInt8]>? {
-        var drained = false
-        
-        return AnyIterator {
-            defer { drained = true }
-            
-            guard !drained else { return nil }
-            
-            return specification.makeBytes()
-        }
-    }
-    
-    public func storeFile(withData data: Data) throws -> Binary {
-        return Binary(data: data, withSubtype: .generic)
     }
 }
 
@@ -96,31 +64,31 @@ public enum PNG<B: ByteSize> : FileLimits {
     }
 }
 
-public struct File<Location: StorageMechanism, Limits: FileLimits> : SimplePrimitive {
+public struct File<Limits: FileLimits> : SimplePrimitive {
     public func convert<S>(_ type: S.Type) -> S? {
         return specification.convert(type)
     }
 
-    public let specification: Location.Specification
+    public let specification: ObjectId
     
     public init?(_ specification: Primitive?) {
-        guard let specification = specification as? Location.Specification else {
+        guard let specification = ObjectId(specification) else {
             return nil
         }
         
         self.specification = specification
     }
     
-    public init(_ specification: Location.Specification) {
+    public init(_ specification: ObjectId) {
         self.specification = specification
     }
     
-    public static func store(_ data: Data) throws -> File<Location, Limits> {
+    public static func store(_ data: Data) throws -> File<Limits> {
         guard data.count <= Limits.maximumByteSize else {
             throw Meow.Error.fileTooLarge(size: data.count, maximum: Limits.maximumByteSize)
         }
         
-        let specification = try Location.default.storeFile(withData: data)
+        let specification = try GridFS.default.storeFile(withData: data)
         
         return self.init(specification)
     }

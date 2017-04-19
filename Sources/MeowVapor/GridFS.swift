@@ -6,7 +6,7 @@ import Vapor
 
 extension File : ResponseRepresentable {
     public func makeResponse() throws -> Response {
-        guard let file = try Location.default.readFile(from: specification) else {
+        guard let file = try GridFS.default.readFile(from: specification) else {
             throw Abort.notFound
         }
         

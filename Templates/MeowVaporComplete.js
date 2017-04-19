@@ -643,9 +643,16 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     model.allVariables.forEach(variable => {
       if(!variable.annotations["public"] || variable.isStatic) { return; }
 
-      if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
+      if(variable.typeName.unwrappedTypeName.startsWith("File<")) {
+        let path;
 
-        <%-group%>.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-variable.name.toLowerCase()%>") { request, subject in
+        if(variable.annotations["path"]) {
+          path = variable.annotations["path"];
+        } else {
+          path = variable.name.toLowerCase();
+        } %>
+
+        <%-group%>.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-path%>") { request, subject in
             return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_download_<%-variable.name%>(subject)) { request in
                 return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_download_<%-variable.name%>(subject)) { request in
                     return try subject.<%-variable.name%>.makeResponse()
@@ -653,7 +660,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             }
         }
 
-        <%-group%>.post("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-variable.name.toLowerCase()%>") { request, subject in
+        <%-group%>.post("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-path%>") { request, subject in
             return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_upload_<%-variable.name%>(subject)) { request in
                 return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_upload_<%-variable.name%>(subject)) { request in
                     subject.<%-variable.name%> = try <%-variable.typeName.unwrappedTypeName%>.store(Data(request.body.bytes ?? []))
