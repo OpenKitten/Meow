@@ -3,7 +3,7 @@ import Meow
 
 <%
 // Selects all classes and structs that are either based on a model or embeddable protocol
-let models = (types.based["Model"] || []);
+let models = (types.based["Model"].filter(model => !model.annotations["skip-meow"]) || []);
 let embeddables = (types.based["Embeddable"] || []);
 
 // An array containing all serializable types
