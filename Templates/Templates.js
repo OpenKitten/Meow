@@ -265,18 +265,18 @@ function generateSerializables() {
       extension <%- serializable.name %> : ConcreteSerializable {
       <% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %><% } %>
       init(meowDocument source: Document) throws {
-          <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
+          <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source[Key._id.keyString]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
             if(variable.isComputed || variable.isStatic) { return; }
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
           <%_ if(variable.isOptional) { -%>
-          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"]) /* File */
+          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source[Key.<%-variable.name%>.keyString]) /* File */
           <%_ } else { -%>
-          self.<%- variable.name %> = try Meow.Helpers.requireValue(<%-variable.typeName.unwrappedTypeName%>(source["<%-variable.name%>"]), keyForError: "<%-variable.name%>") /* File */
+          self.<%- variable.name %> = try Meow.Helpers.requireValue(<%-variable.typeName.unwrappedTypeName%>(source[Key.<%-variable.name%>.keyString]), keyForError: "<%-variable.name%>") /* File */
           <%_ } -%>
             <%_ return; }%>
-          self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source["${variable.name}"]`);
+          self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source[Key.${variable.name}.keyString]`);
         }); %>
 
         <% if (serializable.based["Model"]) { %>Meow.pool.pool(self)<% } %>
@@ -351,7 +351,7 @@ function generateSerializables() {
             case <%- variable.name %>-%>
           <%})%>
 
-
+            var keyString: String { return self.rawValue }
         }
 
       } // end struct or class extension of <%- serializable.name %>
