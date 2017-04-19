@@ -229,19 +229,21 @@ function generateSerializables() {
           <% } %>
         }
 
-        func meowSerialize(resolvingReferences: Bool) throws -> Primitive {
-          return self.meowSerialize()
+        func meowSerialize(resolvingReferences: Bool) -> Primitive {
+            return self.meowSerialize()
         }
 
         func meowSerialize() -> Primitive {
           <% if (serializable.typeName) { %>
             return self.rawValue
-          <% } else { %>
+          <% } else if(serializable.cases.length > 0) { %>
             switch self {
-              <% serializable.cases.forEach(enumCase => {
-                %> case .<%- enumCase.name %>: return "<%- enumCase.name %>"
+              <% serializable.cases.forEach(enumCase => { -%>
+            case .<%- enumCase.name %>: return "<%- enumCase.name %>"
               <%})%>
             }
+          <% } else { %>
+            return Null()
           <% } %>
         }
 
@@ -265,7 +267,7 @@ function generateSerializables() {
       init(meowDocument source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
-            if(variable.isComputed) { return; }
+            if(variable.isComputed || variable.isStatic) { return; }
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
           <%_ if(variable.isOptional) { -%>
@@ -294,22 +296,28 @@ function generateSerializables() {
         }
 
         func meowSerialize() -> Document {
+            return meowSerialize(resolvingReferences: false)
+        }
+
+        func meowSerialize(resolvingReferences: Bool) -> Document {
           var document = Document()
             <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
           <% serializable.allVariables.forEach(variable => {
-              if(variable.isComputed) { return; }
+              if(variable.isComputed || variable.isStatic) { return; }
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
             document["<%- variable.name %>"] = <%-variable.name-%>
+            <% return; }
+            if(variable.type && variable.type.based.Model) {%>
+            if resolvingReferences {
+                document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.meowSerialize(resolvingReferences: resolvingReferences)
+            } else {
+                document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>._id
+            }
             <% return; } %>
             document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
           return document
-        }
-
-        func meowSerialize(resolvingReferences: Bool) throws -> Document {
-          // TODO: re-evaluate references
-            return self.meowSerialize()
         }
 
         struct VirtualInstance {

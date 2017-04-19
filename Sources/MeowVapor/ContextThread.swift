@@ -41,6 +41,12 @@ class ContextThread : Thread {
     }
 }
 
+extension Request {
+    public static var current: Request? {
+        return (Thread.current as? ContextThread)?.request
+    }
+}
+
 public class ContextAwarenessMiddleware : Middleware {
     public enum Error : Swift.Error {
         case strangeInconsistency
