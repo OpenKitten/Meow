@@ -6,7 +6,7 @@ import Vapor
 
 extension File : ResponseRepresentable {
     public func makeResponse() throws -> Response {
-        guard let file = try Meow.database.makeGridFS().findOne(byID: id) else {
+        guard let file = try GridFS.default.findOne(byID: id) else {
             throw Abort.notFound
         }
         
@@ -17,7 +17,7 @@ extension File : ResponseRepresentable {
         }
         
         return Response(status: .ok, headers: headers) { stream in
-            for chunk in try file.chunked() {
+            for chunk in file {
                 try stream.write(chunk.data)
                 try stream.flush(timingOut: 5)
             }
@@ -35,8 +35,4 @@ extension Optional where Wrapped : ResponseRepresentable {
         
         return try wrapped.makeResponse()
     }
-}
-
-extension Array where Element : ResponseRepresentable {
-    
 }

@@ -24,6 +24,11 @@ extension ValueConvertible {
     }
 }
 
+extension GridFS {
+    public static var `default`: GridFS = {
+        return try! Meow.database.makeGridFS()
+    }()
+}
 
 public struct File : ValueConvertible {
     public init?(_ json: Value) throws {

@@ -27,7 +27,7 @@ function plural(name) {
 }
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
-let specialTypes = ["URL", "File", "Unit"];
+let specialTypes = ["File"];
 
 // TODO: Return (other) models and embeddables
 // TODO: Return many models/embeddables
@@ -102,18 +102,16 @@ extension <%- serializable.name %> {
       <%-type%> object: JSONObject = [:]
     <%_ } -%>
 
-      <%_ serializable.allVariables.forEach(variable => {
-          if(!variable.annotations["public"] || variable.isStatic) {
+      <%_ serializable.variables.forEach(variable => {
+          if(!variable.annotations["public"] || variable.isStatic || variable.typeName.unwrappedTypeName.startsWith("File<")) {
               return;
           }
 
-          if(specialTypes.includes(variable.typeName.unwrappedTypeName)) { %>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.jsonRepresentation
-          <%_ } else if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
+          if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
       object["<%-variable.name%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
             if(variable.type.kind == "enum") { -%>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.meowSerialize() as? Cheetah.Value
+      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>. fialize() as? Cheetah.Value
           <%_ } else { -%>
       object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.makeJSONObject()
           <%_ }
@@ -166,22 +164,28 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     }<% }); %>
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-      drop.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
-            return subject
-          }
-        }
-      }
+        <%_  let group = "droplet";
+            if(model.annotations["group"]) {
+                group = "group";%>
+        let group = droplet.grouped("<%-model.annotations["group"]%>")
 
-      drop.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
-        return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
-          return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
-            try subject.delete()
-            return Response(status: .ok)
-          }
+            <%_ } -%>
+        <%-group%>.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_get(subject)) { request in
+                    return subject
+                }
+            }
         }
-      }<%
+
+        <%-group%>.delete("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init) { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_delete(subject)) { request in
+                    try subject.delete()
+                    return Response(status: .ok)
+                }
+            }
+        }<%
 
     exposedMethods.push(`${model.name}_get(${model.name})`);
     exposedMethods.push(`${model.name}_delete(${model.name})`);
@@ -189,12 +193,46 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
     let methods = [];
     let hasInitializer = false;
 
+    model.allVariables.forEach(variable => {
+      if(!variable.annotations["public"] || variable.isStatic) { return; }
+
+      if(variable.typeName.unwrappedTypeName.startsWith("File<")) {
+        let path;
+
+        if(variable.annotations["path"]) {
+          path = variable.annotations["path"];
+        } else {
+          path = variable.name.toLowerCase();
+        } %>
+
+        <%-group%>.get("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-path%>") { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_download_<%-variable.name%>(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_download_<%-variable.name%>(subject)) { request in
+                    return try subject.<%-variable.name%>.makeResponse()
+                }
+            }
+        }
+
+        <%-group%>.post("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-path%>") { request, subject in
+            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_upload_<%-variable.name%>(subject)) { request in
+                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-model.name%>_upload_<%-variable.name%>(subject)) { request in
+                    subject.<%-variable.name%> = try <%-variable.typeName.unwrappedTypeName%>.store(Data(request.body.bytes ?? []))
+                    try subject.save()
+                    return Response(status: .ok)
+                }
+            }
+        }<%
+        exposedMethods.push(`${model.name}_download_${variable.name}(${model.name})`);
+        exposedMethods.push(`${model.name}_upload_${variable.name}(${model.name})`);
+      }
+    });
+
     model.allMethods.forEach(method => {
         let basicReturnType = supportedReturnTypes.includes(method.unwrappedReturnTypeName);
         let httpMethod;
         let parametersText = undefined;
 
-        if(!basicReturnType && !method.returnType.based["ResponseRepresentable"] && !method.isInitializer && !serializables.includes(method.returnType)) {
+        if(!basicReturnType && !method.isInitializer && !serializables.includes(method.returnType) && (!method.returnType || !method.returnType.based["ResponseRepresentable"])) {
             return;
         }
 
@@ -212,7 +250,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             if(hasInitializer) { return; }
 
             hasInitializer = true;
-            let parametersText = undefined;
+            parametersText = undefined;
             httpMethod = "post";
         } else {
             if(!httpMethod) { return; }
@@ -228,13 +266,15 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             routeName = `${model.name}_${method.shortName}`;
         }
         %>
-        <%_ if(method.isInitializer) { %>
-        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
+        <%_ if(method.annotations["path"]) { %>
+        <%-group%>.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <% if(!method.isStatic){%><%-model.name%>.init, <%}%>"<%-method.annotations["path"]%>") { request in
+        <%_ } else if(method.isInitializer) { %>
+        <%-group%>.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>") { request in
         <%_ } else if(method.isStatic) { %>
-        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", "<%-method.shortName%>") { request in
-        <%_} else { %>
+        <%-group%>.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", "<%-method.shortName%>") { request in
+        <%_ } else { %>
         <%-method.returnType%>
-        droplet.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-method.shortName%>") { request, subject in
+        <%-group%>.<%-httpMethod%>("<%-plural(model.name.toLowerCase())%>", <%-model.name%>.init, "<%-method.shortName%>") { request, subject in
         <%_} -%>
             return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.<%-routeName%>) { request in
                 return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.<%-routeName%>) { request in
@@ -349,8 +389,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
         }<%
         methods.push(method);
         exposedMethods.push(routeName);
-    });
-    %>
+    });%>
     }
 }
 <% } -%>
