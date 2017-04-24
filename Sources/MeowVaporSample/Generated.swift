@@ -138,21 +138,21 @@ import Meow
             return nil
           }
 
-          try self.init(meowDocument: document)
+          try self.init(document: document)
         }
 
-        func meowSerialize() -> Document {
-            return meowSerialize(resolvingReferences: false)
+        func serialize() -> Document {
+            return serialize(resolvingReferences: false)
         }
 
-        func meowSerialize(resolvingReferences: Bool) -> Document {
+        func serialize(resolvingReferences: Bool) -> Document {
           var document = Document()
             document["_id"] = self._id
           
             document["username"] = self.username 
             document["email"] = self.email 
-            document["gender"] = self.gender?.meowSerialize() 
-            document["profile"] = self.profile?.meowSerialize() 
+            document["gender"] = self.gender?.serialize() 
+            document["profile"] = self.profile?.serialize() 
             document["password"] = self.password 
           return document
         }
@@ -185,7 +185,7 @@ import Meow
             case profile          
             case password          
 
-
+            var keyString: String { return self.rawValue }
         }
 
       } // end struct or class extension of User
@@ -245,11 +245,11 @@ import Meow
           
         }
 
-        func meowSerialize(resolvingReferences: Bool) -> Primitive {
-            return self.meowSerialize()
+        func serialize(resolvingReferences: Bool) -> Primitive {
+            return self.serialize()
         }
 
-        func meowSerialize() -> Primitive {
+        func serialize() -> Primitive {
           
             switch self {
                           case .male: return "male"
@@ -262,7 +262,7 @@ import Meow
         struct VirtualInstance {
           /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
           static func ==(lhs: VirtualInstance, rhs: Gender?) -> Query {
-            return lhs.keyPrefix == rhs?.meowSerialize()
+            return lhs.keyPrefix == rhs?.serialize()
           }
 
           var keyPrefix: String
@@ -286,12 +286,12 @@ import Meow
       // Struct or Class extension
       extension Profile : ConcreteSerializable {
       
-      init(meowDocument source: Document) throws {
+      init(document source: Document) throws {
           
         
-          self.name = try Meow.Helpers.requireValue(String(source["name"]), keyForError: "name")  /* String */ 
-          self.age = try Meow.Helpers.requireValue(Int(source["age"]), keyForError: "age")  /* Int */ 
-          self.picture = try File(source["picture"])  /* File? */ 
+          self.name = try Meow.Helpers.requireValue(String(source[Key.name.keyString]), keyForError: "name")  /* String */ 
+          self.age = try Meow.Helpers.requireValue(Int(source[Key.age.keyString]), keyForError: "age")  /* Int */ 
+          self.picture = try File(source[Key.picture.keyString])  /* File? */ 
 
         
       }
@@ -303,14 +303,14 @@ import Meow
             return nil
           }
 
-          try self.init(meowDocument: document)
+          try self.init(document: document)
         }
 
-        func meowSerialize() -> Document {
-            return meowSerialize(resolvingReferences: false)
+        func serialize() -> Document {
+            return serialize(resolvingReferences: false)
         }
 
-        func meowSerialize(resolvingReferences: Bool) -> Document {
+        func serialize(resolvingReferences: Bool) -> Document {
           var document = Document()
             
           
@@ -342,7 +342,7 @@ import Meow
             case age          
             case picture          
 
-
+            var keyString: String { return self.rawValue }
         }
 
       } // end struct or class extension of Profile
@@ -381,7 +381,7 @@ extension User {
     public convenience init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-        try self.init(meowDocument: document)
+        try self.init(document: document)
     }
 }
 extension User {
@@ -422,7 +422,7 @@ extension Profile {
     public init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-        try self.init(meowDocument: document)
+        try self.init(document: document)
     }
 }
 extension Profile {
@@ -435,7 +435,7 @@ extension Profile {
 }
 
 
-extension User : StringInitializable, ResponseRepresentable {
+extension User : ResponseRepresentable {
     public func makeResponse() throws -> Response {
         return try makeJSONObject().makeResponse()
     }
@@ -447,7 +447,7 @@ extension User : StringInitializable, ResponseRepresentable {
             return nil
         }
 
-        try self.init(meowDocument: selfDocument)
+        try self.init(document: selfDocument)
     }
 
     fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {

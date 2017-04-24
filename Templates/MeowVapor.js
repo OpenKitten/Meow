@@ -86,7 +86,7 @@ extension <%- serializable.name %> {
     public <%-serializable.kind == "class" ? "convenience " : ""%>init(jsonValue: Cheetah.Value?) throws {
         let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-        try self.init(meowDocument: document)
+        try self.init(document: document)
     }
 }
 <% } -%>
@@ -131,7 +131,7 @@ while(models.length > generatedModels.length) {
     modelIndex++;
     generatedModels.push(model);
 %>
-extension <%- model.name %> : StringInitializable, ResponseRepresentable {
+extension <%- model.name %> : ResponseRepresentable {
     public func makeResponse() throws -> Response {
         return try makeJSONObject().makeResponse()
     }
@@ -143,7 +143,7 @@ extension <%- model.name %> : StringInitializable, ResponseRepresentable {
             return nil
         }
 
-        try self.init(meowDocument: selfDocument)
+        try self.init(document: selfDocument)
     }<%
 
     model.variables.forEach(variable => {
