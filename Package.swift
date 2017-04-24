@@ -4,8 +4,9 @@ let package = Package(
     name: "Meow",
     targets: [
         Target(name: "Meow"),
+        Target(name: "MeowSample", dependencies: ["Meow"]),
         Target(name: "MeowVapor", dependencies: ["Meow"]),
-        Target(name: "MeowSample", dependencies: ["MeowVapor"])
+        Target(name: "MeowVaporSample", dependencies: ["MeowVapor"])
     ],
     dependencies: [
        .Package(url: "https://github.com/OpenKitten/MongoKitten.git", Version(0,0,27)),

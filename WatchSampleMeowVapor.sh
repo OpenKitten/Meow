@@ -1,1 +1,1 @@
-sourcery --sources Sources/MeowSample --templates Templates/MeowVaporComplete.js --output Sources/MeowSample/Generated.swift --watch --verbose
+sourcery --sources Sources/MeowVaporSample --templates Templates/MeowVaporComplete.js --output Sources/MeowVaporSample/Generated.swift --watch --verbose

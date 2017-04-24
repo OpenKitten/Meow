@@ -77,13 +77,13 @@ function serializeToPrimitive(accessor, type, typeName) {
   } else if (type) {
     // Embed a custom type
     ensureSerializable(type);
-    %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.meowSerialize() <%
+    %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.serialize() <%
   } else if (typeName.isArray) {
     let elementTypeNameString = ensureSerializableArray(typeName);
     if (supportedPrimitives.includes(elementTypeNameString)) {
       %> <%- accessor %> <%
     } else {
-      %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.map { $0.meowSerialize() } <%
+      %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.map { $0.serialize() } <%
     }
   } else if (typeName.isTuple) {
     ensureSerializable(typeName);
@@ -229,11 +229,11 @@ function generateSerializables() {
           <% } %>
         }
 
-        func meowSerialize(resolvingReferences: Bool) -> Primitive {
-            return self.meowSerialize()
+        func serialize(resolvingReferences: Bool) -> Primitive {
+            return self.serialize()
         }
 
-        func meowSerialize() -> Primitive {
+        func serialize() -> Primitive {
           <% if (serializable.typeName) { %>
             return self.rawValue
           <% } else if(serializable.cases.length > 0) { %>
@@ -250,7 +250,7 @@ function generateSerializables() {
         struct VirtualInstance {
           /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
           static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
-            return lhs.keyPrefix == rhs?.meowSerialize()
+            return lhs.keyPrefix == rhs?.serialize()
           }
 
           var keyPrefix: String
@@ -264,7 +264,7 @@ function generateSerializables() {
       // Struct or Class extension
       extension <%- serializable.name %> : ConcreteSerializable {
       <% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %><% } %>
-      init(meowDocument source: Document) throws {
+      init(document source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source[Key._id.keyString]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
             if(variable.isComputed || variable.isStatic) { return; }
@@ -292,14 +292,14 @@ function generateSerializables() {
             return nil
           }
 
-          try self.init(meowDocument: document)
+          try self.init(document: document)
         }
 
-        func meowSerialize() -> Document {
-            return meowSerialize(resolvingReferences: false)
+        func serialize() -> Document {
+            return serialize(resolvingReferences: false)
         }
 
-        func meowSerialize(resolvingReferences: Bool) -> Document {
+        func serialize(resolvingReferences: Bool) -> Document {
           var document = Document()
             <% if (serializable.based["Model"]) { %>document["_id"] = self._id<% } %>
           <% serializable.allVariables.forEach(variable => {
@@ -310,7 +310,7 @@ function generateSerializables() {
             <% return; }
             if(variable.type && variable.type.based.Model) {%>
             if resolvingReferences {
-                document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.meowSerialize(resolvingReferences: resolvingReferences)
+                document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.serialize(resolvingReferences: resolvingReferences)
             } else {
                 document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>._id
             }
