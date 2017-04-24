@@ -2,15 +2,30 @@ import Cheetah
 import MongoKitten
 import Foundation
 
-public protocol PublicallyExposed {
-    var bsonRepresentation: Primitive { get }
-    var jsonRepresentation: Cheetah.Value { get }
-    
-    init?(_ json: Cheetah.Value) throws
-    init?(_ bson: Primitive) throws
+/// Allows embedding custom structures
+internal protocol ValueConvertible : BSON.Primitive {
+    var primitive: BSON.Primitive { get }
 }
 
-public struct File : PublicallyExposed {
+extension ValueConvertible {
+    /// Converts the custom structure
+    public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
+        return primitive.convert(to: type)
+    }
+    
+    /// The custom structure's type identifier
+    public var typeIdentifier: Byte {
+        return primitive.typeIdentifier
+    }
+    
+    /// The custom structure's binary form
+    public func makeBinary() -> Bytes {
+        return primitive.makeBinary()
+    }
+}
+
+
+public struct File : ValueConvertible {
     public init?(_ json: Value) throws {
         guard let id = String(json) else {
             return nil
@@ -29,12 +44,8 @@ public struct File : PublicallyExposed {
 
     public let id: ObjectId
     
-    public var bsonRepresentation: Primitive {
-        return id.hexString
-    }
-    
-    public var jsonRepresentation: Cheetah.Value {
-        return id.hexString
+    var primitive: BSON.Primitive {
+        return self.id
     }
     
     public init() {
@@ -47,44 +58,5 @@ public struct File : PublicallyExposed {
         }
         
         self.id = id
-    }
-}
-
-extension URL : PublicallyExposed {
-    public init?(_ bson: Primitive) throws {
-        guard let string = String(bson) else {
-            return nil
-        }
-        
-        self.init(string: string)
-    }
-    
-    public init?(_ json: Cheetah.Value) throws {
-        guard let string = String(json) else {
-            return nil
-        }
-        
-        self.init(string: string)
-    }
-    
-    public var bsonRepresentation: Primitive {
-        return self.absoluteString
-    }
-    
-    public var jsonRepresentation: Cheetah.Value {
-        return self.absoluteString
-    }
-}
-
-//Goede permissions in Vapor integratie, support voor allerlei typen relations, battle (en unit) tested, ondersteuning voor allerlei typen embeddables, support voor common types (URL, Data, Request, Dictionary, Set, NSPredicate, NSDictionary, NSArray, URLSession, Unit, alles wat NSCoding ondersteunt, UUID), ik wil suggested indexes, performance optimization, migrations, generated API documentation
-
-@available(OSX 10.12, *)
-extension Unit {
-    public var bsonRepresentation: Primitive {
-        return self.symbol
-    }
-    
-    public var jsonRepresentation: Value {
-        return self.symbol
     }
 }

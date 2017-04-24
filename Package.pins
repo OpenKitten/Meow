@@ -11,7 +11,7 @@
       "package": "BSON",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/BSON.git",
-      "version": "5.0.0"
+      "version": "5.0.2"
     },
     {
       "package": "Bits",
@@ -35,13 +35,13 @@
       "package": "Console",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/console.git",
-      "version": "2.0.0-beta.4"
+      "version": "2.0.0-beta.6"
     },
     {
       "package": "Core",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/core.git",
-      "version": "2.0.0-beta.1"
+      "version": "2.0.0-beta.3"
     },
     {
       "package": "Crypto",
@@ -113,7 +113,7 @@
       "package": "Random",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/random.git",
-      "version": "1.0.0-beta.2"
+      "version": "1.0.0-beta.3"
     },
     {
       "package": "Routing",
@@ -143,7 +143,7 @@
       "package": "Vapor",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/vapor.git",
-      "version": "2.0.0-beta.8"
+      "version": "2.0.0-beta.18"
     }
   ],
   "version": 1

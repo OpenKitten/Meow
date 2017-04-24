@@ -4,27 +4,19 @@ let drop = try Droplet()
 
 try Meow.init("mongodb://localhost:27017/meow-sample")
 
-Meow.integrate(with: drop)
-Meow.integrateAuthentication(with: drop)
-
-Meow.checkPermissions { route in
-    switch route {
-    case .User_init, .User_static_authenticate:
-        return true
-    case .User_get:
-        return User.current != nil
-    case .User_delete(let removedUser):
-        return User.current == removedUser
+drop.post("users/authenticate") { request in
+    guard let input = request.document, let username = String(input["username"]), let password = String(input["password"]) else {
+        return "FAILED"
     }
+    
+    return try User.authenticate(username: username, password: password) ?? "Invalid login"
 }
 
-Meow.requireAuthentication { route in
-    switch route {
-    case .User_init, .User_static_authenticate:
-        return false
-    default:
-        return true
-    }
+drop.get("users", User.init) { _, user in
+    return user
 }
+
+let u = try User(username: "joannis", password: "kaas", email: "joannis@orlandos.nl")
+try u.save()
 
 try drop.run()

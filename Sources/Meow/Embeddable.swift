@@ -20,27 +20,47 @@ public protocol DynamicSerializable {
 ///
 /// When implemented, it allows conversion to and from a Document
 public protocol ConcreteSerializable {
-    init(meowDocument source: Document) throws
-    func meowSerialize(resolvingReferences: Bool) throws -> Document
-    func meowSerialize() -> Document
+    init?(document source: Document) throws
+    func serialize(resolvingReferences: Bool) throws -> Document
+    func serialize() -> Document
+}
+
+extension ConcreteSerializable {
+    public func serialize(resolvingReferences: Bool) throws -> Document {
+        return serialize()
+    }
+    
+    public init?(_ primitive: Primitive?) throws {
+        guard let document = Document(primitive) else {
+            return nil
+        }
+        
+        try self.init(document: document)
+    }
 }
 
 public protocol ConcreteSingleValueSerializable : Primitive {
-    func meowSerialize(resolvingReferences: Bool) throws -> Primitive
-    func meowSerialize() -> Primitive
+    func serialize(resolvingReferences: Bool) throws -> Primitive
+    func serialize() -> Primitive
+}
+
+extension ConcreteSingleValueSerializable {
+    public func serialize(resolvingReferences: Bool) throws -> Primitive {
+        return serialize()
+    }
 }
 
 extension ConcreteSingleValueSerializable {
     public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
-        return self.meowSerialize().convert(to: type)
+        return self.serialize().convert(to: type)
     }
     
     public var typeIdentifier: Byte {
-        return meowSerialize().typeIdentifier
+        return serialize().typeIdentifier
     }
     
     public func makeBinary() -> Bytes {
-        return meowSerialize().makeBinary()
+        return serialize().makeBinary()
     }
 }
 

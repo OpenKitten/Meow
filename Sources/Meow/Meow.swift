@@ -60,7 +60,7 @@ public enum Meow {
                 return existingInstance
             }
             
-            return try M(meowDocument: document)
+            return try M(document: document)
         }
         
         public func pool(_ instance: ConcreteModel) {

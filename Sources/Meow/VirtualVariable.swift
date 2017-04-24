@@ -88,7 +88,7 @@ public struct VirtualSingleValueArray<V: ConcreteSingleValueSerializable> : Virt
     
     public func contains(_ other: V) -> Query {
         return [
-            self.name: other.meowSerialize()
+            self.name: other.serialize()
         ]
     }
 }
@@ -102,7 +102,7 @@ public struct VirtualEmbeddablesArray<V: ConcreteSerializable> : VirtualVariable
     
     public func contains(_ other: V) -> Query {
         return [
-            self.name: other.meowSerialize()
+            self.name: other.serialize()
         ]
     }
 }

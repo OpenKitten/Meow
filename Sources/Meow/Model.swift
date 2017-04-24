@@ -24,7 +24,7 @@ extension Model {
 
 public typealias ReferenceValues = [(key: String, destinationType: ConcreteModel.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
-/// Should be implemented in an extension by the generator
+/// Could be implemented in an extension by the generator
 ///
 /// When implemented, it exposes the collection where this entity resides in
 public protocol ConcreteModel : Model, ConcreteSerializable, Primitive {
@@ -34,13 +34,18 @@ public protocol ConcreteModel : Model, ConcreteSerializable, Primitive {
     /// All references to foreign objects
     var meowReferencesWithValue: ReferenceValues { get }
     
-    init(meowDocument: Document) throws
+    init(document: Document) throws
 }
 
 /// Implementes basic CRUD functionality for the object
 extension ConcreteModel {
+    /// All references to foreign objects
+    public var meowReferencesWithValue: ReferenceValues {
+        return []
+    }
+    
     public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
-        return self.meowSerialize().convert(to: type)
+        return self.serialize().convert(to: type)
     }
     
     public var typeIdentifier: Byte {
@@ -48,7 +53,7 @@ extension ConcreteModel {
     }
     
     public func makeBinary() -> Bytes {
-        return self.meowSerialize().makeBinary()
+        return self.serialize().makeBinary()
     }
     
     /// Counts the amount of objects matching the query
@@ -58,7 +63,7 @@ extension ConcreteModel {
     
     /// Saves this object
     public func save() throws {
-        let document = meowSerialize()
+        let document = self.serialize()
         
         Meow.pool.pool(self)
         

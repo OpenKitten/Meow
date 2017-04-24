@@ -28,6 +28,36 @@ extension Request {
     }
 }
 
+public protocol APIModel : ConcreteModel, ResponseRepresentable {
+    var publicProjection: Projection { get }
+}
+
+extension APIModel {
+    public func makeResponse() throws -> Response {
+        return try self.serialize().redacting(publicProjection).makeResponse()
+    }
+}
+
+extension Document {
+    public func redacting(_ projection: Projection) -> Document {
+        var doc: Document = [
+            "_id": self["_id"]
+        ]
+        
+        let projection = projection.makeDocument()
+        
+        for (key, value) in projection {
+            if Bool(value) == true {
+                doc[key] = self[key]
+            } else {
+                doc[key] = nil
+            }
+        }
+        
+        return doc
+    }
+}
+
 extension Document : ResponseRepresentable {
     public func makeResponse() throws -> Response {
         return Response(status: .ok, headers: [
@@ -49,19 +79,5 @@ extension JSONArray : ResponseRepresentable {
         return Response(status: .ok, headers: [
             "Content-Type": "application/json; charset=utf-8"
             ], body: Body(self.serialize()))
-    }
-}
-
-extension Meow {
-    public static func integrateAuthentication(with droplet: Droplet, sessionManager: SessionsProtocol = MongoSessions(in: Meow.database["_sessions"])) {
-        AuthenticationMiddleware.default.enabled = true
-        AuthorizationMiddleware.default.enabled = true
-        
-        droplet.middleware = [
-            SessionsMiddleware(sessionManager),
-            ContextAwarenessMiddleware(),
-            DateMiddleware(),
-            FileMiddleware(publicDir: droplet.workDir + "Public/")
-        ]
     }
 }

@@ -12,15 +12,19 @@ extension Meow {
         }
         set {
             (Thread.current as? ContextThread)?.request.storage["meowUser"] = newValue
-            do {
-                try (Thread.current as? ContextThread)?.request.session().document["meow"]["user"] = newValue?._id
-            } catch { }
+            (Thread.current as? ContextThread)?.request.session?.document["meow"]["user"] = newValue?._id
         }
     }
 }
 
 public protocol Authenticatable : Model {
     static func resolve(byId identifier: ObjectId) throws -> Self?
+}
+
+extension Authenticatable where Self : ConcreteModel {
+    public static func resolve(byId identifier: ObjectId) throws -> Self? {
+        return try Self.findOne("_id" == identifier)
+    }
 }
 
 extension Authenticatable {
@@ -69,7 +73,7 @@ public class AuthenticationMiddleware {
             }
         }
         
-        guard let authenticationID = ObjectId(try request.session().document["meow"]["user"]) else {
+        guard let authenticationID = ObjectId(request.session?.document["meow"]["user"]) else {
             return try fail()
         }
         

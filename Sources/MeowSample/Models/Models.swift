@@ -2,47 +2,65 @@ import BCrypt
 import MeowVapor
 import Foundation
 
-enum Gender {
+enum Gender : ConcreteSingleValueSerializable {
     case male, female
-}
-
-struct Profile {
-    // sourcery: public
-    var name: String
     
-    // sourcery: public
-    var age: Int
-    
-    // sourcery: public
-    var picture: File?
-}
-
-// sourcery: user
-final class User: Model {
-    // sourcery: public
-    var profileURL: URL? {
-        return URL(string: "http://localhost:8080/users/\(self._id.hexString)/")
+    func serialize() -> Primitive {
+        return self == .male ? "male" : "female"
     }
     
-    // sourcery: public, unique
+    init?(_ primitive: Primitive?) {
+        guard let string = String(primitive) else {
+            return nil
+        }
+        
+        switch string {
+        case "male":
+            self = .male
+        case "female":
+            self = .female
+        default:
+             return nil
+        }
+    }
+}
+
+struct Profile : ConcreteSerializable {
+    var name: String
+    var age: Int
+    var picture: File?
+    
+    func serialize() -> Document {
+        return [
+            "name": name,
+            "age": age,
+            "picture": picture
+        ]
+    }
+    
+    init?(document source: Document) throws {
+        guard let name = String(source["name"]), let age = Int(source["age"]) else {
+            return nil
+        }
+        
+        self.name = name
+        self.age = age
+        self.picture = try File(source["file"])
+    }
+}
+
+final class User: ConcreteModel, Authenticatable, APIModel {
+    public let publicProjection: Projection = ["username", "email", "gender", "profile"]
+    
+    var _id = ObjectId()
     var username: String
-    
-    // sourcery: public, unique
     var email: String
-    
-    // sourcery: public
     var gender: Gender? = nil
-    
-    // sourcery: public
     var profile: Profile?
-    
     var password: Data
     
-    // sourcery: public, method = "POST"
     static func authenticate(username: String, password: String) throws -> User? {
-        guard let user = try User.findOne({ user in
-            return user.username == username
-        }) else {
+        guard let user = try User.findOne("username" == username) else {
             return nil
         }
         
@@ -55,7 +73,7 @@ final class User: Model {
         return user
     }
     
-    init?(username: String, password: String, email: String, gender: Gender? = nil, profile: Profile? = nil) throws {
+    init(username: String, password: String, email: String, gender: Gender? = nil, profile: Profile? = nil) throws {
         self.username = username
         self.email = email
         self.password = Data(try BCrypt.Hash.make(message: password))
@@ -63,19 +81,27 @@ final class User: Model {
         self.profile = profile
     }
     
-    // sourcery:inline:User.Meow
-      init(meowDocument source: Document) throws {
-          self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")
-        
-          self.username = try Meow.Helpers.requireValue(String(source["username"]), keyForError: "username")  /* String */ 
-          self.email = try Meow.Helpers.requireValue(String(source["email"]), keyForError: "email")  /* String */ 
-          self.gender = try Gender(meowValue: source["gender"])  /* Gender? */ 
-          self.profile = try Profile(meowValue: source["profile"])  /* Profile? */ 
-          self.password = try Meow.Helpers.requireValue(Data(source["password"]), keyForError: "password")  /* Data */ 
+    static var meowCollection = Meow.database["users"]
+    
+    func serialize() -> Document {
+        return [
+            "username": username,
+            "email": email,
+            "gender": gender,
+            "password": password,
+            "profile": profile?.serialize()
+        ]
+    }
+    
+    init(document source: Document) throws {
+        self._id = try Meow.Helpers.requireValue(ObjectId(source["_id"]), keyForError: "_id")
+
+        self.username = try Meow.Helpers.requireValue(String(source["username"]), keyForError: "username")  /* String */ 
+        self.email = try Meow.Helpers.requireValue(String(source["email"]), keyForError: "email")  /* String */ 
+        self.gender = Gender(source["gender"])  /* Gender? */
+        self.profile = try Profile(source["profile"])  /* Profile? */
+        self.password = try Meow.Helpers.requireValue(Data(source["password"]), keyForError: "password")  /* Data */ 
 
         Meow.pool.pool(self)
-      }
-      
-        var _id = ObjectId()
-    // sourcery:end
+    }
 }
