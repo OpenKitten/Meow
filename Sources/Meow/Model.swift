@@ -73,6 +73,16 @@ extension ConcreteModel {
         )
     }
     
+    /// Removes all entities matching this query until `limit` has been reached
+    public static func remove(_ query: Query, limitedTo limit: Int = 0) throws -> Int {
+        return try meowCollection.remove(query, limiting: limit)
+    }
+    
+    /// Updates all entities in this collection to the provided Document
+    public static func update(_ query: Query, to document: Document, multiple: Bool = false) throws -> Int {
+        return try meowCollection.update(query, to: document, upserting: false, multiple: multiple)
+    }
+    
     /// Returns all objects matching the query
     public static func find(_ query: Query? = nil) throws -> CollectionSlice<Self> {
         return try meowCollection.find(query).flatMap { document in

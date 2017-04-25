@@ -9,6 +9,8 @@ enum Gender {
 struct Profile {
     var name: String
     var age: Int
+    
+    // sourcery: name = "profilePicture"
     var picture: File?
 }
 

@@ -108,15 +108,15 @@ extension <%- serializable.name %> {
           }
 
           if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
-      object["<%-variable.name%>"] = self.<%-variable.name%>
+      object["<%-serializedName(variable)%>"] = self.<%-variable.name%>
           <%_ } else if(serializables.includes(variable.type)) {
             if(variable.type.kind == "enum") { -%>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>. fialize() as? Cheetah.Value
+      object["<%-serializedName(variable)%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>. fialize() as? Cheetah.Value
           <%_ } else { -%>
-      object["<%-variable.name%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.makeJSONObject()
+      object["<%-serializedName(variable)%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.makeJSONObject()
           <%_ }
           } else if(bsonJsonMap[variable.type.name]) { -%>
-      object["<%-variable.name%>"] = <%-bsonJsonMap[variable.type.name]%>(self.<%-variable.name%>)
+      object["<%-serializedName(variable)%>"] = <%-bsonJsonMap[variable.type.name]%>(self.<%-variable.name%>)
           <% } -%>
       <%_ }); -%>
 
@@ -155,7 +155,7 @@ extension <%- model.name %> : ResponseRepresentable {
       }
     %>
 
-    public static func by<%-capitalizeFirstLetter(variable.name)%>(_ string: String) throws -> <%-model.name%>? {
+    public static func by<%-capitalizeFirstLetter(serializedName(variable))%>(_ string: String) throws -> <%-model.name%>? {
         let value = <%-primitive ? "" : "try" %> <%-variable.typeName.unwrappedTypeName%>(<%- primitive ? "" : "meowValue: " %>string as Primitive?)
 
         return try <%-model.name%>.findOne { model in
@@ -222,8 +222,8 @@ extension <%- model.name %> : ResponseRepresentable {
                 }
             }
         }<%
-        exposedMethods.push(`${model.name}_download_${variable.name}(${model.name})`);
-        exposedMethods.push(`${model.name}_upload_${variable.name}(${model.name})`);
+        exposedMethods.push(`${model.name}_download_${serializedName(variable)}(${model.name})`);
+        exposedMethods.push(`${model.name}_upload_${serializedName(variable)}(${model.name})`);
       }
     });
 

@@ -14,6 +14,14 @@ let serializableTuples = [];
 let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
 let numberTypes = ["Int", "Int32", "Double"];
 
+function serializedName(variable) {
+  if(variable.annotations["name"]) {
+    return variable.annotations["name"];
+  }
+
+  return variable.name;
+}
+
 /**
 Generates code for deserializing a value from a document
 
@@ -271,12 +279,12 @@ function generateSerializables() {
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
           <%_ if(variable.isOptional) { -%>
-          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source[Key.<%-variable.name%>.keyString]) /* File */
+          self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source[Key.<%-serializedName(variable)%>.keyString]) /* File */
           <%_ } else { -%>
-          self.<%- variable.name %> = try Meow.Helpers.requireValue(<%-variable.typeName.unwrappedTypeName%>(source[Key.<%-variable.name%>.keyString]), keyForError: "<%-variable.name%>") /* File */
+          self.<%- variable.name %> = try Meow.Helpers.requireValue(<%-variable.typeName.unwrappedTypeName%>(source[Key.<%-serializedName(variable)%>.keyString]), keyForError: "<%-variable.name%>") /* File */
           <%_ } -%>
             <%_ return; }%>
-          self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source[Key.${variable.name}.keyString]`);
+          self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source[Key.${serializedName(variable)}.keyString]`);
         }); %>
 
         <% if (serializable.based["Model"]) { %>Meow.pool.pool(self)<% } %>
@@ -306,18 +314,95 @@ function generateSerializables() {
               if(variable.isComputed || variable.isStatic) { return; }
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
-            document["<%- variable.name %>"] = <%-variable.name-%>
+            document["<%- serializedName(variable) %>"] = <%-variable.name-%>
             <% return; }
             if(variable.type && variable.type.based.Model) {%>
             if resolvingReferences {
-                document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.serialize(resolvingReferences: resolvingReferences)
+                document["<%- serializedName(variable) %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.serialize(resolvingReferences: resolvingReferences)
             } else {
-                document["<%- variable.name %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>._id
+                document["<%- serializedName(variable) %>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>._id
             }
             <% return; } %>
-            document["<%- variable.name %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
+            document["<%- serializedName(variable) %>"] =<% serializeToPrimitive("self." + variable.name, variable.type, variable.typeName);
           });%>
           return document
+        }
+
+        struct VirtualUpdateInstance {
+          <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; } %>
+             /// <%- variable.name %>: <%- variable.typeName.name %>
+             <%
+             if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
+               if (numberTypes.includes(variable.unwrappedTypeName)) {
+                 %> var <%- variable.name %>: UpdateNumber = .unaffected<%
+               } else if(variable.unwrappedTypeName == "String") {
+                 %> var <%- variable.name %>: Update<%- variable.unwrappedTypeName %> = .unaffected<%
+               }
+             } else if ((variable.type && variable.type.kind == "enum") || serializables.includes(variable.type)) {
+               ensureSerializable(variable.type);
+               if(variable.type.kind == "enum") {
+                %> var <%-variable.name%>: <%-variable.unwrappedTypeName%>? = nil<%
+               } else {
+                %> var <%- variable.name %> = <%- variable.unwrappedTypeName %>.VirtualUpdateInstance()<%
+              }
+             }
+          }) %>
+
+          init() { }
+
+          var update: Document {
+            var set: Document = Document()
+            var unset: Document = Document()
+            var increment: Document = Document()
+
+            <% serializable.allVariables.forEach(variable => {
+              if(variable.isComputed) { return; } 
+              if(variable.type && variable.type.kind == "enum") { %>
+              set["<%-serializedName(variable)%>"] = <%-variable.name%>?.serialize()
+                <% return;
+              } else if(serializables.includes(variable.type)) { %>
+              let <%-variable.name%>UpdateDoc = <%-variable.name%>.update
+
+              if let otherSet = Document(<%-variable.name%>UpdateDoc["$set"])  {
+                set.append(contentsOf: otherSet)
+              }
+
+              if let otherInc = Document(<%-variable.name%>UpdateDoc["$inc"])  {
+                increment.append(contentsOf: otherInc)
+              }
+
+              if let otherUnset = Document(<%-variable.name%>UpdateDoc["$unset"])  {
+                unset.append(contentsOf: otherUnset)
+              }
+                <% return;
+              } else if(variable.unwrappedTypeName != "String") {
+                return;
+              }
+              %>
+
+              switch self.<%-variable.name%>.operation {
+              case .set(let primitive):
+                set["<%-serializedName(variable)%>"] = primitive
+              case .unset:
+                <%_ if(variable.isOptional) { -%>
+                break
+                <%_ } else { -%> 
+                unset["<%-serializedName(variable)%>"] = ""
+                <%_ } -%> 
+              case .increment(let by):
+                increment["<%-serializedName(variable)%>"] = by
+              default:
+                break
+              }
+            <% }); %>
+
+            return [
+              "$set": set.count > 0 ? set : nil,
+              "$inc": increment.count > 0 ? increment : nil,
+              "$unset": unset.count > 0 ? unset : nil
+            ]
+          }
         }
 
         struct VirtualInstance {
@@ -329,7 +414,7 @@ function generateSerializables() {
              <%
              if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
                if (numberTypes.includes(variable.unwrappedTypeName)) {
-                 %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + "<%- variable.name %>") } <%
+                 %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + "<%- serializedName(variable) %>") } <%
                } else {
                  %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + "<%-variable.name%>") } <%
                }
@@ -348,7 +433,7 @@ function generateSerializables() {
             case _id
           <% serializable.allVariables.forEach(variable => {
               if(variable.isComputed || variable.name == "_id") { return; }%>
-            case <%- variable.name %>-%>
+            case <%- serializedName(variable) %>-%>
           <%})%>
 
             var keyString: String { return self.rawValue }
@@ -364,6 +449,25 @@ function generateSerializables() {
           static func find(_ closure: ((VirtualInstance) -> (Query))) throws -> CollectionSlice<<%- serializable.name %>> {
             let query = closure(VirtualInstance())
             return try self.find(query)
+          }
+
+          static func updateOne(_ closure: ((VirtualInstance) -> (Query)), toSet operations: ((VirtualUpdateInstance) -> ())) throws -> Int {
+            let query = closure(VirtualInstance())
+            let updateInstance = VirtualUpdateInstance()
+            operations(updateInstance)
+            return try self.update(query, to: updateInstance.update, multiple: false)
+          }
+
+          static func updateAll(_ closure: ((VirtualInstance) -> (Query)), toSet operations: ((VirtualUpdateInstance) -> ())) throws -> Int {
+            let query = closure(VirtualInstance())
+            let updateInstance = VirtualUpdateInstance()
+            operations(updateInstance)
+            return try self.update(query, to: updateInstance.update, multiple: true)
+          }
+
+          static func remove(_ limit: Int = 0, _ closure: ((VirtualInstance) -> (Query))) throws -> Int {
+            let query = closure(VirtualInstance())
+            return try self.remove(query, limitedTo: limit)
           }
 
           static func findOne(_ closure: ((VirtualInstance) -> (Query))) throws -> <%- serializable.name %>? {

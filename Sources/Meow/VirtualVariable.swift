@@ -143,7 +143,7 @@ public prefix func !(rhs: Query) -> Query {
     for (key, value) in rhs.makeDocument() {
         query[key] = [
             "$not": value
-        ] as Document
+            ] as Document
     }
     
     return Query(query)

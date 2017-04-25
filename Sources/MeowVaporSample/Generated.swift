@@ -157,6 +157,80 @@ import Meow
           return document
         }
 
+        struct VirtualUpdateInstance {
+          
+             /// username: String
+              var username: UpdateString = .unaffected
+             /// email: String
+              var email: UpdateString = .unaffected
+             /// gender: Gender?
+              var gender: Gender? = nil
+             /// profile: Profile?
+              var profile = Profile.VirtualUpdateInstance()
+             /// password: Data
+             
+
+          init() { }
+
+          var update: Document {
+            var set: Document = Document()
+            var unset: Document = Document()
+            var increment: Document = Document()
+
+            
+
+              switch self.username.operation {
+              case .set(let primitive):
+                set["username"] = primitive
+              case .unset:
+ 
+                unset["username"] = ""
+ 
+              case .increment(let by):
+                increment["username"] = by
+              default:
+                break
+              }
+            
+
+              switch self.email.operation {
+              case .set(let primitive):
+                set["email"] = primitive
+              case .unset:
+ 
+                unset["email"] = ""
+ 
+              case .increment(let by):
+                increment["email"] = by
+              default:
+                break
+              }
+            
+              set["gender"] = gender?.serialize()
+                
+              let profileUpdateDoc = profile.update
+
+              if let otherSet = Document(profileUpdateDoc["$set"])  {
+                set.append(contentsOf: otherSet)
+              }
+
+              if let otherInc = Document(profileUpdateDoc["$inc"])  {
+                increment.append(contentsOf: otherInc)
+              }
+
+              if let otherUnset = Document(profileUpdateDoc["$unset"])  {
+                unset.append(contentsOf: otherUnset)
+              }
+                
+
+            return [
+              "$set": set.count > 0 ? set : nil,
+              "$inc": increment.count > 0 ? increment : nil,
+              "$unset": unset.count > 0 ? unset : nil
+            ]
+          }
+        }
+
         struct VirtualInstance {
           var keyPrefix: String
 
@@ -197,6 +271,25 @@ import Meow
           static func find(_ closure: ((VirtualInstance) -> (Query))) throws -> CollectionSlice<User> {
             let query = closure(VirtualInstance())
             return try self.find(query)
+          }
+
+          static func updateOne(_ closure: ((VirtualInstance) -> (Query)), toSet operations: ((VirtualUpdateInstance) -> ())) throws -> Int {
+            let query = closure(VirtualInstance())
+            let updateInstance = VirtualUpdateInstance()
+            operations(updateInstance)
+            return try self.update(query, to: updateInstance.update, multiple: false)
+          }
+
+          static func updateAll(_ closure: ((VirtualInstance) -> (Query)), toSet operations: ((VirtualUpdateInstance) -> ())) throws -> Int {
+            let query = closure(VirtualInstance())
+            let updateInstance = VirtualUpdateInstance()
+            operations(updateInstance)
+            return try self.update(query, to: updateInstance.update, multiple: true)
+          }
+
+          static func remove(_ limit: Int = 0, _ closure: ((VirtualInstance) -> (Query))) throws -> Int {
+            let query = closure(VirtualInstance())
+            return try self.remove(query, limitedTo: limit)
           }
 
           static func findOne(_ closure: ((VirtualInstance) -> (Query))) throws -> User? {
@@ -291,7 +384,7 @@ import Meow
         
           self.name = try Meow.Helpers.requireValue(String(source[Key.name.keyString]), keyForError: "name")  /* String */ 
           self.age = try Meow.Helpers.requireValue(Int(source[Key.age.keyString]), keyForError: "age")  /* Int */ 
-          self.picture = try File(source[Key.picture.keyString])  /* File? */ 
+          self.picture = try File(source[Key.profilePicture.keyString])  /* File? */ 
 
         
       }
@@ -316,8 +409,48 @@ import Meow
           
             document["name"] = self.name 
             document["age"] = self.age 
-            document["picture"] = self.picture?.id 
+            document["profilePicture"] = self.picture?.id 
           return document
+        }
+
+        struct VirtualUpdateInstance {
+          
+             /// name: String
+              var name: UpdateString = .unaffected
+             /// age: Int
+              var age: UpdateNumber = .unaffected
+             /// picture: File?
+             
+
+          init() { }
+
+          var update: Document {
+            var set: Document = Document()
+            var unset: Document = Document()
+            var increment: Document = Document()
+
+            
+
+              switch self.name.operation {
+              case .set(let primitive):
+                set["name"] = primitive
+              case .unset:
+ 
+                unset["name"] = ""
+ 
+              case .increment(let by):
+                increment["name"] = by
+              default:
+                break
+              }
+            
+
+            return [
+              "$set": set.count > 0 ? set : nil,
+              "$inc": increment.count > 0 ? increment : nil,
+              "$unset": unset.count > 0 ? unset : nil
+            ]
+          }
         }
 
         struct VirtualInstance {
@@ -340,7 +473,7 @@ import Meow
           
             case name          
             case age          
-            case picture          
+            case profilePicture          
 
             var keyString: String { return self.rawValue }
         }
