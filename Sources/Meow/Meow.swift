@@ -38,10 +38,12 @@ public enum Meow {
     /// Generic errors thrown by the generator
     public enum Error : Swift.Error {
         case missingOrInvalidValue(key: String)
+        case missingValue(key: String)
         case referenceError(id: ObjectId, type: Model.Type)
         case undeletableObject(reason: String)
         case enumCaseNotFound(enum: String, name: String)
         case fileTooLarge(size: Int, maximum: Int)
+        case cannotDeserialize(type: Serializable.Type, source: BSON.Primitive?, expectedPrimitive: BSON.Primitive.Type)
     }
     
     public static var pool = ObjectPool()
@@ -52,7 +54,7 @@ public enum Meow {
         private var storage = WeakDictionary<ObjectId, AnyObject>(minimumCapacity: 1000)
         
         /// TODO: Make this thread-safe
-        public func instantiateIfNeeded<M : ConcreteModel>(type: ConcreteModel.Type, document: Document) throws -> M {
+        public func instantiateIfNeeded<M : Model>(type: Model.Type, document: Document) throws -> M {
             guard let id = ObjectId(document["_id"]) else {
                 throw Error.missingOrInvalidValue(key: "_id")
             }
@@ -61,10 +63,10 @@ public enum Meow {
                 return existingInstance
             }
             
-            return try M(document: document)
+            return try M(restoring: document)
         }
         
-        public func pool(_ instance: ConcreteModel) {
+        public func pool(_ instance: Model) {
             if let current = storage[instance._id] {
                 assert(current === instance, "two model instances with the same _id is invalid")
             }
@@ -73,7 +75,7 @@ public enum Meow {
         }
         
         /// Returns if `instance` is currently in the pool
-        public func isPooled(_ instance: ConcreteModel) -> Bool {
+        public func isPooled(_ instance: Model) -> Bool {
             return storage[instance._id] != nil
         }
     }

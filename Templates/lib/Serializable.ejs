@@ -1,0 +1,9 @@
+<%
+if (serializable.kind == "class" || serializable.kind == "struct") {
+	%><%- include('SerializableStructClass', {serializable}) %><%
+} else if (serializable.kind == "enum") {
+	%><%- include('SerializableEnum', {serializable}) %><%
+} else {
+	%><%- meowError(`Type of kind '%{serializable.kind}' unknown to Meow. Cannot generate Serializable implementation.`) %><%
+}
+%>

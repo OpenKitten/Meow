@@ -1,0 +1,70 @@
+<%
+
+// Selects all classes and structs that are either based on a model or embeddable protocol
+window.models = ((types.based["Model"] || []).filter(model => !model.annotations["skip-meow"]) || []);
+window.embeddables = (types.based["Embeddable"] || []);
+
+// An array containing all serializable types
+// Additional types may be added below, in the template itself (supporting implicit serializables)
+window.serializables = models.concat(embeddables);
+window.serializableTuples = [];
+
+window.supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
+window.numberTypes = ["Int", "Int32", "Double"];
+
+Object.assign(window, {
+	/**
+	Ensures the given type is serializable. If it is not already, it will be added to the serialization code generation queue.
+
+	@param {object} type - The type object (e.g. variable.type) or tuple instance
+	*/
+	ensureSerializable(type) {
+		if (typeof type !== "object") {
+			throw "invalid type";
+		}
+		
+		if (supportedPrimitives.includes(type.name)) {
+			return;
+		}
+		
+		if (type.isTuple) {
+			let signature = makeTupleSignature(type);
+			if (serializableTuples.find(t => makeTupleSignature(t) == signature)) { return };
+			serializableTuples.push(type);
+			return;
+		}
+
+		// check if it is already in the queue, and if it is, return:
+		if (serializables.find(t => t.name == type.name)) { return };
+		serializables.push(type);
+	},
+	
+	/**
+	@param {object} tuple - The sourcery tuple object
+	@returns {string} The tuple signature
+	*/
+	makeTupleSignature(tuple) {
+		if (tuple.isTuple) {
+			// The tuple is secretly a typeName
+			tuple = tuple.tuple;
+		}
+
+		if (!tuple) {
+			throw "invalid tuple";
+		}
+
+		return tuple.elements.map(e => (e.typeName.name)).join("And");
+	},
+	
+	/**
+	Generates an error.
+	
+	@param {string} text - The text to include in the error
+	@return {string} The error
+	*/
+	meowError(text) {
+		return `<# ${text} #>`;
+	}
+})
+
+%>

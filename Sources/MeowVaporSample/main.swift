@@ -2,7 +2,7 @@ import MeowVapor
 
 let drop = try Droplet()
 
-try Meow.init("mongodb://localhost:27017/meow-sample")
+try Meow.init("mongodb://localhost:27017/meow-vapor-sample")
 
 drop.post("users/authenticate") { request in
     guard let input = request.document, let username = String(input["username"]), let password = String(input["password"]) else {

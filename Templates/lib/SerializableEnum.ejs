@@ -1,0 +1,22 @@
+extension <%- serializable.name %> : Serializable {
+	init(restoring source: BSON.Primitive) throws {
+		guard let rawValue = String(source) else {
+				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: String.self)
+		}
+
+		switch rawValue {
+			<% serializable.cases.forEach(enumCase => {
+				%> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
+			<%})%>
+			default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+		}
+	}
+	
+	func serialize() -> BSON.Primitive {
+		switch self {
+			<% serializable.cases.forEach(enumCase => { -%>
+		case .<%- enumCase.name %>: return "<%- enumCase.name %>"
+			<%})%>
+		}
+	}
+}

@@ -80,21 +80,7 @@ public struct VirtualArray<V: VirtualVariable> : VirtualVariable {
 }
 
 // sourcery: donotequate
-public struct VirtualSingleValueArray<V: ConcreteSingleValueSerializable> : VirtualVariable {
-    public var name: String
-    public init(name: String) { self.name = name }
-    
-    typealias VirtualSubtype = V.Type
-    
-    public func contains(_ other: V) -> Query {
-        return [
-            self.name: other.serialize()
-        ]
-    }
-}
-
-// sourcery: donotequate
-public struct VirtualEmbeddablesArray<V: ConcreteSerializable> : VirtualVariable {
+public struct VirtualEmbeddablesArray<V: Serializable> : VirtualVariable {
     public var name: String
     public init(name: String) { self.name = name }
     
@@ -114,7 +100,7 @@ public struct VirtualData : VirtualVariable {
 }
 
 // sourcery: donotequate
-public struct VirtualReference<T : ConcreteModel, D : DeleteRule>: VirtualVariable {
+public struct VirtualReference<T : Model, D : DeleteRule>: VirtualVariable {
     public var name: String
     public init(name: String) {
         self.name = name
@@ -126,7 +112,7 @@ public struct VirtualReference<T : ConcreteModel, D : DeleteRule>: VirtualVariab
 }
 
 // sourcery: donotequate
-public struct VirtualReferenceArray<T : ConcreteModel, D : DeleteRule>: VirtualVariable {
+public struct VirtualReferenceArray<T : Model, D : DeleteRule>: VirtualVariable {
     public var name: String
     public init(name: String) {
         self.name = name

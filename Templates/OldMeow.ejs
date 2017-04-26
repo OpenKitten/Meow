@@ -1,199 +1,21 @@
 import Foundation
 import Meow
 
+<%- include('lib/OldMeowCore') %>
+
 <%
-// Selects all classes and structs that are either based on a model or embeddable protocol
-let models = (types.based["Model"].filter(model => !model.annotations["skip-meow"]) || []);
-let embeddables = (types.based["Embeddable"] || []);
-
-// An array containing all serializable types
-// Additional types may be added below, in the template itself (supporting implicit serializables)
-let serializables = models.concat(embeddables);
-let serializableTuples = [];
-
-let supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
-let numberTypes = ["Int", "Int32", "Double"];
-
-function serializedName(variable) {
-  if(variable.annotations["name"]) {
-    return variable.annotations["name"];
-  }
-
-  return variable.name;
-}
-
-/**
-Generates code for deserializing a value from a document
-
-@param {string} name - The name of the value to use as error key
-@param {object} type - The type (e.g. variable.type), if available - required for nonprimitive values, may be null or undefined for primitives
-@param {object} typeName - The typeName (required, e.g. variable.typeName)
-@param {string} accessor - The accessor to the primitive
-*/
-function deserializeFromPrimitive(name, type, typeName, accessor) {
-  if (supportedPrimitives.includes(typeName.unwrappedTypeName)) {
-    if (typeName.isOptional) {
-      %> <%- typeName.unwrappedTypeName %>(<%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(<%-typeName.name%>(<%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if (type) {
-    // Embed a custom type
-    ensureSerializable(type);
-
-    if (typeName.isOptional) {
-      %> try <%-typeName.unwrappedTypeName-%>(meowValue: <%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(<%-typeName.unwrappedTypeName-%>(meowValue: <%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if (typeName.isArray) {
-    let elementTypeNameString = ensureSerializableArray(typeName);
-
-    if (typeName.isOptional) {
-      %> try meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(meowReinstantiate<%- elementTypeNameString %>Array(from: <%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if (typeName.isTuple) {
-    ensureSerializable(typeName);
-    if (typeName.isOptional) {
-      %> try <%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(<%- makeTupleDeserializeFunctionName(typeName) %>(<%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  } else if(typeName.unwrappedTypeName == "File") {
-    if (typeName.isOptional) {
-      %> try File(<%- accessor %>) <%
-    } else {
-      %> try Meow.Helpers.requireValue(File(<%- accessor %>), keyForError: "<%-name%>") <%
-    }
-  }
-
-  %> /* <%-typeName.name%> */ <%
-}
-
-/**
-Generates code for deserializing a value into a primitive
-
-@param {string} accessor - The accessor of the variable (e.g. self.id)
-@param {object} type - The type (e.g. variable.type), if available - required for nonprimitive values, may be null or undefined for primitives
-@param {object} typeName - The typeName (required, e.g. variable.typeName)
-*/
-function serializeToPrimitive(accessor, type, typeName) {
-  if (supportedPrimitives.includes(typeName.unwrappedTypeName)) {
-    %> <%- accessor %> <%
-  } else if (type) {
-    // Embed a custom type
-    ensureSerializable(type);
-    %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.serialize() <%
-  } else if (typeName.isArray) {
-    let elementTypeNameString = ensureSerializableArray(typeName);
-    if (supportedPrimitives.includes(elementTypeNameString)) {
-      %> <%- accessor %> <%
-    } else {
-      %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.map { $0.serialize() } <%
-    }
-  } else if (typeName.isTuple) {
-    ensureSerializable(typeName);
-    %> <%- makeTupleSerializeFunctionName(typeName) %>(<%- accessor %>)<%
-  } else if(typeName.unwrappedTypeName == "File") {
-    %> <%- accessor %><%- typeName.isOptional ? '?' : '';%>.id <%
-  }
-}
-
-/**
-Ensures the given type is serializable. If it is not already, it will be added to the serialization code generation queue.
-
-@param {object} type - The type object (e.g. variable.type) or tuple instance
-*/
-function ensureSerializable(type) {
-  if (type.isTuple) {
-    let signature = makeTupleSignature(type);
-    if (serializableTuples.find(t => makeTupleSignature(t) == signature)) { return };
-    serializableTuples.push(type);
-    return;
-  }
-
-  if(type.name == "File") { return; }
-
-  // check if it is already in the queue, and if it is, return:
-  if (serializables.find(t => t.name == type.name)) { return };
-  serializables.push(type);
-}
-
-/**
-Ensures the given array element is serializable. If it is not already, it will be added to the serialization code generation queue.
-If the type was not found, an error is generated.
-
-@param {object} typeName - The type name of the array
-@returns {string} The parsed type name of the array
-*/
-function ensureSerializableArray(typeName) {
-  // Work around a bug in Sourcery (the element type is not given on arrays)
-  let elementTypeNameString = typeName.name.substring(1, typeName.name.length - (typeName.isOptional ? 2 : 1)); // workaround for sourcery bug
-
-  if (supportedPrimitives.includes(elementTypeNameString)) {
-    return elementTypeNameString;
-  }
-
-  let elementType = types.all.find(t => t.name == elementTypeNameString);
-
-  if (elementType == undefined) {
-    %> <#meow error: array type <%- elementTypeNameString %> was not found, is not a primitive and cannot be serialized#> <%
-    return elementTypeNameString;
-  }
-
-  ensureSerializable(elementType);
-  return elementTypeNameString;
-}
-
-/**
-@param {object} tuple - The sourcery tuple object
-@returns {string} The tuple signature
-*/
-function makeTupleSignature(tuple) {
-  if (tuple.isTuple) {
-    // The tuple is secretly a typeName
-    tuple = tuple.tuple;
-  }
-
-  if (!tuple) {
-    return "invalidTuple";
-  }
-
-  return tuple.elements.map(e => ((e.name || "") + e.unwrappedTypeName)).join("And");
-}
-
-/**
-@param {object} tuple - The sourcery tuple object
-@returns {string} The tuple serialization swift function name
-*/
-function makeTupleSerializeFunctionName(tuple) {
-  let signature = makeTupleSignature(tuple);
-  return `meowSerializeTupleOf${signature}`;
-}
-
-/**
-@param {object} tuple - The sourcery tuple object
-@returns {string} The tuple deserialization swift function name
-*/
-function makeTupleDeserializeFunctionName(tuple) {
-  let signature = makeTupleSignature(tuple);
-  return `meowDeserializeTupleOf${signature}`;
-}
-
 supportedPrimitives.forEach(primitive => { %>
 
-  func meowReinstantiate<%- primitive %>Array(from source: Primitive?) throws -> [<%- primitive %>]? {
-      guard let document = Document(source) else {
-        return nil
-      }
+    func meowReinstantiate<%- primitive %>Array(from source: Primitive?) throws -> [<%- primitive %>]? {
+        guard let document = Document(source) else {
+          return nil
+        }
 
-      return try document.map { index, rawValue -> <%- primitive %> in
-          return try Meow.Helpers.requireValue(<%- primitive %>(rawValue), keyForError: "index \(index) on array of <%- primitive %>")
-      }
-  }
-<% }) // end supportedPrimitives loop
+        return try document.map { index, rawValue -> <%- primitive %> in
+            return try Meow.Helpers.requireValue(<%- primitive %>(rawValue), keyForError: "index \(index) on array of <%- primitive %>")
+        }
+    }
+  <% }) // end supportedPrimitives loop
 
 // Generate serialization for every serializable
 // It is important to keep this as far down as possible.
@@ -271,19 +93,19 @@ function generateSerializables() {
     <% } else { %>
       // Struct or Class extension
       extension <%- serializable.name %> : ConcreteSerializable {
-      <% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %><% } %>
+      <% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Test<% } %>
       init(document source: Document) throws {
           <% if (serializable.based["Model"]) { %>self._id = try Meow.Helpers.requireValue(ObjectId(source[Key._id.keyString]), keyForError: "_id")<% } %>
         <% serializable.variables.forEach(variable => {
             if(variable.isComputed || variable.isStatic) { return; }
 
             if(variable.typeName.unwrappedTypeName.startsWith("File<")) {%>
-          <%_ if(variable.isOptional) { -%>
+          <% if(variable.isOptional) { -%>
           self.<%- variable.name %> = <%-variable.typeName.unwrappedTypeName%>(source[Key.<%-serializedName(variable)%>.keyString]) /* File */
-          <%_ } else { -%>
+          <% } else { -%>
           self.<%- variable.name %> = try Meow.Helpers.requireValue(<%-variable.typeName.unwrappedTypeName%>(source[Key.<%-serializedName(variable)%>.keyString]), keyForError: "<%-variable.name%>") /* File */
-          <%_ } -%>
-            <%_ return; }%>
+          <% } -%>
+            <% return; }%>
           self.<%- variable.name %> =<% deserializeFromPrimitive(variable.name, variable.type, variable.typeName, `source[Key.${serializedName(variable)}.keyString]`);
         }); %>
 

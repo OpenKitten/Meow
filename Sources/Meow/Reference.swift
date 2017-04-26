@@ -22,7 +22,7 @@ public enum Ignore : DeleteRule {}
 /// A reference to any (other) model
 ///
 /// The DeleteRule specified removal behaviour as specified above
-public final class Reference<M : ConcreteModel, D : DeleteRule> {
+public final class Reference<M : Model, D : DeleteRule> {
     public var id: ObjectId
     
     public init(_ instance: M) {

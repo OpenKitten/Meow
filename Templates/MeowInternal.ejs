@@ -1,0 +1,23 @@
+import MongoKitten
+import BSON
+import Foundation
+
+<%
+
+include('lib/MeowCore');
+
+supportedPrimitives.forEach(primitive => {
+	%>
+extension <%- primitive %> : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(<%- primitive %>(source), keyForError: "primitive <%- primitive %>")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
+}
+	<%
+});
+
+%>

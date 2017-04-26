@@ -1,66 +1,119 @@
-// Generated using Sourcery 0.5.2 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.6.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 
 import MongoKitten
+import BSON
 import Foundation
 
-  
-public func ==(lhs: VirtualBool, rhs: Bool) -> MongoKitten.Query {
-  return lhs.name == rhs
+
+extension ObjectId : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(ObjectId(source), keyForError: "primitive ObjectId")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func ==(lhs: VirtualData, rhs: Data) -> MongoKitten.Query {
-    return lhs.name == Binary(data: rhs, withSubtype: .generic)
+	
+extension String : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(String(source), keyForError: "primitive String")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func ==(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
-  return lhs.name == rhs
+	
+extension Int : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Int(source), keyForError: "primitive Int")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func ==(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
-  return lhs.name == rhs
+	
+extension Int32 : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Int32(source), keyForError: "primitive Int32")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func ==(lhs: VirtualObjectId, rhs: ObjectId) -> MongoKitten.Query {
-  return lhs.name == rhs
+	
+extension Bool : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Bool(source), keyForError: "primitive Bool")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func ==(lhs: VirtualString, rhs: String) -> MongoKitten.Query {
-  return lhs.name == rhs
+	
+extension Document : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Document(source), keyForError: "primitive Document")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-
-
-public func >(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
-  return lhs.name > rhs
+	
+extension Double : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Double(source), keyForError: "primitive Double")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func <(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
-  return lhs.name < rhs
+	
+extension Data : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Data(source), keyForError: "primitive Data")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func >=(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
-  return lhs.name >= rhs
+	
+extension Binary : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Binary(source), keyForError: "primitive Binary")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func <=(lhs: VirtualDate, rhs: Date) -> MongoKitten.Query {
-  return lhs.name <= rhs
+	
+extension Date : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(Date(source), keyForError: "primitive Date")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func >(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
-  return lhs.name > rhs
+	
+extension RegularExpression : Serializable {
+	public init(restoring source: Primitive) throws {
+		self = try Meow.Helpers.requireValue(RegularExpression(source), keyForError: "primitive RegularExpression")
+	}
+	
+	public func serialize() -> BSON.Primitive {
+		return self
+	}
 }
-
-public func <(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
-  return lhs.name < rhs
-}
-
-public func >=(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
-  return lhs.name >= rhs
-}
-
-public func <=(lhs: VirtualNumber, rhs: MeowNumber) -> MongoKitten.Query {
-  return lhs.name <= rhs
-}
-
+	

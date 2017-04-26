@@ -1,0 +1,30 @@
+extension Document {
+	mutating func pack(_ tuple: <%- tupleName.unwrappedTypeName %>?, as key: String) {
+		guard let tuple = tuple else {
+			self[key] = nil
+			return
+		}
+		
+		var document: Document = [:]-%>
+		<% tuple.elements.forEach(element => { %>
+		document.pack(tuple.<%- element.name %>, as: "<%- element.name %>")<% -%>
+		<% }) %>
+		self[key] = document
+	}
+	
+	func unpack(_ key: String) throws -> <%- tupleName.unwrappedTypeName %> {
+		guard let document = Document(self[key]) else {
+			throw Meow.Error.cannotDeserialize(type: Document.self, source: self[key], expectedPrimitive: Document.self)
+		}
+
+		return try (-%>
+			<% tuple.elements.forEach((element, index) => { %>
+				<% ensureSerializable(element.type || element.typeName); %> -%>
+				<% /* /^\d+$/ checks if the element name has only numbers in it */ %> -%>
+				<% if (! /^\d+$/.test(element.name)) { %> <%- element.name %>: <% } %> -%>
+				document.unpack("<%- element.name %>") -%>
+				<% if (index < tuple.elements.length-1) { %>,<% } %> -%>
+			<% }) %>
+		)
+	}
+}

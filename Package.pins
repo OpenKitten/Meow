@@ -89,7 +89,7 @@
       "package": "MongoKitten",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",
-      "version": "0.0.25"
+      "version": "0.0.27"
     },
     {
       "package": "Multipart",
