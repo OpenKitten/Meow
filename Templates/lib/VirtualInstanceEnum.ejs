@@ -1,0 +1,13 @@
+
+struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	var keyPrefix: String
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}

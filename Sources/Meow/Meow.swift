@@ -15,6 +15,7 @@ public enum Meow {
     
     /// Initializes the static Meow database state with a MongoKitten.Database
     public static func `init`(_ db: MongoKitten.Database) {
+        print("🐈 Init")
         Meow.database = db
     }
     
@@ -60,15 +61,22 @@ public enum Meow {
             }
             
             if let existingInstance = storage[id] as? M {
+                print("🐈 Returning \(M.self) \(id) from pool")
                 return existingInstance
             }
             
-            return try M(restoring: document)
+            print("🐈 Restoring fresh instance of \(M.self) \(id)")
+            
+            let instance = try M(restoring: document)
+            self.pool(instance)
+            return instance
         }
         
         public func pool(_ instance: Model) {
             if let current = storage[instance._id] {
                 assert(current === instance, "two model instances with the same _id is invalid")
+            } else {
+                print("🐈 Pooling \(type(of: instance)) \(instance._id)")
             }
             
             storage[instance._id] = instance
@@ -77,6 +85,17 @@ public enum Meow {
         /// Returns if `instance` is currently in the pool
         public func isPooled(_ instance: Model) -> Bool {
             return storage[instance._id] != nil
+        }
+        
+        public func handleDeinit(_ instance: Model) {
+            do {
+                try instance.save()
+            } catch {
+                print("error while saving Meow object in deinit: \(error)")
+                assertionFailure()
+            }
+            print("🐈 Unpooling \(type(of: instance)) \(instance._id)")
+            storage[instance._id] = nil
         }
     }
 }

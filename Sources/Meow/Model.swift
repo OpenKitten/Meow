@@ -3,7 +3,7 @@
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
 ///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
-public protocol Model : class, Serializable, Primitive {
+public protocol Model : class, SerializableToDocument, Primitive {
     /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you.
     var _id: ObjectId { get set }
     
@@ -30,11 +30,7 @@ extension Model {
 public typealias ReferenceValues = [(key: String, destinationType: Model.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
 /// Implementes basic CRUD functionality for the object
-extension Model {
-    public func serialize() -> Primitive {
-        return self.serialize() as Document
-    }
-    
+extension Model {    
     public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
         return self.serialize().convert(to: type)
     }
@@ -54,6 +50,8 @@ extension Model {
     
     /// Saves this object
     public func save() throws {
+        print("🐈 Saving \(Self.self) \(self._id)")
+        
         let document = self.serialize()
         
         Meow.pool.pool(self)

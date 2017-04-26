@@ -1,0 +1,24 @@
+
+struct VirtualInstance {
+	var keyPrefix: String
+
+	<% serializable.allVariables.forEach(variable => {
+			if(variable.isComputed) { return; } %>
+		 /// <%- variable.name %>: <%- variable.typeName.name %>
+		 <%
+		 if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
+			 if (numberTypes.includes(variable.unwrappedTypeName)) {
+				 %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.<%- variable.name %>.keyString) } <%
+			 } else {
+				 %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			 }
+		 } else if ((variable.type && variable.type.kind == "enum") || serializables.includes(variable.type)) {
+			 ensureSerializable(variable.type);
+			 %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+		 }
+	}) %>
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance

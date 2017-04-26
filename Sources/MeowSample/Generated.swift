@@ -6,7 +6,7 @@ import Foundation
 import Meow
 
 
-extension Breed {
+extension Breed : SerializableToDocument {
 
 	
 
@@ -17,12 +17,54 @@ extension Breed {
 		document.pack(self.country, as: "country")
 		document.pack(self.origin, as: "origin")
 		document.pack(self.kaas, as: "kaas")
+		document.pack(self.geval, as: "geval")
 		return document
 	}
 	
 	
 	static let collection: MongoKitten.Collection = Meow.database["breed"]
 	
+	func handleDeinit() {
+		do {
+			try self.save()
+			
+		} catch {
+			print("error while saving Meow object in deinit: \(error)")
+			assertionFailure()
+		}
+	}
+	
+	
+	enum Key : String {	case _id
+	
+	case name	
+	case country	
+	case origin	
+	case kaas	
+	case geval	
+
+	var keyString: String { return self.rawValue }
+}
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// name: String
+		  var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
+		 /// country: Country?
+		  var country: Country.VirtualInstance { return Country.VirtualInstance(keyPrefix: keyPrefix + Key.country.keyString) } 
+		 /// origin: Origin?
+		  var origin: Origin.VirtualInstance { return Origin.VirtualInstance(keyPrefix: keyPrefix + Key.origin.keyString) } 
+		 /// kaas: (String,String,String)
+		 
+		 /// geval: Thing?
+		  var geval: Thing.VirtualInstance { return Thing.VirtualInstance(keyPrefix: keyPrefix + Key.geval.keyString) } 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
 }
 		
 extension Breed.Country : Serializable {
@@ -48,6 +90,20 @@ extension Breed.Country : Serializable {
 			
 		}
 	}
+	
+	
+struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	static func ==(lhs: VirtualInstance, rhs: Breed.Country?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	var keyPrefix: String
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}
 }
 		
 extension Breed.Origin : Serializable {
@@ -77,6 +133,68 @@ extension Breed.Origin : Serializable {
 			
 		}
 	}
+	
+	
+struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	static func ==(lhs: VirtualInstance, rhs: Breed.Origin?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	var keyPrefix: String
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}
+}
+		
+extension Breed.Thing : SerializableToDocument {
+	
+	
+		init(restoring source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+		
+		
+		self.henk = try document.unpack("henk")
+		self.fred = try document.unpack("fred")
+	}
+	
+	
+
+	func serialize() -> Document {
+		var document: Document = [:]
+		
+		document.pack(self.henk, as: "henk")
+		document.pack(self.fred, as: "fred")
+		return document
+	}
+	
+	
+	
+	enum Key : String {	
+	
+	case henk	
+	case fred	
+
+	var keyString: String { return self.rawValue }
+}
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// henk: String
+		  var henk: VirtualString { return VirtualString(name: keyPrefix + Key.henk.keyString) } 
+		 /// fred: Int
+		  var fred: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.fred.keyString) } 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
 }
 		
 extension Document {
@@ -110,6 +228,6 @@ extension Document {
 // 🐈 Statistics
 // Models: 1
 //   Breed
-// Serializables: 3
-//   Breed, Breed.Country, Breed.Origin
+// Serializables: 4
+//   Breed, Breed.Country, Breed.Origin, Breed.Thing
 // Tuples: 1

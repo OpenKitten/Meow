@@ -1,7 +1,7 @@
 import Meow
 import Foundation
 
-final class Breed : Model {
+class Breed : Model {
     enum Country : String {
       case ethopia, greece, unitedStates
     }
@@ -9,11 +9,17 @@ final class Breed : Model {
     enum Origin {
       case natural, mutation, crossbreed, hybrid, hybridCrossbreed
     }
+    
+    struct Thing {
+        var henk: String
+        var fred: Int
+    }
 
     var name: String
     var country: Country?
     var origin: Origin?
     var kaas: (String,String,String)
+    var geval: Thing?
 
     init(name: String) {
       self.name = name
@@ -22,7 +28,7 @@ final class Breed : Model {
 
 
 // sourcery:inline:auto:Breed.Meow
-		init(restoring source: BSON.Primitive) throws {
+		required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -32,9 +38,15 @@ final class Breed : Model {
 		self.country = try? document.unpack("country")
 		self.origin = try? document.unpack("origin")
 		self.kaas = try document.unpack("kaas")
+		self.geval = try? document.unpack("geval")
 	}
 	
 	
+	
 	var _id = ObjectId()
+	
+	deinit {
+		Meow.pool.handleDeinit(self)
+	}
 // sourcery:end
 }

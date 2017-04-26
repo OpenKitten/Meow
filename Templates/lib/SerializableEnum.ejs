@@ -19,4 +19,6 @@ extension <%- serializable.name %> : Serializable {
 			<%})%>
 		}
 	}
+	
+	<%- include('VirtualInstanceEnum', {serializable}); %>
 }

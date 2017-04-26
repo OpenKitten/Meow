@@ -1,8 +1,8 @@
-extension <%- serializable.name %> {
+extension <%- serializable.name %> : SerializableToDocument {
 	<%# Classes need their designated initializers to be in the definition of the body, so we use automatic inline code generation. %>
 	<% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Meow<% } %>
 	<% -%>
-	init(restoring source: BSON.Primitive) throws {
+	<% if (serializable.kind == "class") { %>required <% }%>init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -20,7 +20,13 @@ extension <%- serializable.name %> {
 	}
 	
 	<% if (serializable.kind == "class") { %>
-	<% if (serializable.based["Model"]) { %>var _id = ObjectId()<% } %>
+	<% if (serializable.based["Model"]) { %>
+	var _id = ObjectId()
+	
+	deinit {
+		Meow.pool.handleDeinit(self)
+	}
+	<% } %>
 		// sourcery:end
 	<% } %>
 
@@ -43,5 +49,18 @@ extension <%- serializable.name %> {
 	
 	<% if (serializable.based["Model"]) { %>
 	static let collection: MongoKitten.Collection = Meow.database["<%- serializable.name.toLowerCase() %>"]
+	
+	func handleDeinit() {
+		do {
+			try self.save()
+			
+		} catch {
+			print("error while saving Meow object in deinit: \(error)")
+			assertionFailure()
+		}
+	}
 	<% } %>
+	
+	<%- include('KeyEnum', {serializable}); %>
+	<%- include('VirtualInstanceStructClass', {serializable}); %>
 }
