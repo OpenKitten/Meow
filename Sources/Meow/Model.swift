@@ -50,7 +50,7 @@ extension Model {
     
     /// Saves this object
     public func save() throws {
-        print("🐈 Saving \(Self.self) \(self._id)")
+        print("🐈 Saving \(self)")
         
         let document = self.serialize()
         
@@ -63,7 +63,8 @@ extension Model {
     }
     
     /// Removes all entities matching this query until `limit` has been reached
-    public static func remove(_ query: Query, limitedTo limit: Int = 0) throws -> Int {
+    @discardableResult
+    public static func remove(_ query: Query? = nil, limitedTo limit: Int = 0) throws -> Int {
         return try collection.remove(query, limiting: limit)
     }
     

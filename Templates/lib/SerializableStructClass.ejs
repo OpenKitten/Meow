@@ -7,7 +7,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
 		
-		<% if (serializable.based["Model"]) { %>self._id = try document.unpack("_id")<% }
+		<% if (serializable.based["Model"]) { %>Meow.pool.free(self._id)
+		self._id = try document.unpack("_id")<% }
 		
 		serializable.variables.forEach(variable => {
 			if (variable.isComputed || variable.isStatic) { return; }
@@ -21,7 +22,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 	
 	<% if (serializable.kind == "class") { %>
 	<% if (serializable.based["Model"]) { %>
-	var _id = ObjectId()
+	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 	
 	deinit {
 		Meow.pool.handleDeinit(self)
@@ -63,4 +64,10 @@ extension <%- serializable.name %> : SerializableToDocument {
 	
 	<%- include('KeyEnum', {serializable}); %>
 	<%- include('VirtualInstanceStructClass', {serializable}); %>
+}
+
+extension <%- serializable.name %> : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
 }

@@ -4,6 +4,7 @@
 
 import Foundation
 import Meow
+import ExtendedJSON
 
 
 extension Breed : SerializableToDocument {
@@ -66,6 +67,12 @@ struct VirtualInstance {
 	}
 } // end VirtualInstance
 }
+
+extension Breed : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
+}
 		
 extension Breed.Country : Serializable {
 	init(restoring source: BSON.Primitive) throws {
@@ -77,6 +84,7 @@ extension Breed.Country : Serializable {
 			 case "ethopia": self = .ethopia
 			 case "greece": self = .greece
 			 case "unitedStates": self = .unitedStates
+			 case "brazil": self = .brazil
 			
 			default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Country", name: rawValue)
 		}
@@ -87,6 +95,7 @@ extension Breed.Country : Serializable {
 					case .ethopia: return "ethopia"
 					case .greece: return "greece"
 					case .unitedStates: return "unitedStates"
+					case .brazil: return "brazil"
 			
 		}
 	}
@@ -195,6 +204,12 @@ struct VirtualInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
+}
+
+extension Breed.Thing : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
 }
 		
 extension Document {
