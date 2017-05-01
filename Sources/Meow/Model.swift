@@ -123,7 +123,7 @@ extension Model {
     
     /// Returns the first object matching the query
     public static func findOne(_ query: Query? = nil) throws -> Self? {
-        return try Self.find(query).makeIterator().next()
+        return try Self.find(query, limitedTo: 1).makeIterator().next()
     }
     
     /// Removes this object from the database
