@@ -28,7 +28,7 @@ extension Request {
     }
 }
 
-public protocol APIModel : ConcreteModel, ResponseRepresentable {
+public protocol APIModel : Model, ResponseRepresentable {
     var publicProjection: Projection { get }
 }
 

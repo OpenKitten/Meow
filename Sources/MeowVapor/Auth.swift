@@ -21,7 +21,7 @@ public protocol Authenticatable : Model {
     static func resolve(byId identifier: ObjectId) throws -> Self?
 }
 
-extension Authenticatable where Self : ConcreteModel {
+extension Authenticatable where Self : Model {
     public static func resolve(byId identifier: ObjectId) throws -> Self? {
         return try Self.findOne("_id" == identifier)
     }
