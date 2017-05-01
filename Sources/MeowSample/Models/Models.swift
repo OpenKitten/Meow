@@ -56,10 +56,10 @@ class Breed : Model {
 }
 
 class Cat : Model {
-    let name: String
-    let breed: Breed
-    let bestFriend: Reference<Cat>?
-    let family: Set<Reference<Cat>>
+    var name: String
+    var breed: Breed
+    var bestFriend: Reference<Cat>?
+    var family: Set<Reference<Cat>>
     
     init(name: String, breed: Breed, bestFriend: Cat?, family: [Cat]) {
         self.name = name

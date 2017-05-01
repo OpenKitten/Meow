@@ -73,6 +73,7 @@ extension Breed : CustomStringConvertible {
 		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
 	}
 }
+
 		
 extension Cat : SerializableToDocument {
 
@@ -136,6 +137,7 @@ extension Cat : CustomStringConvertible {
 		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
 	}
 }
+
 		
 extension Breed.Country : Serializable {
 	init(restoring source: BSON.Primitive) throws {
@@ -177,6 +179,7 @@ struct VirtualInstance {
 	}
 }
 }
+
 		
 extension Breed.Origin : Serializable {
 	init(restoring source: BSON.Primitive) throws {
@@ -220,6 +223,7 @@ struct VirtualInstance {
 	}
 }
 }
+
 		
 extension Breed.Thing : SerializableToDocument {
 	
@@ -274,10 +278,7 @@ extension Breed.Thing : CustomStringConvertible {
 		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
 	}
 }
-		
-<# Type of kind '%{serializable.kind}' unknown to Meow. Cannot generate Serializable implementation. #>
-		
-<# Type of kind '%{serializable.kind}' unknown to Meow. Cannot generate Serializable implementation. #>
+
 		
 extension Document {
 	mutating func pack(_ tuple: (String,String,String)?, as key: String) {
@@ -310,6 +311,6 @@ extension Document {
 // 🐈 Statistics
 // Models: 2
 //   Breed, Cat
-// Serializables: 7
-//   Breed, Cat, Breed.Country, Breed.Origin, Breed.Thing, Reference<Cat>?, Set<Reference<Cat>>
+// Serializables: 5
+//   Breed, Cat, Breed.Country, Breed.Origin, Breed.Thing
 // Tuples: 1

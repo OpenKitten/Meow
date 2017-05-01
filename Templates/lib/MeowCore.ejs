@@ -9,6 +9,8 @@ window.embeddables = (types.based["Embeddable"] || []);
 window.serializables = models.concat(embeddables);
 window.serializableTuples = [];
 
+// TODO: FIX generics
+window.supportedGenerics = ["Reference", "Array<Reference", "Set<Reference", "[Reference"];
 window.supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
 window.numberTypes = ["Int", "Int32", "Double"];
 
@@ -22,11 +24,21 @@ Object.assign(window, {
 		if (typeof type !== "object") {
 			throw "invalid type";
 		}
-		
+
 		if (supportedPrimitives.includes(type.name)) {
 			return;
 		}
-		
+
+		let isGeneric = false;
+
+		window.supportedGenerics.forEach(generic => {
+			if(type.name.startsWith(generic)) {
+				isGeneric = true;
+			}
+		});
+
+		if(isGeneric) { return }
+
 		if (type.isTuple) {
 			let signature = makeTupleSignature(type);
 			if (serializableTuples.find(t => makeTupleSignature(t) == signature)) { return };
@@ -38,7 +50,7 @@ Object.assign(window, {
 		if (serializables.find(t => t.name == type.name)) { return };
 		serializables.push(type);
 	},
-	
+
 	/**
 	@param {object} tuple - The sourcery tuple object
 	@returns {string} The tuple signature
@@ -55,10 +67,10 @@ Object.assign(window, {
 
 		return tuple.elements.map(e => (e.typeName.name)).join("And");
 	},
-	
+
 	/**
 	Generates an error.
-	
+
 	@param {string} text - The text to include in the error
 	@return {string} The error
 	*/
