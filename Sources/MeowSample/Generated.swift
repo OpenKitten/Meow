@@ -163,6 +163,134 @@ extension Cat : CustomStringConvertible {
 
 
 		
+extension CatReferencing : SerializableToDocument {
+
+	
+
+	func serialize() -> Document {
+		var document: Document = [:]
+		document.pack(self._id, as: "_id")
+		document.pack(self.cat, as: "cat")
+		return document
+	}
+
+	
+	static let collection: MongoKitten.Collection = Meow.database["catreferencing"]
+
+	func handleDeinit() {
+		do {
+			try self.save()
+
+		} catch {
+			print("error while saving Meow object in deinit: \(error)")
+			assertionFailure()
+		}
+	}
+	
+
+	enum Key : String, KeyRepresentable {	case _id
+	
+	case cat
+
+	var keyString: String { return self.rawValue }
+}
+
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// cat: CatLike
+		 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
+	
+	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<CatReferencing> {
+		return try find(closure(VirtualInstance()))
+	}
+
+	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> CatReferencing? {
+		return try findOne(closure(VirtualInstance()))
+	}
+
+
+}
+
+extension CatReferencing : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
+}
+
+
+		
+extension Tiger : SerializableToDocument {
+
+	
+
+	func serialize() -> Document {
+		var document: Document = [:]
+		document.pack(self._id, as: "_id")
+		document.pack(self.breed, as: "breed")
+		return document
+	}
+
+	
+	static let collection: MongoKitten.Collection = Meow.database["tiger"]
+
+	func handleDeinit() {
+		do {
+			try self.save()
+
+		} catch {
+			print("error while saving Meow object in deinit: \(error)")
+			assertionFailure()
+		}
+	}
+	
+
+	enum Key : String, KeyRepresentable {	case _id
+	
+	case breed
+
+	var keyString: String { return self.rawValue }
+}
+
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// breed: Breed
+		  var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
+	
+	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<Tiger> {
+		return try find(closure(VirtualInstance()))
+	}
+
+	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> Tiger? {
+		return try findOne(closure(VirtualInstance()))
+	}
+
+
+}
+
+extension Tiger : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
+}
+
+
+		
 extension Breed.Country : Serializable {
 	init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) else {
@@ -308,6 +436,22 @@ extension Breed.Thing : CustomStringConvertible {
 
 
 		
+// fred
+extension Document {
+	func unpack(_ key: String) throws -> CatLike {
+		guard let document = self[key] as? Document, let ref = DBRef(document, inDatabase: Meow.database) else {
+			throw Meow.Error.missingOrInvalidValue(key: key)
+		}
+		
+		guard let instance = try ref.resolveModel() as? CatLike else {
+			throw Meow.Error.missingOrInvalidValue(key: key)
+		}
+		
+		return instance
+	}
+}
+
+		
 extension Document {
 	mutating func pack(_ tuple: (String,String,String)?, as key: String) {
 		guard let tuple = tuple else {
@@ -336,9 +480,11 @@ extension Document {
 }
 		
 
+let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, CatLike.self]
+
 // 🐈 Statistics
-// Models: 2
-//   Breed, Cat
-// Serializables: 5
-//   Breed, Cat, Breed.Country, Breed.Origin, Breed.Thing
+// Models: 4
+//   Breed, Cat, CatReferencing, Tiger
+// Serializables: 8
+//   Breed, Cat, CatReferencing, Tiger, Breed.Country, Breed.Origin, Breed.Thing, CatLike
 // Tuples: 1
