@@ -7,15 +7,16 @@
 //
 
 import BSON
+import MongoKitten
 
 fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primitive?) throws -> S {
     if let M = S.self as? Model.Type {
-        guard let id = primitive as? ObjectId else {
+        guard let document = primitive as? Document, let ref = DBRef(document, inDatabase: Meow.database) else {
             throw Meow.Error.missingOrInvalidValue(key: key)
         }
         
-        guard let instance = try M.findOne("_id" == id) else {
-            throw Meow.Error.brokenReference(in: [id])
+        guard let instance = try M.findOne("_id" == ref.id) else {
+            throw Meow.Error.brokenReference(in: [ref])
         }
         
         return instance as! S
@@ -30,7 +31,7 @@ fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primit
 
 fileprivate func _pack(_ serializable: Serializable?) -> Primitive? {
     if let serializable = serializable as? Model {
-        return serializable._id
+        return DBRef(referencing: serializable._id, inCollection: type(of: serializable).collection)
     } else {
         return serializable?.serialize()
     }

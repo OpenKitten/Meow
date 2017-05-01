@@ -24,13 +24,13 @@ public struct Reference<M: Model> : Serializable, Hashable {
     }
     
     public init(restoring source: Primitive) throws {
-        let id = try Meow.Helpers.requireValue(ObjectId(source), keyForError: "primitive ObjectId")
-        
-        self.reference = id
+        let document = try Meow.Helpers.requireValue(source as? Document, keyForError: "reference to \(M.self)")
+        let ref = try Meow.Helpers.requireValue(DBRef(document, inDatabase: Meow.database), keyForError: "reference to \(M.self)")
+        self.reference = try Meow.Helpers.requireValue(ref.id as? ObjectId, keyForError: "ObjectId for reference to \(M.self)")
     }
     
     public func serialize() -> Primitive {
-        return reference
+        return DBRef(referencing: reference, inCollection: M.collection)
     }
     
     public func resolve() throws -> M {
