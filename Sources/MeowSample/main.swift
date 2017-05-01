@@ -11,15 +11,28 @@ for collection in try! Meow.database.listCollections() {
 var breed = Breed(name: "Abyssinian")
 breed.country = .ethopia
 
+try breed.save()
+let abyssinian = breed
+
 breed = Breed(name: "Brazilian Shorthair")
 breed.country = .brazil
 breed.origin = .natural
+try breed.save()
 
-breed = try! Breed.findOne("name" == "Abyssinian")!
+let brazillianShorthair = breed
+
+breed = try Breed.findOne("name" == "Abyssinian")!
 breed.origin = .natural
 
-var cat = Cat(name: "Henk", breed: breed, bestFriend: nil, family: [])
+let superCat = Cat(name: "Harrie", breed: brazillianShorthair, bestFriend: nil, family: [])
+let uberSuperCat = Cat(name: "Bob", breed: abyssinian, bestFriend: superCat, family: [superCat])
 
-Meow.pool.pool(cat)
+superCat.family.insert(Reference(to: uberSuperCat))
+try superCat.save()
+try uberSuperCat.save()
+
+let superCatClone = try Cat.findOne("name" == "Harrie")
 
 print("📍 \(breed.country!)")
+print(superCatClone?.breed.name ?? "nope")
+print(try superCatClone?.family.first?.resolve().name ?? "nope")
