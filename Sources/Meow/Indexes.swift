@@ -19,8 +19,6 @@ public enum Attribute {
     }
 }
 
-public typealias Attributes = [Attribute]
-
 public struct Fields : ExpressibleByDictionaryLiteral {
     var sort = Document()
     
