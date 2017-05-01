@@ -1,23 +1,34 @@
 @_exported import MongoKitten
 
-/// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
-///
-/// Embeddables will have a generated Virtual variant of itself for the type safe queries
-public protocol Model : class, SerializableToDocument, Primitive {
-    /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you using Sourcery.
-    var _id: ObjectId { get set }
-    
+public protocol KeyRepresentable {
+    var keyString: String { get }
+}
+
+extension String : KeyRepresentable {
+    public var keyString: String {
+        return self
+    }
+}
+
+/// Something that can be saved
+public protocol BaseModel : class, SerializableToDocument, Primitive {
     /// The collection this entity resides in
     static var collection: MongoKitten.Collection { get }
     
-    /// Serialize the model into a Document
-    func serialize() -> Document
+    /// Saves this object
+    func save() throws
     
     /// Will be called before saving the Model. Throwing from here will prevent the model from saving.
     func willSave() throws
     
     /// Will be called when the Model has been saved to the database.
     func didSave() throws
+    
+    /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you using Sourcery.
+    var _id: ObjectId { get set }
+    
+    /// Serialize the model into a Document
+    func serialize() -> Document
     
     /// Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.
     func willDelete() throws
@@ -26,7 +37,14 @@ public protocol Model : class, SerializableToDocument, Primitive {
     func didDelete() throws
 }
 
-extension Model {
+/// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
+///
+/// Embeddables will have a generated Virtual variant of itself for the type safe queries
+public protocol Model : BaseModel {
+    associatedtype Key : KeyRepresentable = String
+}
+
+extension BaseModel {
     public static func ==(lhs: Self, rhs: Self) -> Bool {
         return lhs._id == rhs._id
     }
@@ -40,7 +58,7 @@ extension Model {
     }
 }
 
-public extension Model {
+public extension BaseModel {
     /// Will be called before saving the Model. Throwing from here will prevent the model from saving.
     public func willSave() throws {}
     
@@ -56,7 +74,7 @@ public extension Model {
 
 
 /// Implementes basic CRUD functionality for the object
-extension Model {    
+extension BaseModel {
     public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
         return self.serialize().convert(to: type)
     }
@@ -74,6 +92,19 @@ extension Model {
         return try collection.count(filter, limiting: limit, skipping: skip)
     }
     
+    /// Removes this object from the database
+    public func delete() throws {
+        try self.willDelete()
+        Meow.pool.invalidate(self._id)
+        try Self.collection.remove("_id" == self._id)
+        try self.didDelete()
+    }
+    
+    /// Returns the first object matching the query
+    public static func findOne(_ query: Query? = nil) throws -> Self? {
+        return try Self.find(query, limitedTo: 1).makeIterator().next()
+    }
+    
     /// Saves this object
     public func save() throws {
         try self.willSave()
@@ -84,8 +115,8 @@ extension Model {
         Meow.pool.pool(self)
         
         try Self.collection.update("_id" == self._id,
-            to: document,
-            upserting: true
+                                   to: document,
+                                   upserting: true
         )
         
         try self.didSave()
@@ -119,18 +150,5 @@ extension Model {
                 return nil
             }
         }
-    }
-    
-    /// Returns the first object matching the query
-    public static func findOne(_ query: Query? = nil) throws -> Self? {
-        return try Self.find(query, limitedTo: 1).makeIterator().next()
-    }
-    
-    /// Removes this object from the database
-    public func delete() throws {
-        try self.willDelete()
-        Meow.pool.invalidate(self._id)
-        try Self.collection.remove("_id" == self._id)
-        try self.didDelete()
     }
 }

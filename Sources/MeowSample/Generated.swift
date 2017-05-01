@@ -21,31 +21,32 @@ extension Breed : SerializableToDocument {
 		document.pack(self.geval, as: "geval")
 		return document
 	}
-	
+
 	
 	static let collection: MongoKitten.Collection = Meow.database["breed"]
-	
+
 	func handleDeinit() {
 		do {
 			try self.save()
-			
+
 		} catch {
 			print("error while saving Meow object in deinit: \(error)")
 			assertionFailure()
 		}
 	}
 	
+
+	enum Key : String, KeyRepresentable {	case _id
 	
-	enum Key : String {	case _id
-	
-	case name	
-	case country	
-	case origin	
-	case kaas	
-	case geval	
+	case name
+	case country
+	case origin
+	case kaas
+	case geval
 
 	var keyString: String { return self.rawValue }
 }
+
 	
 struct VirtualInstance {
 	var keyPrefix: String
@@ -74,6 +75,7 @@ extension Breed : CustomStringConvertible {
 	}
 }
 
+
 		
 extension Cat : SerializableToDocument {
 
@@ -88,30 +90,31 @@ extension Cat : SerializableToDocument {
 		document.pack(self.family, as: "family")
 		return document
 	}
-	
+
 	
 	static let collection: MongoKitten.Collection = Meow.database["cat"]
-	
+
 	func handleDeinit() {
 		do {
 			try self.save()
-			
+
 		} catch {
 			print("error while saving Meow object in deinit: \(error)")
 			assertionFailure()
 		}
 	}
 	
+
+	enum Key : String, KeyRepresentable {	case _id
 	
-	enum Key : String {	case _id
-	
-	case name	
-	case breed	
-	case bestFriend	
-	case family	
+	case name
+	case breed
+	case bestFriend
+	case family
 
 	var keyString: String { return self.rawValue }
 }
+
 	
 struct VirtualInstance {
 	var keyPrefix: String
@@ -137,6 +140,7 @@ extension Cat : CustomStringConvertible {
 		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
 	}
 }
+
 
 		
 extension Breed.Country : Serializable {
@@ -232,12 +236,12 @@ extension Breed.Thing : SerializableToDocument {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-		
+
 		
 		self.henk = try document.unpack("henk")
 		self.fred = try document.unpack("fred")
 	}
-	
+
 	
 
 	func serialize() -> Document {
@@ -247,16 +251,17 @@ extension Breed.Thing : SerializableToDocument {
 		document.pack(self.fred, as: "fred")
 		return document
 	}
+
 	
+
+	enum Key : String, KeyRepresentable {	
 	
-	
-	enum Key : String {	
-	
-	case henk	
-	case fred	
+	case henk
+	case fred
 
 	var keyString: String { return self.rawValue }
 }
+
 	
 struct VirtualInstance {
 	var keyPrefix: String
@@ -278,6 +283,7 @@ extension Breed.Thing : CustomStringConvertible {
 		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
 	}
 }
+
 
 		
 extension Document {

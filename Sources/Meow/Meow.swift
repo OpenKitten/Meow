@@ -48,7 +48,7 @@ public enum Meow {
     public enum Error : Swift.Error {
         case missingOrInvalidValue(key: String)
         case missingValue(key: String)
-        case referenceError(id: ObjectId, type: Model.Type)
+        case referenceError(id: ObjectId, type: BaseModel.Type)
         case undeletableObject(reason: String)
         case enumCaseNotFound(enum: String, name: String)
         case fileTooLarge(size: Int, maximum: Int)
@@ -70,7 +70,7 @@ public enum Meow {
             print("🐈 Performing pre-exit save")
             
             for (_, object) in storage {
-                guard let instance = object as? Model else {
+                guard let instance = object as? BaseModel else {
                     continue
                 }
                 
@@ -107,7 +107,7 @@ public enum Meow {
         }
         
         /// TODO: Make this thread-safe
-        public func instantiateIfNeeded<M : Model>(type: Model.Type, document: Document) throws -> M {
+        public func instantiateIfNeeded<M : BaseModel>(type: M.Type, document: Document) throws -> M {
             guard let id = ObjectId(document["_id"]) else {
                 throw Error.missingOrInvalidValue(key: "_id")
             }
@@ -129,7 +129,7 @@ public enum Meow {
             return instance
         }
         
-        public func pool(_ instance: Model) {
+        public func pool<M: BaseModel>(_ instance: M) {
             var current: AnyObject?
             
             objectPoolQueue.sync {
@@ -174,13 +174,13 @@ public enum Meow {
         }
         
         /// Returns if `instance` is currently in the pool
-        public func isPooled(_ instance: Model) -> Bool {
+        public func isPooled<M: BaseModel>(_ instance: M) -> Bool {
             return objectPoolQueue.sync {
                 return storage[instance._id] != nil
             }
         }
         
-        public func handleDeinit(_ instance: Model) {
+        public func handleDeinit<M: BaseModel>(_ instance: M) {
             do {
                 try instance.save()
             } catch {

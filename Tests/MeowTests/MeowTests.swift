@@ -7,76 +7,6 @@ class MeowTests: XCTestCase {
         try! Meow.init("mongodb://localhost:27017/meow")
         try! Meow.database.drop()
     }
-    
-    func testExample() throws {
-        let user0 = User(username: "piet", email: "piet@openkitten.org", password: "123", age: 20, gender: .male)
-        let user1 = User(username: "henk", email: "henk@openkitten.org", password: "321", age: 20, gender: .male)
-        let user2 = User(username: "klaas", email: "klaas@openkitten.org", password: "12345", age: 16, gender: .female)
-        let user3 = User(username: "harrie", email: "harrie@openkitten.org", password: "bob", age: 24, gender: .male)
-        let user4 = User(username: "bob", email: "bob@openkitten.org", password: "harrie", age: 42, gender: .male)
-        
-        user4.preferences = [.swift, .linux]
-        user2.extraPreferences = [.swift, .mongodb, .macos]
-        
-        user3.details = Details()
-        user3.details!.firstName = "Harrietjuh"
-        user3.details!.address = (streetName: nil, number: 42, city: "Eindhoven", houseGender: .male)
-        
-        try user0.save()
-        try user1.save()
-        try user2.save()
-        try user3.save()
-        try user4.save()
-        
-        XCTAssertEqual(try User.count { user in
-            return user.username == "piet" || user.password == "321"
-        }, 2)
-
-        XCTAssertEqual(try User.count { user in
-            return user.username == "piet" || user.password == "123"
-            }, 1)
-        
-        XCTAssertEqual(try User.count { user in
-            return user.username == "harrie" || user.password == "harrie"
-            }, 2)
-        
-        XCTAssertEqual(try User.count { user in
-            return user.username.hasPrefix("h")
-            }, 2)
-        
-        XCTAssertEqual(try User.count { user in
-            return user.gender == .female
-            }, 1)
-
-        XCTAssertEqual(try User.count { user in
-            return user.gender == .male
-            }, 4)
-        
-        XCTAssertEqual(try User.count { user in
-            return user.age >= 20
-            }, 4)
-        
-        XCTAssertEqual(try User.count { user in
-            return user.age > 20
-            }, 2)
-        
-        XCTAssertEqual(try User.count { user in
-            return user.age < 20
-            }, 1)
-
-        XCTAssertEqual(try User.count(), 5)
-        
-        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.password, "bob")
-        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.details?.firstName, "Harrietjuh")
-        XCTAssertEqual(try User.findOne { $0.username == "harrie" }?.details?.address?.city, "Eindhoven")
-        XCTAssertEqual(try User.findOne { $0.username == "piet" }?.unnamedTuple.2, 4)
-        
-        try user0.delete()
-        try user1.delete()
-        try user2.delete()
-//        try user3.delete()
-        try user4.delete()
-    }
 
     static var allTests : [(String, (MeowTests) -> () throws -> Void)] {
         return [
@@ -85,6 +15,13 @@ class MeowTests: XCTestCase {
     }
 }
 
+final class Group: Model {
+    let name: String
+    
+    init(name: String) {
+        self.name = name
+    }
+}
 
 final class User: Model {
     // sourcery:begin: unique
@@ -96,6 +33,7 @@ final class User: Model {
     var age: Int?
     var gender: Gender?
     var details: Details?
+    var group: Group
     var preferences = [Preference]()
     var extraPreferences: [Preference]?
     var unnamedTuple: (String,String,Int) = ("Example", "Other example", 4)

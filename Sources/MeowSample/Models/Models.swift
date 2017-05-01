@@ -35,7 +35,7 @@ class Breed : Model {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-		
+
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack("name")
@@ -44,11 +44,11 @@ class Breed : Model {
 		self.kaas = try document.unpack("kaas")
 		self.geval = try? document.unpack("geval")
 	}
-	
+
 	
 	
 	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
-	
+
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
@@ -77,7 +77,7 @@ class Cat : Model {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-		
+
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack("name")
@@ -85,11 +85,11 @@ class Cat : Model {
 		self.bestFriend = try? document.unpack("bestFriend")
 		self.family = try document.unpack("family")
 	}
-	
+
 	
 	
 	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
-	
+
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
