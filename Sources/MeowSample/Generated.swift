@@ -67,6 +67,16 @@ struct VirtualInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
+	
+	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<Breed> {
+		return try find(closure(VirtualInstance()))
+	}
+
+	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> Breed? {
+		return try findOne(closure(VirtualInstance()))
+	}
+
+
 }
 
 extension Breed : CustomStringConvertible {
@@ -133,6 +143,16 @@ struct VirtualInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
+	
+	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<Cat> {
+		return try find(closure(VirtualInstance()))
+	}
+
+	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> Cat? {
+		return try findOne(closure(VirtualInstance()))
+	}
+
+
 }
 
 extension Cat : CustomStringConvertible {
@@ -276,6 +296,8 @@ struct VirtualInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
+	
+
 }
 
 extension Breed.Thing : CustomStringConvertible {
