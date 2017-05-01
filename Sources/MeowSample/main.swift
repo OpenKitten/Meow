@@ -8,6 +8,10 @@ for collection in try! Meow.database.listCollections() {
     try! collection.remove()
 }
 
+try Cat.index([
+    .name: .ascending
+], named: "name", attributes: .unique)
+
 var breed = Breed(name: "Abyssinian")
 breed.country = .ethopia
 
@@ -41,3 +45,11 @@ print(referencing.cat.breed.name)
 print("📍 \(breed.country!)")
 print(superCatClone?.breed.name ?? "nope")
 print(superCatClone?.family.first?.name ?? "nope")
+
+guard let otherSuperCatClone = try Cat.findOne({ cat in
+    cat.name == "Harrie"
+}) else {
+    fatalError("MEOW NO! :(")
+}
+
+print(superCatClone == otherSuperCatClone)

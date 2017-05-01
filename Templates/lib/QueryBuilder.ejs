@@ -1,0 +1,9 @@
+<% if (serializable.based["Model"]) { %>
+	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<<%-serializable.name%>> {
+		return try find(closure(VirtualInstance()))
+	}
+
+	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> <%-serializable.name%>? {
+		return try findOne(closure(VirtualInstance()))
+	}
+<% } %>
