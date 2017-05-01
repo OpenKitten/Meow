@@ -54,7 +54,6 @@ public extension Model {
     public func didDelete() throws {}
 }
 
-public typealias ReferenceValues = [(key: String, destinationType: Model.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
 
 /// Implementes basic CRUD functionality for the object
 extension Model {    
