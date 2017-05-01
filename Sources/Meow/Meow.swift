@@ -53,6 +53,7 @@ public enum Meow {
         case enumCaseNotFound(enum: String, name: String)
         case fileTooLarge(size: Int, maximum: Int)
         case cannotDeserialize(type: Serializable.Type, source: BSON.Primitive?, expectedPrimitive: BSON.Primitive.Type)
+        case brokenReference(in: [ObjectId])
     }
     
     public static var pool: ObjectPool!

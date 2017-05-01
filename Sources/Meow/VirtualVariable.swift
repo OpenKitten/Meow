@@ -99,30 +99,6 @@ public struct VirtualData : VirtualVariable {
     public init(name: String) { self.name = name }
 }
 
-// sourcery: donotequate
-public struct VirtualReference<T : Model, D : DeleteRule>: VirtualVariable {
-    public var name: String
-    public init(name: String) {
-        self.name = name
-    }
-    
-    public static func ==(lhs: VirtualReference<T,D>, rhs: T) -> MongoKitten.Query {
-        return lhs.name == rhs._id
-    }
-}
-
-// sourcery: donotequate
-public struct VirtualReferenceArray<T : Model, D : DeleteRule>: VirtualVariable {
-    public var name: String
-    public init(name: String) {
-        self.name = name
-    }
-    
-    public func contains(_ rhs: T) -> MongoKitten.Query {
-        return self.name == rhs._id
-    }
-}
-
 public prefix func !(rhs: Query) -> Query {
     var query = Document()
     

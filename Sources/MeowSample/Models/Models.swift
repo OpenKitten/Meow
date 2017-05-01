@@ -54,3 +54,44 @@ class Breed : Model {
 	}
 // sourcery:end
 }
+
+class Cat : Model {
+    let name: String
+    let breed: Breed
+    let bestFriend: Reference<Cat>?
+    let family: Set<Reference<Cat>>
+    
+    init(name: String, breed: Breed, bestFriend: Cat?, family: [Cat]) {
+        self.name = name
+        self.breed = breed
+        
+        if let bestFriend = bestFriend {
+            self.bestFriend = Reference(to: bestFriend)
+        }
+        
+        self.family = Set(family.map { Reference(to: $0) })
+    }
+
+// sourcery:inline:auto:Cat.Meow
+		required init(restoring source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+		
+		Meow.pool.free(self._id)
+		self._id = try document.unpack("_id")
+		self.name = try document.unpack("name")
+		self.breed = try document.unpack("breed")
+		self.bestFriend = try? document.unpack("bestFriend")
+		self.family = try document.unpack("family")
+	}
+	
+	
+	
+	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
+	
+	deinit {
+		Meow.pool.handleDeinit(self)
+	}
+// sourcery:end
+}

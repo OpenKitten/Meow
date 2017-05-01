@@ -74,6 +74,69 @@ extension Breed : CustomStringConvertible {
 	}
 }
 		
+extension Cat : SerializableToDocument {
+
+	
+
+	func serialize() -> Document {
+		var document: Document = [:]
+		document.pack(self._id, as: "_id")
+		document.pack(self.name, as: "name")
+		document.pack(self.breed, as: "breed")
+		document.pack(self.bestFriend, as: "bestFriend")
+		document.pack(self.family, as: "family")
+		return document
+	}
+	
+	
+	static let collection: MongoKitten.Collection = Meow.database["cat"]
+	
+	func handleDeinit() {
+		do {
+			try self.save()
+			
+		} catch {
+			print("error while saving Meow object in deinit: \(error)")
+			assertionFailure()
+		}
+	}
+	
+	
+	enum Key : String {	case _id
+	
+	case name	
+	case breed	
+	case bestFriend	
+	case family	
+
+	var keyString: String { return self.rawValue }
+}
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// name: String
+		  var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
+		 /// breed: Breed
+		  var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+		 /// bestFriend: Reference<Cat>?
+		 
+		 /// family: Set<Reference<Cat>>
+		 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
+}
+
+extension Cat : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
+}
+		
 extension Breed.Country : Serializable {
 	init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) else {
@@ -212,6 +275,10 @@ extension Breed.Thing : CustomStringConvertible {
 	}
 }
 		
+<# Type of kind '%{serializable.kind}' unknown to Meow. Cannot generate Serializable implementation. #>
+		
+<# Type of kind '%{serializable.kind}' unknown to Meow. Cannot generate Serializable implementation. #>
+		
 extension Document {
 	mutating func pack(_ tuple: (String,String,String)?, as key: String) {
 		guard let tuple = tuple else {
@@ -241,8 +308,8 @@ extension Document {
 		
 
 // 🐈 Statistics
-// Models: 1
-//   Breed
-// Serializables: 4
-//   Breed, Breed.Country, Breed.Origin, Breed.Thing
+// Models: 2
+//   Breed, Cat
+// Serializables: 7
+//   Breed, Cat, Breed.Country, Breed.Origin, Breed.Thing, Reference<Cat>?, Set<Reference<Cat>>
 // Tuples: 1
