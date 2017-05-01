@@ -58,6 +58,8 @@ public enum Meow {
     public static var pool: ObjectPool!
     
     public class ObjectPool {
+        private let objectPoolQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
+        
         fileprivate init() {
             atexit { Meow.pool.beforeExit() }
         }
@@ -93,7 +95,11 @@ public enum Meow {
         
         public func newObjectId() -> ObjectId {
             let id = ObjectId()
-            unsavedObjectIds.append(id)
+            
+            objectPoolQueue.sync {
+                unsavedObjectIds.append(id)
+            }
+            
             return id
         }
         
@@ -103,7 +109,13 @@ public enum Meow {
                 throw Error.missingOrInvalidValue(key: "_id")
             }
             
-            if let existingInstance = storage[id] as? M {
+            var existingInstance: M?
+                
+            objectPoolQueue.sync {
+                existingInstance = storage[id] as? M
+            }
+            
+            if let existingInstance = existingInstance {
                 print("🐈 Returning \(existingInstance) from pool")
                 return existingInstance
             }
@@ -115,28 +127,42 @@ public enum Meow {
         }
         
         public func pool(_ instance: Model) {
-            if let current = storage[instance._id] {
+            var current: AnyObject?
+            
+            objectPoolQueue.sync {
+                current = storage[instance._id]
+            }
+            
+            if let current = current {
                 assert(current === instance, "two model instances with the same _id is invalid")
             } else {
                 print("🐈 Pooling \(instance)")
-                if let index = unsavedObjectIds.index(of: instance._id) {
-                    unsavedObjectIds.remove(at: index)
+                objectPoolQueue.sync {
+                    if let index = unsavedObjectIds.index(of: instance._id) {
+                        unsavedObjectIds.remove(at: index)
+                    }
                 }
             }
             
-            storage[instance._id] = instance
+            objectPoolQueue.sync {
+                storage[instance._id] = instance
+            }
         }
         
         public func free(_ id: ObjectId) {
-            if let index = unsavedObjectIds.index(of: id) {
-                print("🐈 Unregistering ObjectId \(id)")
-                unsavedObjectIds.remove(at: index)
+            objectPoolQueue.sync {
+                if let index = unsavedObjectIds.index(of: id) {
+                    print("🐈 Unregistering ObjectId \(id)")
+                    unsavedObjectIds.remove(at: index)
+                }
             }
         }
         
         /// Returns if `instance` is currently in the pool
         public func isPooled(_ instance: Model) -> Bool {
-            return storage[instance._id] != nil
+            return objectPoolQueue.sync {
+                return storage[instance._id] != nil
+            }
         }
         
         public func handleDeinit(_ instance: Model) {
@@ -147,7 +173,10 @@ public enum Meow {
                 assertionFailure()
             }
             print("🐈 Unpooling \(instance)")
-            storage[instance._id] = nil
+            
+            objectPoolQueue.sync {
+                storage[instance._id] = nil
+            }
         }
     }
 }
