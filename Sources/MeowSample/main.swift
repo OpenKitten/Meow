@@ -40,3 +40,11 @@ let superCatClone = try Cat.findOne("name" == "Harrie")
 print("📍 \(breed.country!)")
 print(superCatClone?.breed.name ?? "nope")
 print(superCatClone?.family.first?.name ?? "nope")
+
+guard let otherSuperCatClone = try Cat.findOne({ cat in
+    cat.name == "Harrie"
+}) else {
+    fatalError("MEOW NO! :(")
+}
+
+print(superCatClone == otherSuperCatClone)
