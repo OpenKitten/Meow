@@ -32,12 +32,18 @@ Object.assign(window, {
 		let isGeneric = false;
 
 		window.supportedGenerics.forEach(generic => {
-			if(type.name.startsWith(generic)) {
+			if (type.name.startsWith(generic)) {
 				isGeneric = true;
 			}
 		});
 
-		if(isGeneric) { return }
+		if (isGeneric) { return; }
+		
+		if (type.isArray) {
+			let arr = type.array;
+			ensureSerializable(arr.elementType || arr.elementTypeName);
+			return;
+		}
 
 		if (type.isTuple) {
 			let signature = makeTupleSignature(type);
