@@ -56,7 +56,11 @@ extension Document {
         return try array.arrayValue.map { try _unpack(key, from: $0) }
     }
     
-    public mutating func pack(_ serializables: [Serializable], as key: String) {
+    public func unpack<S : Serializable>(_ key: String) throws -> Set<S> {
+        return try Set(unpack(key) as [S])
+    }
+    
+    public mutating func pack<S : Sequence>(_ serializables: S, as key: String) where S.Iterator.Element : Serializable {
         self[key] = serializables.map { _pack($0) }
     }
 }

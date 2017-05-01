@@ -43,14 +43,6 @@ public struct Reference<M: Model> : Serializable, Hashable {
 }
 
 extension Document {
-    public func unpack<M: Model>(_ key: String) throws -> Set<Reference<M>> {
-        return Set(try unpack(key) as [Reference<M>])
-    }
-    
-    public mutating func pack<M: Model>(_ serializable: Set<Reference<M>>, as key: String) {
-        self[key] = serializable.map { $0.reference }
-    }
-    
     public func unpack<K: Hashable & Serializable, V: Serializable>(_ key: String) throws -> Dictionary<K, V> {
         let doc = try self.unpack(key) as Document
         
