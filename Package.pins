@@ -11,13 +11,13 @@
       "package": "BSON",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/BSON.git",
-      "version": "5.0.2"
+      "version": "5.0.3"
     },
     {
       "package": "Bits",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/bits.git",
-      "version": "1.0.0-beta.4"
+      "version": "1.0.0-beta.5"
     },
     {
       "package": "CTLS",
@@ -41,7 +41,7 @@
       "package": "Core",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/core.git",
-      "version": "2.0.0-beta.3"
+      "version": "2.0.0-beta.7"
     },
     {
       "package": "Crypto",
@@ -89,7 +89,7 @@
       "package": "MongoKitten",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",
-      "version": "0.0.27"
+      "version": "0.0.28"
     },
     {
       "package": "Multipart",
@@ -131,19 +131,19 @@
       "package": "Sockets",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/socks.git",
-      "version": "2.0.0-beta.3"
+      "version": "2.0.0-beta.4"
     },
     {
       "package": "TLS",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/tls.git",
-      "version": "2.0.0-beta.2"
+      "version": "2.0.0-beta.3"
     },
     {
       "package": "Vapor",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/vapor.git",
-      "version": "2.0.0-beta.18"
+      "version": "2.0.0-beta.22"
     }
   ],
   "version": 1
