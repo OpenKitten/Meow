@@ -123,7 +123,7 @@ struct VirtualInstance {
 		  var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
 		 /// bestFriend: Reference<Cat>?
 		 
-		 /// family: Set<Reference<Cat>>
+		 /// family: [Cat]
 		 
 
 	init(keyPrefix: String = "") {

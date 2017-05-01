@@ -43,22 +43,6 @@ public struct Reference<M: Model> : Serializable, Hashable {
 }
 
 extension Document {
-    public func unpack<M: Model>(_ key: String) throws -> [Reference<M>] {
-        let referenceDoc = try Meow.Helpers.requireValue(Document(self[key]), keyForError: key)
-        
-        guard referenceDoc.validatesAsArray() else {
-            throw Meow.Error.missingOrInvalidValue(key: key)
-        }
-        
-        return try referenceDoc.arrayValue.map { primitive in
-            return try Reference<M>(restoring: primitive)
-        }
-    }
-    
-    public mutating func pack<M: Model>(_ serializable: [Reference<M>], as key: String) {
-        self[key] = serializable.map { $0.reference }
-    }
-    
     public func unpack<M: Model>(_ key: String) throws -> Set<Reference<M>> {
         return Set(try unpack(key) as [Reference<M>])
     }

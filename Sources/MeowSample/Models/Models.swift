@@ -59,7 +59,7 @@ class Cat : Model {
     var name: String
     var breed: Breed
     var bestFriend: Reference<Cat>?
-    var family: Set<Reference<Cat>>
+    var family: [Cat]
     
     init(name: String, breed: Breed, bestFriend: Cat?, family: [Cat]) {
         self.name = name
@@ -69,7 +69,7 @@ class Cat : Model {
             self.bestFriend = Reference(to: bestFriend)
         }
         
-        self.family = Set(family.map { Reference(to: $0) })
+        self.family = family
     }
 
 // sourcery:inline:auto:Cat.Meow

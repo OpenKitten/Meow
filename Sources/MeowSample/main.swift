@@ -27,7 +27,7 @@ breed.origin = .natural
 let superCat = Cat(name: "Harrie", breed: brazillianShorthair, bestFriend: nil, family: [])
 let uberSuperCat = Cat(name: "Bob", breed: abyssinian, bestFriend: superCat, family: [superCat])
 
-superCat.family.insert(Reference(to: uberSuperCat))
+superCat.family.append(uberSuperCat)
 try superCat.save()
 try uberSuperCat.save()
 
@@ -35,4 +35,4 @@ let superCatClone = try Cat.findOne("name" == "Harrie")
 
 print("📍 \(breed.country!)")
 print(superCatClone?.breed.name ?? "nope")
-print(try superCatClone?.family.first?.resolve().name ?? "nope")
+print(superCatClone?.family.first?.name ?? "nope")
