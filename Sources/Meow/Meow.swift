@@ -54,6 +54,7 @@ public enum Meow {
         case fileTooLarge(size: Int, maximum: Int)
         case cannotDeserialize(type: Serializable.Type, source: BSON.Primitive?, expectedPrimitive: BSON.Primitive.Type)
         case brokenReference(in: [ObjectId])
+        case deletingMultiple(errors: [(ObjectId, Swift.Error)])
     }
     
     public static var pool: ObjectPool!
@@ -88,7 +89,8 @@ public enum Meow {
         }
         
         private var storage = WeakDictionary<ObjectId, AnyObject>(minimumCapacity: 1000)
-        private var unsavedObjectIds = [ObjectId]()
+        private var unsavedObjectIds = Set<ObjectId>()
+        private var invalidatedObjectIds = Set<ObjectId>()
         
         public func hello(_ henk: Any? = nil) {
             print(Thread.callStackSymbols)
@@ -98,7 +100,7 @@ public enum Meow {
             let id = ObjectId()
             
             objectPoolQueue.sync {
-                unsavedObjectIds.append(id)
+                _ = unsavedObjectIds.insert(id)
             }
             
             return id
@@ -146,7 +148,19 @@ public enum Meow {
             }
             
             objectPoolQueue.sync {
-                storage[instance._id] = instance
+                // Only pool it if the instance is not invalidated
+                if !invalidatedObjectIds.contains(instance._id) {
+                    storage[instance._id] = instance
+                }
+            }
+        }
+        
+        /// Invalidates the given ObjectId. Called when removing an object
+        internal func invalidate(_ id: ObjectId) {
+            objectPoolQueue.sync {
+                // remove the instance from the pool
+                storage[id] = nil
+                invalidatedObjectIds.insert(id)
             }
         }
         
@@ -177,6 +191,9 @@ public enum Meow {
             
             objectPoolQueue.sync {
                 storage[instance._id] = nil
+                
+                // remove if invalidated to free up memory:
+                invalidatedObjectIds.remove(instance._id)
             }
         }
     }

@@ -4,13 +4,26 @@
 ///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
 public protocol Model : class, SerializableToDocument, Primitive {
-    /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you.
+    /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you using Sourcery.
     var _id: ObjectId { get set }
     
     /// The collection this entity resides in
     static var collection: MongoKitten.Collection { get }
     
+    /// Serialize the model into a Document
     func serialize() -> Document
+    
+    /// Will be called before saving the Model. Throwing from here will prevent the model from saving.
+    func willSave() throws
+    
+    /// Will be called when the Model has been saved to the database.
+    func didSave() throws
+    
+    /// Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.
+    func willDelete() throws
+    
+    /// Will be called when the Model is deleted. At this point, it is no longer in the database and saves will no longer work because the ObjectId is invalidated.
+    func didDelete() throws
 }
 
 extension Model {
@@ -25,6 +38,20 @@ extension Model {
     public static func ==(lhs: Self, rhs: Self?) -> Bool {
         return lhs._id == rhs?._id
     }
+}
+
+public extension Model {
+    /// Will be called before saving the Model. Throwing from here will prevent the model from saving.
+    public func willSave() throws {}
+    
+    /// Will be called when the Model has been saved to the database.
+    public func didSave() throws {}
+    
+    /// Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.
+    public func willDelete() throws {}
+    
+    /// Will be called when the Model is deleted. At this point, it is no longer in the database and saves will no longer work because the ObjectId is invalidated.
+    public func didDelete() throws {}
 }
 
 public typealias ReferenceValues = [(key: String, destinationType: Model.Type, deleteRule: DeleteRule.Type, id: ObjectId)]
@@ -50,6 +77,7 @@ extension Model {
     
     /// Saves this object
     public func save() throws {
+        try self.willSave()
         print("🐈 Saving \(self)")
         
         let document = self.serialize()
@@ -60,26 +88,34 @@ extension Model {
             to: document,
             upserting: true
         )
+        
+        try self.didSave()
     }
     
-    /// Removes all entities matching this query until `limit` has been reached
-    @discardableResult
-    public static func remove(_ query: Query? = nil, limitedTo limit: Int = 0) throws -> Int {
-        return try collection.remove(query, limiting: limit)
-    }
-    
-    /// Updates all entities in this collection to the provided Document
-    public static func update(_ query: Query, to document: Document, multiple: Bool = false) throws -> Int {
-        return try collection.update(query, to: document, upserting: false, multiple: multiple)
+    /// Removes all entities matching the query
+    /// Errors that happen during deletion will be collected and a `Meow.error.deletingMultiple` will be thrown if errors occurred
+    public static func remove(_ query: Query? = nil, limitedTo limit: Int? = nil) throws {
+        var errors = [(ObjectId, Error)]()
+        for instance in try self.find(query, limitedTo: limit) {
+            do {
+                try instance.delete()
+            } catch {
+                errors.append((instance._id, error))
+            }
+        }
+        
+        guard errors.count == 0 else {
+            throw Meow.Error.deletingMultiple(errors: errors)
+        }
     }
     
     /// Returns all objects matching the query
-    public static func find(_ query: Query? = nil) throws -> CollectionSlice<Self> {
-        return try collection.find(query).flatMap { document in
+    public static func find(_ query: Query? = nil, limitedTo limit: Int? = nil) throws -> CollectionSlice<Self> {
+        return try collection.find(query, limitedTo: limit).flatMap { document in
             do {
                 return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
             } catch {
-                print("initializing from document failed: \(error)")
+                print("🐈 Initializing from document failed: \(error)")
                 assertionFailure()
                 return nil
             }
@@ -91,59 +127,11 @@ extension Model {
         return try Self.find(query).makeIterator().next()
     }
     
-    /// Returns `true` if the object can be deleted, `false` otherwise
-    public var canBeDeleted: Bool {
-        do {
-            _ = try self.validateDeletion()
-        } catch {
-            return false
-        }
-        
-        return true
-    }
-    
-    /// Validates if this object can be deleted
-    ///
-    /// - parameter keyPrefix: The string will be prefixed to all keys in thrown errors
-    /// - returns: A closure that will correctly commit the deletion and its cascades
-    public func validateDeletion(keyPrefix: String = "") throws -> (() throws -> ()) {
-        fatalError("unimplemented")
-//        // We'll store the actual deletion as a recursive closure, starting with ourselves:
-//        var cascade: (() throws -> ()) = {
-//            try Self.collection.remove("_id" == self._id)
-//        }
-//        
-//        let referenceValues = self.meowReferencesWithValue
-//        for (key, type, deleteRule, id) in referenceValues {
-//            // Ignore rules should be, well... ignored
-//            if deleteRule == Ignore.self {
-//                continue
-//            }
-//            
-//            guard let referee = try type.findOne("_id" == id) else {
-//                continue
-//            }
-//            
-//            // A deny should prevent deletion so we throw an error, making deletion impossible
-//            if deleteRule == Deny.self {
-//                throw Meow.Error.undeletableObject(reason: keyPrefix + key)
-//            }
-//            
-//            // Cascades should be prefixed to our own cascade closure, so we'll do just that
-//            if deleteRule == Cascade.self {
-//                let thisCascade = try referee.validateDeletion(keyPrefix: key + ".")
-//                cascade = {
-//                    try thisCascade()
-//                    try cascade()
-//                }
-//            }
-//        }
-//        
-//        return cascade
-    }
-    
     /// Removes this object from the database
     public func delete() throws {
-        try self.validateDeletion()()
+        try self.willDelete()
+        Meow.pool.invalidate(self._id)
+        try Self.collection.remove("_id" == self._id)
+        try self.didDelete()
     }
 }
