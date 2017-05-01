@@ -1,6 +1,6 @@
 @_exported import MongoKitten
 
-public protocol KeyRepresentable {
+public protocol KeyRepresentable : Hashable {
     var keyString: String { get }
 }
 

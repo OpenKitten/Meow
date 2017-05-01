@@ -8,6 +8,10 @@ for collection in try! Meow.database.listCollections() {
     try! collection.remove()
 }
 
+try Cat.index([
+    .name: .ascending
+], named: "name", attributes: .unique)
+
 var breed = Breed(name: "Abyssinian")
 breed.country = .ethopia
 
