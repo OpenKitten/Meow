@@ -55,7 +55,7 @@ class Breed : Model {
 // sourcery:end
 }
 
-class Cat : Model {
+class Cat : Model, CatLike {
     var name: String
     var breed: Breed
     var bestFriend: Reference<Cat>?

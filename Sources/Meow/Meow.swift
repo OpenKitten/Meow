@@ -18,18 +18,22 @@ import Foundation
 /// The main object, keeps track of the database
 public enum Meow {
     /// The database object
-    public static var database: MongoKitten.Database!
+    public private(set) static var database: MongoKitten.Database!
+    
+    /// All Meow types
+    internal static var types: [Any.Type]!
     
     /// Initializes the static Meow database state with a MongoKitten.Database
-    public static func `init`(_ db: MongoKitten.Database) {
+    public static func `init`(_ db: MongoKitten.Database, _ types: [Any.Type]) {
         print("🐈 Init")
         Meow.database = db
+        Meow.types = types
         Meow.pool = ObjectPool()
     }
     
     /// Initializes the static Meow database state with a MongoKitten.Database from a connection string
-    public static func `init`(_ connectionString: String) throws {
-        Meow.init(try Database(connectionString))
+    public static func `init`(_ connectionString: String, _ types: [Any.Type]) throws {
+        Meow.init(try Database(connectionString), types)
     }
     
     /// Helpers for the generator

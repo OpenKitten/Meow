@@ -2,7 +2,7 @@ import Meow
 
 // Sample for just Meow - for MeowVapor, see the MeowVaporSample
 
-try Meow.init("mongodb://localhost:27017/meow-sample")
+try Meow.init("mongodb://localhost:27017/meow-sample", meows)
 
 for collection in try! Meow.database.listCollections() {
     try! collection.remove()
@@ -32,6 +32,11 @@ try superCat.save()
 try uberSuperCat.save()
 
 let superCatClone = try Cat.findOne("name" == "Harrie")
+
+var referencing: CatReferencing! = CatReferencing(cat: superCat)
+referencing = nil
+referencing = try! CatReferencing.findOne()!
+print(referencing.cat.breed.name)
 
 print("📍 \(breed.country!)")
 print(superCatClone?.breed.name ?? "nope")

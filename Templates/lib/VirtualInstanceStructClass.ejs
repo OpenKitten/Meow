@@ -12,7 +12,7 @@ struct VirtualInstance {
 			 } else {
 				 %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
 			 }
-		 } else if ((variable.type && variable.type.kind == "enum") || serializables.includes(variable.type)) {
+		 } else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 			 ensureSerializable(variable.type);
 			 %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
 		 }

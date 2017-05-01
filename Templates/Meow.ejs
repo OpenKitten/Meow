@@ -46,6 +46,8 @@ generateSerializables()
 
 %>
 
+let meows: [Any.Type] = [<%- serializables.map(m => m.name + ".self").join(", ") %>]
+
 // 🐈 Statistics
 // Models: <%- models.length %>
 //   <%- models.map(m => m.name).join(", ") %>

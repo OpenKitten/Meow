@@ -8,6 +8,22 @@
 
 import MongoKitten
 
+extension MongoKitten.Collection {
+    var model: BaseModel.Type? {
+        return Meow.types.flatMap{ $0 as? BaseModel.Type }.first{ $0.collection.fullName == self.fullName }
+    }
+}
+
+extension DBRef {
+    public func resolveModel() throws -> BaseModel {
+        guard let M = collection.model, let instance = try M.findOne("_id" == id) else {
+            throw Meow.Error.brokenReference(in: [self])
+        }
+        
+        return instance
+    }
+}
+
 public struct Reference<M: Model> : Serializable, Hashable {
     let reference: ObjectId
     

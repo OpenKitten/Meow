@@ -1,0 +1,14 @@
+// fred
+extension Document {
+	func unpack(_ key: String) throws -> <%- serializable.name %> {
+		guard let document = self[key] as? Document, let ref = DBRef(document, inDatabase: Meow.database) else {
+			throw Meow.Error.missingOrInvalidValue(key: key)
+		}
+		
+		guard let instance = try ref.resolveModel() as? <%- serializable.name %> else {
+			throw Meow.Error.missingOrInvalidValue(key: key)
+		}
+		
+		return instance
+	}
+}
