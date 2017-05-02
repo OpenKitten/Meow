@@ -1,6 +1,6 @@
 # 🐈 Meow
 
-Meow (work in progress) is a **boilerplate-free** object persistence framework for Swift and MongoDB, from the creators of [MongoKitten](https://github.com/openkitten/mongokitten). 
+Meow is a **boilerplate-free** object persistence framework for Swift and MongoDB, from the creators of [MongoKitten](https://github.com/openkitten/mongokitten). 
 
 It manages your database for you, so you can focus on writing your application.
 
@@ -8,14 +8,11 @@ It manages your database for you, so you can focus on writing your application.
 
 - [x] Boilerplate-free
 - [x] So easy it will make you purr, or have your money back!
-- [x] Type-safe and autocompleted queries
-- [ ] Type-safe and autocompleted updates
+- [x] Awesome type-safe and autocompleted queries that feel like filtering an array
+- [x] Support for custom MongoDB queries
+- [x] Easy migrations to a new model version
 - [x] Supports your own types (like structs and enums) and common types (like String, Int and Date) out of the box with zero configuration
 - [x] Uses the full power of MongoDB
-- [ ] Model subclassing
-- [ ] Optional integration with Vapor for amazingly simple and absurdly fast API development
-
-*Meow 1.0 will have all these boxes checked.*
 
 Object serialization and deserialization code is generated automatically using [Sourcery](https://github.com/krzysztofzablocki/Sourcery).
 
@@ -33,6 +30,7 @@ To get started, this is all you need:
 
 ```swift
 import Meow
+
 try Meow.init("mongodb://localhost/meow")
 ```
 
@@ -52,28 +50,12 @@ final class User: Model {
         self.name = name
         self.gender = gender
     }
-    
-    // sourcery:inline:User.Meow
-    // sourcery:end
 }
 ```
 
-This class is a valid model, because:
+This class is a valid model, because it states conformance to the Model protocol.
 
-- It states conformance to the `Model` protocol
-- It marks a place four Sourcery to insert a generated initializer and `_id` variable
-
-Sourcery and Meow will do the rest: with the definition shown above, you can now query and save users.
-
-A minimal (but not very useful) model looks like this:
-
-```swift
-class MyModel: Model {
-    init() {}
-    // sourcery:inline:MyModel.Meow
-    // sourcery:end
-}
-```
+Sourcery and Meow will do the rest: with the definition shown above, you can now query and save users. Serialization and deserialization will be handled for you.
 
 ### Queries
 
