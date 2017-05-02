@@ -11,22 +11,7 @@ import ExtendedJSON
 
 <%
 // helpers
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}
 
-function plural(name) {
-    let lastLetter = name.slice(-1);
-    name = name.substring(0, name.length - 1);
-
-    if(lastLetter == "y") {
-        return name + "ies";
-    } else if(lastLetter == "o") {
-        return name + "oes";
-    } else {
-        return name + lastLetter + "s"
-    }
-}
 
 let supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
 let specialTypes = ["File"];

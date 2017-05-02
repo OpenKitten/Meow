@@ -1,0 +1,15 @@
+<%if(variable.isComputed) { return; }
+	let primitive = supportedPrimitives.includes(variable.typeName.unwrappedTypeName);
+
+	if((!variable.isEnum && !primitive) || !variable.annotations["unique"]) {
+			return;
+	}
+%>
+
+public static func by<%-capitalizeFirstLetter(serializedName(variable))%>(_ string: String) throws -> <%-model.name%>? {
+	let value = <%-primitive ? "" : "try" %> <%-variable.typeName.unwrappedTypeName%>(<%- primitive ? "" : "meowValue: " %>string as Primitive?)
+
+	return try <%-model.name%>.findOne { model in
+		 return model.<%-variable.name%> == value
+	}
+}

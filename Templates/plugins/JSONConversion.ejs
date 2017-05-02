@@ -1,0 +1,76 @@
+<%if(serializable.kind == "enum") {%>
+extension <%- serializable.name %> {
+	public init(jsonValue: Cheetah.Value?) throws {
+	<% if (serializable.typeName) { %>
+			let rawValue = try Meow.Helpers.requireValue(<%- serializable.rawTypeName.name %>(jsonValue), keyForError: "enum <%- serializable.name %>")
+			self = try Meow.Helpers.requireValue(<%- serializable.name %>(rawValue: rawValue), keyForError: "enum <%- serializable.name %>")
+	<% } else if (!serializable.hasAssociatedValues) { %>
+			let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum <%- serializable.name %>")
+			switch rawValue {
+			<% serializable.cases.forEach(enumCase => {
+					%> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
+			<%})%>
+				default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+			}
+	<% } else { %>
+			<# error: enum <%- serializable.name %> has associated values. associated values are not yet supported by Meow. #>
+	<% } %>
+	}
+
+	public static func `self`(from string: String) throws -> <%- serializable.name %>? {
+		return try <%-serializable.name%>(jsonValue: string)
+	}
+}
+<%_ } else { -%>
+extension <%- serializable.name %> {
+	public <%-serializable.kind == "class" ? "convenience " : ""%>init(jsonValue: Cheetah.Value?) throws {
+			let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
+
+			try self.init(restoring: document)
+	}
+
+	<%_ if(serializable.kind == "class") { -%>
+	public static func `self`(from string: String) throws -> <%- serializable.name %>? {
+		let id = try ObjectId(string)
+		return try <%-serializable.name%>.findOne("_id" == id)
+	}
+	<%_ } -%>
+}
+<% } -%>
+extension <%- serializable.name %> : ResponseRepresentable {
+	public func makeResponse() throws -> Response {
+			return try makeJSONObject().makeResponse()
+	}
+
+	public func makeJSONObject() -> JSONObject {
+	<%_
+	let type = (serializable.allVaraibles && serializable.allVariables.length > 0) ? "var" : "let";
+	if(models.includes(serializable)) { -%>
+		<%-type%> object: JSONObject = [
+				"id": self._id.hexString
+		]
+	<%_ } else { -%>
+		<%-type%> object: JSONObject = [:]
+	<%_ } -%>
+
+		<%_ (serializable.variables || []).forEach(variable => {
+				if(!variable.annotations["public"] || variable.isStatic || variable.typeName.unwrappedTypeName.startsWith("File<")) {
+						return;
+				}
+
+				if(supportedJSONValues.includes(variable.typeName.unwrappedTypeName)) {-%>
+		object["<%-serializedName(variable)%>"] = self.<%-variable.name%>
+				<%_ } else if(serializables.includes(variable.type)) {
+					if(variable.type.kind == "enum") { -%>
+		object["<%-serializedName(variable)%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>. fialize() as? Cheetah.Value
+				<%_ } else { -%>
+		object["<%-serializedName(variable)%>"] = self.<%-variable.name%><%-variable.isOptional ? "?" : ""%>.makeJSONObject()
+				<%_ }
+				} else if(bsonJsonMap[variable.type.name]) { -%>
+		object["<%-serializedName(variable)%>"] = <%-bsonJsonMap[variable.type.name]%>(self.<%-variable.name%>)
+				<% } -%>
+		<%_ }); -%>
+
+		return object
+	}
+}

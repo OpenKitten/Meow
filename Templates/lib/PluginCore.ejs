@@ -1,0 +1,31 @@
+<%
+window.imports = {
+	"Foundation": true,
+  "Meow": true,
+  "ExtendedJSON": true
+};
+
+window.execute = function(closures, argument) {
+	var code = "";
+	closures.forEach(closure => {
+    code += closure(argument) + "\n";
+  });
+
+	return code
+}
+
+window.importPluginDependencies = function() {
+	var imports = "";
+
+	for(var key in window.imports) {
+	  if(window.imports.hasOwnProperty(key)) {
+			imports += `import ${key}\n`;
+		}
+	}
+
+	return imports;
+}
+
+window.serializableGenerators = [];
+window.initialization = [window.importPluginDependencies];
+%>

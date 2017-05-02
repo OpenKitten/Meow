@@ -1,0 +1,63 @@
+<%
+window.imports["MeowVapor"] = true;
+window.imports["Vapor"] = true;
+window.imports["Cheetah"] = true;
+window.imports["HTTP"] = true;
+
+window.vapor = {};
+window.vapor.helpers = {};
+
+window.vapor.helpers.capitalizeFirstLetter = function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+window.vapor.helpers.plural = function(name) {
+    let lastLetter = name.slice(-1);
+    name = name.substring(0, name.length - 1);
+
+    if(lastLetter == "y") {
+        return name + "ies";
+    } else if(lastLetter == "o") {
+        return name + "oes";
+    } else {
+        return name + lastLetter + "s"
+    }
+}
+
+window.vapor.supportedJSONValues = ["JSONObject", "JSONArray", "String", "Int", "Double", "Bool"];
+window.vapor.specialTypes = ["File"];
+window.vapor.supportedReturnTypes = ["JSONObject", "JSONArray", "String", "JSON", "Response", "ResponseRepresentable"];
+window.vapor.bsonJsonMap = {
+    "Int": "Int",
+    "Int32": "Int",
+    "Bool": "Bool",
+    "Double": "Double",
+    "String": "String",
+    "ObjectId": "String",
+    "RegularExpression": "String"
+};
+window.vapor.exposedMethods = [];
+window.vapor.generatedModels = [];
+window.vapor.authenticables = [];
+window.vapor.modelIndex = 0;
+
+function generateAuthenticatable(serializable) {
+	return include('Authenticatable', {serializable});
+}
+
+function generateJSONConversion(serializable) {
+	return include('JSONConversion', {serializable});
+}
+
+function generateRoutingHelpers(serializable) {
+	if(!serializable.based["Model"]) { return ""; }
+
+	return include('RoutingHelpers', {serializable});
+}
+
+window.serializableGenerators.push(generateAuthenticatable);
+window.serializableGenerators.push(generateJSONConversion);
+window.serializableGenerators.push(generateRoutingHelpers);
+
+window.authenticables = [];
+-%>

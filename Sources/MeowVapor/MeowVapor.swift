@@ -3,6 +3,7 @@ import Cheetah
 @_exported import Meow
 @_exported import Vapor
 @_exported import BSON
+@_exported import MongoKitten
 import Sessions
 import ExtendedJSON
 

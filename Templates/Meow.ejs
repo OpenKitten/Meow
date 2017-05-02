@@ -1,11 +1,8 @@
-import Foundation
-import Meow
-import ExtendedJSON
-
+<% include('lib/MeowCore') -%>
+<% include('lib/PluginCore') -%>
+<% include('plugins/Vapor') -%>
+<%- window.importPluginDependencies() %>
 <%
-
-include('lib/MeowCore')
-
 // Generate serialization for every serializable
 // It is important to keep this as far down as possible.
 // Keep track of the serializables we already handled:
@@ -22,9 +19,10 @@ function generateSerializables() {
 
 		%>
 <%- include('lib/Serializable', {serializable}) %>
-		<%
+<%- window.execute(window.serializableGenerators, serializable) %>
+<%
 	}
-	
+
 	let tupleIndex = 0;
 	while (serializableTuples.length > generatedSerializableTuples.length) {
 		let tupleName = serializableTuples[tupleIndex];
@@ -35,7 +33,6 @@ function generateSerializables() {
 		%>
 <%- include('lib/Tuple', {tuple, tupleName}) %>
 		<%
-
 	} // end tuple loop
 } // end generatedSerializables
 

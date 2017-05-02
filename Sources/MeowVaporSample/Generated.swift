@@ -4,16 +4,11 @@
 
 import Foundation
 import Meow
+import ExtendedJSON
 import MeowVapor
 import Vapor
 import Cheetah
 import HTTP
-import Cheetah
-import ExtendedJSON
-
-import Foundation
-import Meow
-import ExtendedJSON
 
 
 extension User : SerializableToDocument {
@@ -95,7 +90,51 @@ extension User : CustomStringConvertible {
 }
 
 
-		
+	extension User : Authenticatable {
+		public static func resolve(byId identifier: ObjectId) throws -> User? {
+				return try User.findOne("_id" == identifier)
+		}
+	}
+
+extension User {
+	public convenience init(jsonValue: Cheetah.Value?) throws {
+			let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
+
+			try self.init(restoring: document)
+	}
+
+	public static func `self`(from string: String) throws -> User? {
+		let id = try ObjectId(string)
+		return try User.findOne("_id" == id)
+	}
+}
+extension User : ResponseRepresentable {
+	public func makeResponse() throws -> Response {
+			return try makeJSONObject().makeResponse()
+	}
+
+	public func makeJSONObject() -> JSONObject {
+		let object: JSONObject = [
+				"id": self._id.hexString
+		]
+
+
+		return object
+	}
+}
+
+extension User {
+	public func `init`(from string: String) throws -> User? {
+		let objectId = try ObjectId(string)
+
+		return try User.findOne("_id" == objectId)
+	}
+
+						
+}
+
+
+
 extension Gender : Serializable {
 	init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) else {
@@ -133,7 +172,41 @@ struct VirtualInstance {
 }
 }
 
-		
+
+
+extension Gender {
+	public init(jsonValue: Cheetah.Value?) throws {
+	
+			let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum Gender")
+			switch rawValue {
+			 case "male": self = .male
+			 case "female": self = .female
+			
+				default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
+			}
+	
+	}
+
+	public static func `self`(from string: String) throws -> Gender? {
+		return try Gender(jsonValue: string)
+	}
+}
+extension Gender : ResponseRepresentable {
+	public func makeResponse() throws -> Response {
+			return try makeJSONObject().makeResponse()
+	}
+
+	public func makeJSONObject() -> JSONObject {
+		let object: JSONObject = [:]
+
+
+		return object
+	}
+}
+
+
+
+
 extension Profile : SerializableToDocument {
 	
 	
@@ -145,7 +218,6 @@ extension Profile : SerializableToDocument {
 		
 		self.name = try document.unpack("name")
 		self.age = try document.unpack("age")
-		self.picture = try? document.unpack("picture")
 	}
 
 	
@@ -155,7 +227,6 @@ extension Profile : SerializableToDocument {
 		
 		document.pack(self.name, as: "name")
 		document.pack(self.age, as: "age")
-		document.pack(self.picture, as: "picture")
 		return document
 	}
 
@@ -165,7 +236,6 @@ extension Profile : SerializableToDocument {
 	
 	case name
 	case age
-	case picture
 
 	var keyString: String { return self.rawValue }
 }
@@ -179,8 +249,6 @@ struct VirtualInstance {
 		  var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
 		 /// age: Int
 		  var age: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.age.keyString) } 
-		 /// picture: File?
-		 
 
 	init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -197,215 +265,37 @@ extension Profile : CustomStringConvertible {
 }
 
 
-		
-<# Type of kind 'undefined' named 'undefined' unknown to Meow. Cannot generate Serializable implementation. ([object Sourcery.TypeName]) #>
 
-		
+extension Profile {
+	public init(jsonValue: Cheetah.Value?) throws {
+			let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
 
-let meows: [Any.Type] = [User.self, Gender.self, Profile.self, File?.self]
+			try self.init(restoring: document)
+	}
+
+}
+extension Profile : ResponseRepresentable {
+	public func makeResponse() throws -> Response {
+			return try makeJSONObject().makeResponse()
+	}
+
+	public func makeJSONObject() -> JSONObject {
+		let object: JSONObject = [:]
+
+
+		return object
+	}
+}
+
+
+
+
+
+let meows: [Any.Type] = [User.self, Gender.self, Profile.self]
 
 // 🐈 Statistics
 // Models: 1
 //   User
-// Serializables: 4
-//   User, Gender, Profile, File?
+// Serializables: 3
+//   User, Gender, Profile
 // Tuples: 0
-
-extension User : Authenticatable {
-    public static func resolve(byId identifier: ObjectId) throws -> User? {
-        guard let document = try User.meowCollection.findOne("_id" == identifier) else {
-            return nil
-        }
-
-        return try Meow.pool.instantiateIfNeeded(type: User.self, document: document)
-    }
-}
-extension User {
-    public convenience init(jsonValue: Cheetah.Value?) throws {
-        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
-
-        try self.init(document: document)
-    }
-}
-extension User {
-  public func makeJSONObject() -> JSONObject {
-      let object: JSONObject = [
-          "id": self._id.hexString
-      ]
-
-
-      return object
-  }
-}
-
-
-extension Gender {
-    public init(jsonValue: Cheetah.Value?) throws {
-    
-        let rawValue = try Meow.Helpers.requireValue(String(jsonValue), keyForError: "enum Gender")
-        switch rawValue {
-         case "male": self = .male
-         case "female": self = .female
-        
-          default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
-        }
-    
-  }
-}
-extension Gender {
-  public func makeJSONObject() -> JSONObject {
-      let object: JSONObject = [:]
-
-
-      return object
-  }
-}
-
-extension Profile {
-    public init(jsonValue: Cheetah.Value?) throws {
-        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
-
-        try self.init(document: document)
-    }
-}
-extension Profile {
-  public func makeJSONObject() -> JSONObject {
-      let object: JSONObject = [:]
-
-
-      return object
-  }
-}
-
-extension File? {
-    public init(jsonValue: Cheetah.Value?) throws {
-        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
-
-        try self.init(document: document)
-    }
-}
-extension File? {
-  public func makeJSONObject() -> JSONObject {
-      let object: JSONObject = [:]
-
-
-      return object
-  }
-}
-
-
-extension User : ResponseRepresentable {
-    public func makeResponse() throws -> Response {
-        return try makeJSONObject().makeResponse()
-    }
-
-    public convenience init?(from string: String) throws {
-        let objectId = try ObjectId(string)
-
-        guard let selfDocument = try User.meowCollection.findOne("_id" == objectId) else {
-            return nil
-        }
-
-        try self.init(document: selfDocument)
-    }
-
-    fileprivate static func integrate(with droplet: Droplet, prefixed prefix: String = "/") {
-        droplet.get("users", User.init) { request, subject in
-            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_get(subject)) { request in
-                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_get(subject)) { request in
-                    return subject
-                }
-            }
-        }
-
-        droplet.delete("users", User.init) { request, subject in
-            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_delete(subject)) { request in
-                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_delete(subject)) { request in
-                    try subject.delete()
-                    return Response(status: .ok)
-                }
-            }
-        }
-
-        droplet.post("users") { request in
-            return try AuthenticationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
-                return try AuthorizationMiddleware.default.respond(to: request, route: MeowRoutes.User_init) { request in
-                    guard let object = request.jsonObject else {
-                        throw Abort(.badRequest, reason: "No JSON object provided")
-                    }
-            
-                    guard let username = String(object["username"]) else {
-                        throw Abort(.badRequest, reason: "Invalid key \"username\"")
-                    }
-                
-                    guard let password = String(object["password"]) else {
-                        throw Abort(.badRequest, reason: "Invalid key \"password\"")
-                    }
-                
-                    guard let email = String(object["email"]) else {
-                        throw Abort(.badRequest, reason: "Invalid key \"email\"")
-                    }
-                
-                    let gender: Gender?
-
-                    if let genderJSON = String(object["gender"]) {
-                        gender = try Gender(meowValue: genderJSON)
-                    } else {
-                        gender = nil
-                    }
-                      
-                    let profile: Profile?
-
-                    if let profileJSON = object["profile"] {
-                        profile = try Profile(jsonValue: profileJSON)
-                    } else {
-                        profile = nil
-                    }
-                    let subject = try User.init(username: username, password: password, email: email, gender: gender, profile: profile)
-                    try subject.save()
-                    let jsonResponse = subject.makeJSONObject()
-
-                    return Response(status: .created, headers: [
-                        "Content-Type": "application/json; charset=utf-8"
-                    ], body: Body(jsonResponse.serialize()))
-                }
-            }
-        }
-    }
-}
-
-extension Meow {
-    public static func integrate(with droplet: Droplet) {
-        AuthenticationMiddleware.default.models.append(User.self)
-        
-        User.integrate(with: droplet)
-    }
-}
-
-enum MeowRoutes {
-    case User_get(User)
-    case User_delete(User)
-    case User_init
-}
-
-extension Meow {
-    static func checkPermissions(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
-        AuthorizationMiddleware.default.permissionChecker = { route in
-            guard let route = route as? MeowRoutes else {
-                return false
-            }
-
-            return try closure(route)
-        }
-    }
-
-    static func requireAuthentication(_ closure: @escaping ((MeowRoutes) throws -> (Bool))) {
-        AuthenticationMiddleware.default.authenticationRequired = { route in
-            guard let route = route as? MeowRoutes else {
-                return false
-            }
-
-            return try closure(route)
-        }
-    }
-}

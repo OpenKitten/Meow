@@ -11,7 +11,7 @@ struct Profile {
     var age: Int
     
     // sourcery: name = "profilePicture"
-    var picture: File?
+//    var picture: File?
 }
 
 // sourcery: user
