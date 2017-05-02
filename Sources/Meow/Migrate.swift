@@ -109,9 +109,16 @@ extension Meow {
         
         /// Adds a migration step, and tries to combine it with existing steps
         private func addStep(_ step: Step) {
-            plan.append(step)
+            guard let last = plan.last else {
+                plan.append(step)
+                return
+            }
             
-            // TODO: Try to minimize the amount of updates by combining them
+            switch (last, step) {
+            case (.map(let transforms1), .map(let transforms2)):
+                plan[plan.endIndex-1] = .map(transforms1 + transforms2)
+            default: plan.append(step)
+            }
         }
         
         /// Rename a property
