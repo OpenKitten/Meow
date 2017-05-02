@@ -115,6 +115,7 @@ extension Meow {
             }
             
             switch (last, step) {
+                // TODO: Nondestructively combine update steps
             case (.map(let transforms1), .map(let transforms2)):
                 plan[plan.endIndex-1] = .map(transforms1 + transforms2)
             default: plan.append(step)

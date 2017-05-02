@@ -52,4 +52,8 @@ guard let otherSuperCatClone = try Cat.findOne({ cat in
     fatalError("MEOW NO! :(")
 }
 
+try Meow.migrate("Test migration", on: Breed.self) { migrate in
+    migrate.remove("country")
+}
+
 print(superCatClone == otherSuperCatClone)
