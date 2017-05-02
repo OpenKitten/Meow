@@ -94,6 +94,35 @@ Meow currently supports variables of the following kind:
 - Classes defined in the same module as the model. The same rules apply here as with structs. However, due to a limitation in the Swift language (designated initializers have to be defined within the class definition), these classes also need the `sourcery:inline` markers.
 - Tuples of which the elements comply to the normal variable rules
 
+### Migrations
+
+Whenever you make a breaking change to your models and you want to keep using your existing data, you will need to provide a migration. Breaking changes are:
+
+- Adding a required property
+- Renaming a property
+- Changing the data type of a property
+
+Migrations are performed on a lower level than other operations in Meow, because Meow does not know the difference between the before and after data model. Migrations look like this:
+
+```swift
+Meow.migrate("My migration description", on: MyModel.self) { migrate in
+	// rename a property
+	migrate.rename("foo", to: "bar")
+	
+	// convert a property into a new format
+	migrate.map("myStringFormattedDate") { myStringFormattedDate in
+		return myDateConversionFunction(myStringFormattedDate)
+	}
+	
+	// advanced: custom document adaption
+	migrate.map { document in
+		// change the document
+		return otherDocument
+	}
+}
+```
+
+From the given closure, Meow will create a migration plan. The plan is optimized into a minimum amount of database operations and then executed.
 
 ## ℹ About the queries
 
