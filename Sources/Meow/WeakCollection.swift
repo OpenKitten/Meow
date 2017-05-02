@@ -13,12 +13,20 @@ struct Weak<Wrapped : AnyObject> {
     }
 }
 
-struct WeakDictionary<Key : Hashable, Value : AnyObject> : Swift.Collection, ExpressibleByDictionaryLiteral {
+struct WeakDictionary<Key : Hashable, Value : AnyObject> : Swift.Sequence, ExpressibleByDictionaryLiteral {
     typealias UnderlyingDictionary = [Key : Weak<Value>]
     typealias Element = (key: Key, value: Value)
     typealias Index = UnderlyingDictionary.Index
     
     var underlyingDictionary: UnderlyingDictionary
+    
+    mutating func removeDeallocated() {
+        for (key, element) in underlyingDictionary {
+            if element.value == nil {
+                underlyingDictionary[key] = nil
+            }
+        }
+    }
     
     /// Creates an empty dictionary.
     init() {
@@ -65,8 +73,9 @@ struct WeakDictionary<Key : Hashable, Value : AnyObject> : Swift.Collection, Exp
         return underlyingDictionary.index(after: i)
     }
     
-    subscript(index: Index) -> Element {
-        fatalError("unimplemented")
+    mutating func count() -> Int {
+        self.removeDeallocated()
+        return underlyingDictionary.count
     }
     
     subscript(index: Key) -> Value? {

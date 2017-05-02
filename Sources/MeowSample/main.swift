@@ -4,13 +4,29 @@ import Meow
 
 try Meow.init("mongodb://localhost:27017/meow-sample", meows)
 
+do {
+    var problems = try Meow.validateDatabaseIntegrity()
+    print(problems)
+    
+    // break all the things!
+    try Meow.migrate("Test migration two", on: Breed.self) { migrate in
+        migrate.remove("name")
+    }
+    
+    problems = try Meow.validateDatabaseIntegrity()
+    print(problems)
+} catch {
+    print(error)
+    fatalError()
+}
+
 for collection in try! Meow.database.listCollections() {
     try! collection.remove()
 }
 
 try Cat.index([
     .name: .ascending
-], named: "name", attributes: .unique)
+    ], named: "name", attributes: .unique)
 
 var breed = Breed(name: "Abyssinian")
 breed.country = .ethopia
@@ -25,13 +41,12 @@ try breed.save()
 
 let brazillianShorthair = breed
 
-breed = try Breed.findOne("name" == "Abyssinian")!
+breed = try Breed.findOne { $0.name == "Abyssinian" }!
 breed.origin = .natural
 
 let superCat = Cat(name: "Harrie", breed: brazillianShorthair, bestFriend: nil, family: [])
 let uberSuperCat = Cat(name: "Bob", breed: abyssinian, bestFriend: superCat, family: [superCat])
 
-superCat.family.append(uberSuperCat)
 try superCat.save()
 try uberSuperCat.save()
 
@@ -55,5 +70,3 @@ guard let otherSuperCatClone = try Cat.findOne({ cat in
 try Meow.migrate("Test migration", on: Breed.self) { migrate in
     migrate.remove("country")
 }
-
-print(superCatClone == otherSuperCatClone)

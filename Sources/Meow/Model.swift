@@ -102,7 +102,12 @@ extension BaseModel {
     
     /// Returns the first object matching the query
     public static func findOne(_ query: Query? = nil) throws -> Self? {
-        return try Self.find(query, limitedTo: 1).makeIterator().next()
+        // We don't reuse find here because that one does not have proper error reporting
+        guard let document = try collection.findOne(query) else {
+            return nil
+        }
+        
+        return try Self.instantiateIfNeeded(document)
     }
     
     /// Saves this object
@@ -143,12 +148,16 @@ extension BaseModel {
     public static func find(_ query: Query? = nil, limitedTo limit: Int? = nil) throws -> CollectionSlice<Self> {
         return try collection.find(query, limitedTo: limit).flatMap { document in
             do {
-                return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
+                return try Self.instantiateIfNeeded(document)
             } catch {
                 print("🐈 Initializing from document failed: \(error)")
                 assertionFailure()
                 return nil
             }
         }
+    }
+    
+    public static func instantiateIfNeeded(_ document: Document) throws -> Self {
+        return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
     }
 }

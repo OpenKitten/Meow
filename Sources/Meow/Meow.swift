@@ -8,6 +8,7 @@
 
 import MongoKitten
 import Foundation
+import Dispatch
 
 #if os(Linux)
     import Glibc
@@ -59,6 +60,8 @@ public enum Meow {
         case cannotDeserialize(type: Serializable.Type, source: BSON.Primitive?, expectedPrimitive: BSON.Primitive.Type)
         case brokenReference(in: [DBRef])
         case deletingMultiple(errors: [(ObjectId, Swift.Error)])
+        case cannotValidate(reason: String)
+        case infiniteReferenceLoop(type: BaseModel.Type, id: ObjectId)
     }
     
     public static var pool: ObjectPool!
@@ -92,13 +95,10 @@ public enum Meow {
             }
         }
         
-        private var storage = WeakDictionary<ObjectId, AnyObject>(minimumCapacity: 1000)
+        internal private(set) var storage = WeakDictionary<ObjectId, AnyObject>(minimumCapacity: 1000)
         private var unsavedObjectIds = Set<ObjectId>()
         private var invalidatedObjectIds = Set<ObjectId>()
-        
-        public func hello(_ henk: Any? = nil) {
-            print(Thread.callStackSymbols)
-        }
+        private var currentlyInstantiating = Set<ObjectId>()
         
         public func newObjectId() -> ObjectId {
             let id = ObjectId()
@@ -110,7 +110,6 @@ public enum Meow {
             return id
         }
         
-        /// TODO: Make this thread-safe
         public func instantiateIfNeeded<M : BaseModel>(type: M.Type, document: Document) throws -> M {
             guard let id = ObjectId(document["_id"]) else {
                 throw Error.missingOrInvalidValue(key: "_id")
@@ -127,8 +126,17 @@ public enum Meow {
                 return existingInstance
             }
             
+            guard !currentlyInstantiating.contains(id) else {
+                throw Meow.Error.infiniteReferenceLoop(type: M.self, id: id)
+            }
+            
+            currentlyInstantiating.insert(id)
+            
             let instance = try M(restoring: document)
             print("🐈 Returning fresh instance \(instance)")
+            
+            currentlyInstantiating.remove(id)
+            
             self.pool(instance)
             return instance
         }
@@ -199,6 +207,18 @@ public enum Meow {
                 // remove if invalidated to free up memory:
                 invalidatedObjectIds.remove(instance._id)
             }
+        }
+        
+        /// The amount of pooled objects
+        public var count: Int {
+            return objectPoolQueue.sync {
+                return storage.count()
+            }
+        }
+        
+        /// Removes deallocated entries from the pool, possibly saving around 12 bytes per model
+        public func clean() {
+            storage.removeDeallocated()
         }
     }
 }
