@@ -2,6 +2,12 @@
   "autoPin": true,
   "pins": [
     {
+      "package": "BCrypt",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/bcrypt.git",
+      "version": "1.0.0-beta.1"
+    },
+    {
       "package": "BSON",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/BSON.git",
@@ -26,10 +32,22 @@
       "version": "1.0.1"
     },
     {
+      "package": "Console",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/console.git",
+      "version": "2.0.0-beta.6"
+    },
+    {
       "package": "Core",
       "reason": null,
       "repositoryURL": "https://github.com/vapor/core.git",
       "version": "2.0.0-beta.9"
+    },
+    {
+      "package": "Crypto",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/crypto.git",
+      "version": "2.0.0-beta.1"
     },
     {
       "package": "CryptoSwift",
@@ -44,6 +62,18 @@
       "version": "1.0.0-beta.1"
     },
     {
+      "package": "Engine",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/engine.git",
+      "version": "2.0.0-beta.3"
+    },
+    {
+      "package": "JSON",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/json.git",
+      "version": "2.0.0-beta.3"
+    },
+    {
       "package": "KittenCore",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/KittenCore.git",
@@ -54,6 +84,36 @@
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",
       "version": "0.0.28"
+    },
+    {
+      "package": "Multipart",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/multipart.git",
+      "version": "2.0.0-beta.2"
+    },
+    {
+      "package": "Node",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/node.git",
+      "version": "2.0.0-beta.1"
+    },
+    {
+      "package": "PathIndexable",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/path-indexable.git",
+      "version": "2.0.0-beta.1"
+    },
+    {
+      "package": "Random",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/random.git",
+      "version": "1.0.0-beta.3"
+    },
+    {
+      "package": "Routing",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/routing.git",
+      "version": "2.0.0-beta.3"
     },
     {
       "package": "Schrodinger",
@@ -72,6 +132,12 @@
       "reason": null,
       "repositoryURL": "https://github.com/vapor/tls.git",
       "version": "2.0.0-beta.3"
+    },
+    {
+      "package": "Vapor",
+      "reason": null,
+      "repositoryURL": "https://github.com/vapor/vapor.git",
+      "version": "2.0.0-beta.23"
     }
   ],
   "version": 1

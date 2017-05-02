@@ -1,497 +1,7 @@
-// Generated using Sourcery 0.5.9 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 0.6.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 
-import Foundation
-import Meow
-
-
-
-  func meowReinstantiateObjectIdArray(from source: Primitive?) throws -> [ObjectId]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> ObjectId in
-          return try Meow.Helpers.requireValue(ObjectId(rawValue), keyForError: "index \(index) on array of ObjectId")
-      }
-  }
-
-
-  func meowReinstantiateStringArray(from source: Primitive?) throws -> [String]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> String in
-          return try Meow.Helpers.requireValue(String(rawValue), keyForError: "index \(index) on array of String")
-      }
-  }
-
-
-  func meowReinstantiateIntArray(from source: Primitive?) throws -> [Int]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Int in
-          return try Meow.Helpers.requireValue(Int(rawValue), keyForError: "index \(index) on array of Int")
-      }
-  }
-
-
-  func meowReinstantiateInt32Array(from source: Primitive?) throws -> [Int32]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Int32 in
-          return try Meow.Helpers.requireValue(Int32(rawValue), keyForError: "index \(index) on array of Int32")
-      }
-  }
-
-
-  func meowReinstantiateBoolArray(from source: Primitive?) throws -> [Bool]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Bool in
-          return try Meow.Helpers.requireValue(Bool(rawValue), keyForError: "index \(index) on array of Bool")
-      }
-  }
-
-
-  func meowReinstantiateDocumentArray(from source: Primitive?) throws -> [Document]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Document in
-          return try Meow.Helpers.requireValue(Document(rawValue), keyForError: "index \(index) on array of Document")
-      }
-  }
-
-
-  func meowReinstantiateDoubleArray(from source: Primitive?) throws -> [Double]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Double in
-          return try Meow.Helpers.requireValue(Double(rawValue), keyForError: "index \(index) on array of Double")
-      }
-  }
-
-
-  func meowReinstantiateDataArray(from source: Primitive?) throws -> [Data]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Data in
-          return try Meow.Helpers.requireValue(Data(rawValue), keyForError: "index \(index) on array of Data")
-      }
-  }
-
-
-  func meowReinstantiateBinaryArray(from source: Primitive?) throws -> [Binary]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Binary in
-          return try Meow.Helpers.requireValue(Binary(rawValue), keyForError: "index \(index) on array of Binary")
-      }
-  }
-
-
-  func meowReinstantiateDateArray(from source: Primitive?) throws -> [Date]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> Date in
-          return try Meow.Helpers.requireValue(Date(rawValue), keyForError: "index \(index) on array of Date")
-      }
-  }
-
-
-  func meowReinstantiateRegularExpressionArray(from source: Primitive?) throws -> [RegularExpression]? {
-      guard let document = Document(source) else {
-        return nil
-      }
-
-      return try document.map { index, rawValue -> RegularExpression in
-          return try Meow.Helpers.requireValue(RegularExpression(rawValue), keyForError: "index \(index) on array of RegularExpression")
-      }
-  }
-
-      // Struct or Class extension
-      extension User : ConcreteSerializable {
-
-      
-
-
-        convenience init?(meowValue: Primitive?) throws {
-          guard let document = Document(meowValue) else {
-            return nil
-          }
-
-          try self.init(document: document)
-        }
-
-        func serialize() -> Document {
-            return serialize(resolvingReferences: false)
-        }
-
-        func serialize(resolvingReferences: Bool) -> Document {
-          var document = Document()
-            document["_id"] = self._id
-          
-            document["username"] = self.username 
-            document["email"] = self.email 
-            document["gender"] = self.gender?.serialize() 
-            document["profile"] = self.profile?.serialize() 
-            document["password"] = self.password 
-          return document
-        }
-
-        struct VirtualUpdateInstance {
-          
-             /// username: String
-              var username: UpdateString = .unaffected
-             /// email: String
-              var email: UpdateString = .unaffected
-             /// gender: Gender?
-              var gender: Gender? = nil
-             /// profile: Profile?
-              var profile = Profile.VirtualUpdateInstance()
-             /// password: Data
-             
-
-          init() { }
-
-          var update: Document {
-            var set: Document = Document()
-            var unset: Document = Document()
-            var increment: Document = Document()
-
-            
-
-              switch self.username.operation {
-              case .set(let primitive):
-                set["username"] = primitive
-              case .unset:
- 
-                unset["username"] = ""
- 
-              case .increment(let by):
-                increment["username"] = by
-              default:
-                break
-              }
-            
-
-              switch self.email.operation {
-              case .set(let primitive):
-                set["email"] = primitive
-              case .unset:
- 
-                unset["email"] = ""
- 
-              case .increment(let by):
-                increment["email"] = by
-              default:
-                break
-              }
-            
-              set["gender"] = gender?.serialize()
-                
-              let profileUpdateDoc = profile.update
-
-              if let otherSet = Document(profileUpdateDoc["$set"])  {
-                set.append(contentsOf: otherSet)
-              }
-
-              if let otherInc = Document(profileUpdateDoc["$inc"])  {
-                increment.append(contentsOf: otherInc)
-              }
-
-              if let otherUnset = Document(profileUpdateDoc["$unset"])  {
-                unset.append(contentsOf: otherUnset)
-              }
-                
-
-            return [
-              "$set": set.count > 0 ? set : nil,
-              "$inc": increment.count > 0 ? increment : nil,
-              "$unset": unset.count > 0 ? unset : nil
-            ]
-          }
-        }
-
-        struct VirtualInstance {
-          var keyPrefix: String
-
-          
-             /// username: String
-              var username: VirtualString { return VirtualString(name: keyPrefix + "username") } 
-             /// email: String
-              var email: VirtualString { return VirtualString(name: keyPrefix + "email") } 
-             /// gender: Gender?
-              var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: keyPrefix + "gender") } 
-             /// profile: Profile?
-              var profile: Profile.VirtualInstance { return Profile.VirtualInstance(keyPrefix: keyPrefix + "profile") } 
-             /// password: Data
-              var password: VirtualData { return VirtualData(name: keyPrefix + "password") } 
-
-          init(keyPrefix: String = "") {
-            self.keyPrefix = keyPrefix
-          }
-        } // end VirtualInstance
-
-        enum Key : String {            case _id
-          
-            case username          
-            case email          
-            case gender          
-            case profile          
-            case password          
-
-            var keyString: String { return self.rawValue }
-        }
-
-      } // end struct or class extension of User
-  
-        extension User : ConcreteModel {
-          static let meowCollection: MongoKitten.Collection = Meow.database["user"]
-          var meowReferencesWithValue: ReferenceValues { return [] }
-
-          static func find(_ closure: ((VirtualInstance) -> (Query))) throws -> CollectionSlice<User> {
-            let query = closure(VirtualInstance())
-            return try self.find(query)
-          }
-
-          static func updateOne(_ closure: ((VirtualInstance) -> (Query)), toSet operations: ((VirtualUpdateInstance) -> ())) throws -> Int {
-            let query = closure(VirtualInstance())
-            let updateInstance = VirtualUpdateInstance()
-            operations(updateInstance)
-            return try self.update(query, to: updateInstance.update, multiple: false)
-          }
-
-          static func updateAll(_ closure: ((VirtualInstance) -> (Query)), toSet operations: ((VirtualUpdateInstance) -> ())) throws -> Int {
-            let query = closure(VirtualInstance())
-            let updateInstance = VirtualUpdateInstance()
-            operations(updateInstance)
-            return try self.update(query, to: updateInstance.update, multiple: true)
-          }
-
-          static func remove(_ limit: Int = 0, _ closure: ((VirtualInstance) -> (Query))) throws -> Int {
-            let query = closure(VirtualInstance())
-            return try self.remove(query, limitedTo: limit)
-          }
-
-          static func findOne(_ closure: ((VirtualInstance) -> (Query))) throws -> User? {
-            let query = closure(VirtualInstance())
-            return try self.findOne(query)
-          }
-
-          static func count(_ closure: ((VirtualInstance) -> (Query))) throws -> Int {
-            let query = closure(VirtualInstance())
-            return try self.count(query)
-          }
-
-          static func createIndex(named name: String? = nil, withParameters closure: ((VirtualInstance, IndexSubject) -> ())) throws {
-            let indexSubject = IndexSubject()
-            closure(VirtualInstance(), indexSubject)
-
-            try meowCollection.createIndexes([(name: name ?? "", parameters: indexSubject.makeIndexParameters())])
-          }
-        }
-      
-    func meowReinstantiateUserArray(from source: Primitive?) throws -> [User]? {
-        guard let document = Document(source) else {
-          return nil
-        }
-
-        return try document.map { index, rawValue -> User in
-            return try Meow.Helpers.requireValue(User(meowValue: rawValue), keyForError: "index \(index) on array of User")
-        }
-    }
-  
-      // Enum extension
-      extension Gender : ConcreteSingleValueSerializable {
-        /// Creates a `Gender` from a BSON Primtive
-        init?(meowValue: Primitive?) throws {
-          
-            guard let rawValue = String(meowValue) else {
-                return nil
-            }
-
-            switch rawValue {
-               case "male": self = .male
-               case "female": self = .female
-              
-              default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
-            }
-          
-        }
-
-        func serialize(resolvingReferences: Bool) -> Primitive {
-            return self.serialize()
-        }
-
-        func serialize() -> Primitive {
-          
-            switch self {
-                          case .male: return "male"
-                          case .female: return "female"
-              
-            }
-          
-        }
-
-        struct VirtualInstance {
-          /// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
-          static func ==(lhs: VirtualInstance, rhs: Gender?) -> Query {
-            return lhs.keyPrefix == rhs?.serialize()
-          }
-
-          var keyPrefix: String
-
-          init(keyPrefix: String = "") {
-            self.keyPrefix = keyPrefix
-          }
-        }
-      }
-    
-    func meowReinstantiateGenderArray(from source: Primitive?) throws -> [Gender]? {
-        guard let document = Document(source) else {
-          return nil
-        }
-
-        return try document.map { index, rawValue -> Gender in
-            return try Meow.Helpers.requireValue(Gender(meowValue: rawValue), keyForError: "index \(index) on array of Gender")
-        }
-    }
-  
-      // Struct or Class extension
-      extension Profile : ConcreteSerializable {
-      
-      init(document source: Document) throws {
-          
-        
-          self.name = try Meow.Helpers.requireValue(String(source[Key.name.keyString]), keyForError: "name")  /* String */ 
-          self.age = try Meow.Helpers.requireValue(Int(source[Key.age.keyString]), keyForError: "age")  /* Int */ 
-          self.picture = try File(source[Key.profilePicture.keyString])  /* File? */ 
-
-        
-      }
-      
-
-
-         init?(meowValue: Primitive?) throws {
-          guard let document = Document(meowValue) else {
-            return nil
-          }
-
-          try self.init(document: document)
-        }
-
-        func serialize() -> Document {
-            return serialize(resolvingReferences: false)
-        }
-
-        func serialize(resolvingReferences: Bool) -> Document {
-          var document = Document()
-            
-          
-            document["name"] = self.name 
-            document["age"] = self.age 
-            document["profilePicture"] = self.picture?.id 
-          return document
-        }
-
-        struct VirtualUpdateInstance {
-          
-             /// name: String
-              var name: UpdateString = .unaffected
-             /// age: Int
-              var age: UpdateNumber = .unaffected
-             /// picture: File?
-             
-
-          init() { }
-
-          var update: Document {
-            var set: Document = Document()
-            var unset: Document = Document()
-            var increment: Document = Document()
-
-            
-
-              switch self.name.operation {
-              case .set(let primitive):
-                set["name"] = primitive
-              case .unset:
- 
-                unset["name"] = ""
- 
-              case .increment(let by):
-                increment["name"] = by
-              default:
-                break
-              }
-            
-
-            return [
-              "$set": set.count > 0 ? set : nil,
-              "$inc": increment.count > 0 ? increment : nil,
-              "$unset": unset.count > 0 ? unset : nil
-            ]
-          }
-        }
-
-        struct VirtualInstance {
-          var keyPrefix: String
-
-          
-             /// name: String
-              var name: VirtualString { return VirtualString(name: keyPrefix + "name") } 
-             /// age: Int
-              var age: VirtualNumber { return VirtualNumber(name: keyPrefix + "age") } 
-             /// picture: File?
-             
-
-          init(keyPrefix: String = "") {
-            self.keyPrefix = keyPrefix
-          }
-        } // end VirtualInstance
-
-        enum Key : String {            case _id
-          
-            case name          
-            case age          
-            case profilePicture          
-
-            var keyString: String { return self.rawValue }
-        }
-
-      } // end struct or class extension of Profile
-  
-    func meowReinstantiateProfileArray(from source: Primitive?) throws -> [Profile]? {
-        guard let document = Document(source) else {
-          return nil
-        }
-
-        return try document.map { index, rawValue -> Profile in
-            return try Meow.Helpers.requireValue(Profile(meowValue: rawValue), keyForError: "index \(index) on array of Profile")
-        }
-    }
-  
-// Serializables parsed: User,Gender,Profile
-// Tuples parsed: 
 import Foundation
 import Meow
 import MeowVapor
@@ -500,6 +10,206 @@ import Cheetah
 import HTTP
 import Cheetah
 import ExtendedJSON
+
+import Foundation
+import Meow
+import ExtendedJSON
+
+
+extension User : SerializableToDocument {
+
+	
+
+	func serialize() -> Document {
+		var document: Document = [:]
+		document.pack(self._id, as: "_id")
+		document.pack(self.username, as: "username")
+		document.pack(self.email, as: "email")
+		document.pack(self.gender, as: "gender")
+		document.pack(self.profile, as: "profile")
+		document.pack(self.password, as: "password")
+		return document
+	}
+
+	
+	static let collection: MongoKitten.Collection = Meow.database["user"]
+
+	func handleDeinit() {
+		do {
+			try self.save()
+
+		} catch {
+			print("error while saving Meow object in deinit: \(error)")
+			assertionFailure()
+		}
+	}
+	
+
+	enum Key : String, KeyRepresentable {	case _id
+	
+	case username
+	case email
+	case gender
+	case profile
+	case password
+
+	var keyString: String { return self.rawValue }
+}
+
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// username: String
+		  var username: VirtualString { return VirtualString(name: keyPrefix + Key.username.keyString) } 
+		 /// email: String
+		  var email: VirtualString { return VirtualString(name: keyPrefix + Key.email.keyString) } 
+		 /// gender: Gender?
+		  var gender: Gender.VirtualInstance { return Gender.VirtualInstance(keyPrefix: keyPrefix + Key.gender.keyString) } 
+		 /// profile: Profile?
+		  var profile: Profile.VirtualInstance { return Profile.VirtualInstance(keyPrefix: keyPrefix + Key.profile.keyString) } 
+		 /// password: Data
+		  var password: VirtualData { return VirtualData(name: keyPrefix + Key.password.keyString) } 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
+	
+	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<User> {
+		return try find(closure(VirtualInstance()))
+	}
+
+	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> User? {
+		return try findOne(closure(VirtualInstance()))
+	}
+
+
+}
+
+extension User : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
+}
+
+
+		
+extension Gender : Serializable {
+	init(restoring source: BSON.Primitive) throws {
+		guard let rawValue = String(source) else {
+				throw Meow.Error.cannotDeserialize(type: Gender.self, source: source, expectedPrimitive: String.self)
+		}
+
+		switch rawValue {
+			 case "male": self = .male
+			 case "female": self = .female
+			
+			default: throw Meow.Error.enumCaseNotFound(enum: "Gender", name: rawValue)
+		}
+	}
+	
+	func serialize() -> BSON.Primitive {
+		switch self {
+					case .male: return "male"
+					case .female: return "female"
+			
+		}
+	}
+	
+	
+struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	static func ==(lhs: VirtualInstance, rhs: Gender?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	var keyPrefix: String
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}
+}
+
+		
+extension Profile : SerializableToDocument {
+	
+	
+		init(restoring source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: Profile.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		
+		self.name = try document.unpack("name")
+		self.age = try document.unpack("age")
+		self.picture = try? document.unpack("picture")
+	}
+
+	
+
+	func serialize() -> Document {
+		var document: Document = [:]
+		
+		document.pack(self.name, as: "name")
+		document.pack(self.age, as: "age")
+		document.pack(self.picture, as: "picture")
+		return document
+	}
+
+	
+
+	enum Key : String, KeyRepresentable {	
+	
+	case name
+	case age
+	case picture
+
+	var keyString: String { return self.rawValue }
+}
+
+	
+struct VirtualInstance {
+	var keyPrefix: String
+
+	
+		 /// name: String
+		  var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
+		 /// age: Int
+		  var age: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.age.keyString) } 
+		 /// picture: File?
+		 
+
+	init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+} // end VirtualInstance
+	
+
+}
+
+extension Profile : CustomStringConvertible {
+	var description: String {
+		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	}
+}
+
+
+		
+<# Type of kind 'undefined' named 'undefined' unknown to Meow. Cannot generate Serializable implementation. ([object Sourcery.TypeName]) #>
+
+		
+
+let meows: [Any.Type] = [User.self, Gender.self, Profile.self, File?.self]
+
+// 🐈 Statistics
+// Models: 1
+//   User
+// Serializables: 4
+//   User, Gender, Profile, File?
+// Tuples: 0
 
 extension User : Authenticatable {
     public static func resolve(byId identifier: ObjectId) throws -> User? {
@@ -519,7 +229,7 @@ extension User {
 }
 extension User {
   public func makeJSONObject() -> JSONObject {
-      var object: JSONObject = [
+      let object: JSONObject = [
           "id": self._id.hexString
       ]
 
@@ -560,7 +270,23 @@ extension Profile {
 }
 extension Profile {
   public func makeJSONObject() -> JSONObject {
-      var object: JSONObject = [:]
+      let object: JSONObject = [:]
+
+
+      return object
+  }
+}
+
+extension File? {
+    public init(jsonValue: Cheetah.Value?) throws {
+        let document = try Meow.Helpers.requireValue(Document(jsonValue), keyForError: "")
+
+        try self.init(document: document)
+    }
+}
+extension File? {
+  public func makeJSONObject() -> JSONObject {
+      let object: JSONObject = [:]
 
 
       return object

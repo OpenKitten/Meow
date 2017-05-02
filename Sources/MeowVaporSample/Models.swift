@@ -45,19 +45,30 @@ final class User: Model {
         self.profile = profile
     }
 
-// sourcery:inline:auto:User
-      init(document source: Document) throws {
-          self._id = try Meow.Helpers.requireValue(ObjectId(source[Key._id.keyString]), keyForError: "_id")
-        
-          self.username = try Meow.Helpers.requireValue(String(source[Key.username.keyString]), keyForError: "username")  /* String */ 
-          self.email = try Meow.Helpers.requireValue(String(source[Key.email.keyString]), keyForError: "email")  /* String */ 
-          self.gender = try Gender(meowValue: source[Key.gender.keyString])  /* Gender? */ 
-          self.profile = try Profile(meowValue: source[Key.profile.keyString])  /* Profile? */ 
-          self.password = try Meow.Helpers.requireValue(Data(source[Key.password.keyString]), keyForError: "password")  /* Data */ 
+    
+    
 
-        Meow.pool.pool(self)
-      }
-      
-        var _id = ObjectId()
+// sourcery:inline:auto:User.Meow
+		required init(restoring source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: User.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		Meow.pool.free(self._id)
+		self._id = try document.unpack("_id")
+		self.username = try document.unpack("username")
+		self.email = try document.unpack("email")
+		self.gender = try? document.unpack("gender")
+		self.profile = try? document.unpack("profile")
+		self.password = try document.unpack("password")
+	}
+
+	
+	
+	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
+
+	deinit {
+		Meow.pool.handleDeinit(self)
+	}
 // sourcery:end
 }

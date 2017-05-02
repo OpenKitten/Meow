@@ -17,11 +17,11 @@ extension Meow {
     }
 }
 
-public protocol Authenticatable : Model {
+public protocol Authenticatable : BaseModel {
     static func resolve(byId identifier: ObjectId) throws -> Self?
 }
 
-extension Authenticatable where Self : Model {
+extension Authenticatable {
     public static func resolve(byId identifier: ObjectId) throws -> Self? {
         return try Self.findOne("_id" == identifier)
     }
