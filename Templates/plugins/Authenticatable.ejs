@@ -1,9 +1,0 @@
-<%
-	if(serializable.annotations && serializable.annotations["user"] && window.models.includes(serializable)) {
-		window.authenticables.push(serializable.name); -%>
-	extension <%-serializable.name %> : Authenticatable {
-		public static func resolve(byId identifier: ObjectId) throws -> <%-serializable.name%>? {
-				return try <%-serializable.name%>.findOne("_id" == identifier)
-		}
-	}
-<%}-%>
