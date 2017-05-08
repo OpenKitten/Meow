@@ -10,6 +10,12 @@ extension String : KeyRepresentable {
     }
 }
 
+extension ObjectId : KeyRepresentable {
+    public var keyString: String {
+        return hexString
+    }
+}
+
 /// Something that can be saved
 public protocol BaseModel : class, SerializableToDocument, Primitive {
     /// The collection this entity resides in
@@ -40,8 +46,22 @@ public protocol BaseModel : class, SerializableToDocument, Primitive {
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
 ///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
-public protocol Model : BaseModel {
+public protocol Model : BaseModel, Hashable {
     associatedtype Key : KeyRepresentable = String
+}
+
+extension Model {
+    public var keyString: String {
+        return _id.hexString
+    }
+    
+    public var hashValue: Int {
+        return _id.hashValue
+    }
+    
+    public static func ==(lhs: Self, rhs: Self) -> Bool {
+        return lhs._id == rhs._id
+    }
 }
 
 extension BaseModel {

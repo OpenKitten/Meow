@@ -39,14 +39,6 @@ public struct File : ValueConvertible {
         self.id = try ObjectId(id)
     }
     
-    public init?(_ bson: Primitive) throws {
-        guard let id = ObjectId(bson) else {
-            return nil
-        }
-        
-        self.id = id
-    }
-
     public let id: ObjectId
     
     var primitive: BSON.Primitive {
@@ -63,5 +55,19 @@ public struct File : ValueConvertible {
         }
         
         self.id = id
+    }
+}
+
+extension File : Serializable {
+    public init(restoring source: BSON.Primitive) throws {
+        guard let id = ObjectId(source) else {
+            throw Meow.Error.missingOrInvalidValue(key: "")
+        }
+        
+        self.id = id
+    }
+    
+    public func serialize() -> Primitive {
+        return id
     }
 }

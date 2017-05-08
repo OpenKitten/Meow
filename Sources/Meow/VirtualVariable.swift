@@ -23,6 +23,15 @@ public func ==(lhs: VirtualVariable, rhs: Primitive?) -> Query {
     return lhs.name == rhs
 }
 
+public struct VirtualDocument : VirtualVariable {
+    public var name: String
+    public init(name: String) { self.name = name }
+    
+    public subscript(key: String) -> String {
+        return name + "." + key
+    }
+}
+
 // sourcery: compareType=String
 public struct VirtualString : VirtualVariable {
     public var name: String
