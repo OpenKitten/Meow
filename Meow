@@ -1,0 +1,68 @@
+#!/bin/bash
+
+DIRNAME=${PWD##*/}
+
+if [ ! -d ".build" ]; then
+	echo "❗️  Meow stores artifacts in the .build directory, but it is not present. Is the working directory a Swift package?"
+	exit 1
+fi
+
+# Swift Package lookup
+# Stores relative package URL in PACKAGE_DIR
+lookupPackage () {
+	local pkgName=$1
+	
+	if [[ $DIRNAME == "$pkgName" ]]; then
+		PACKAGE_DIR="."
+	elif [ -d "Packages/Meow" ]; then
+		PACKAGE_DIR="Packages/$pkgName"
+	else
+		PACKAGE_DIR=$(echo ".build/checkouts/$pkgName.git"*)
+		
+		if [ ! -d $PACKAGE_DIR ]; then
+			echo "❗️  Error: package $pkgName was not found"
+			exit 1
+		fi
+	fi
+}
+
+lookupPackage Meow
+MEOW=$PACKAGE_DIR
+
+echo "🐈  Meow directory: $MEOW"
+
+if [ -f meow-plugins ]; then
+	echo "🐈  Reading plugins file"
+	PLUGIN_NUM=0
+	while read PLUGIN; do
+		lookupPackage "$PLUGIN"
+		echo "$PLUGIN found in $PACKAGE_DIR"
+		PLUGINS[$PLUGIN_NUM]=$PACKAGE_DIR
+		((PLUGIN_NUM=$PLUGIN_NUM+1))
+	done < meow-plugins
+else
+	echo "ℹ  No plugins file found (./meow-plugins)"
+fi
+
+# Create templates directory
+if [ -d ".build/meow-templates" ]; then
+	rm -r ".build/meow-templates"
+fi
+
+mkdir ".build/meow-templates"
+
+# Copy templates
+echo "🐈  Copying templates"
+cp -r "$MEOW/Templates/" ".build/meow-templates/"
+
+touch ".build/meow-templates/plugins.ejs"
+
+for p in $PLUGINS; do
+	echo "<%- include('../../$p/MeowPlugin.ejs') %>" >> ".build/meow-templates/plugins.ejs"
+done
+
+echo "🐈  Running sourcery"
+
+sourcery --templates ".build/meow-templates/Meow.ejs" "$@"
+
+echo "🐈  Done"
