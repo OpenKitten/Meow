@@ -10,6 +10,7 @@ window.serializables = models.concat(embeddables);
 window.serializableTuples = [];
 
 // TODO: FIX generics
+window.meowTypes = ["File"];
 window.supportedGenerics = ["Reference", "Array<Reference", "Set<Reference", "[Reference"];
 window.supportedPrimitives = ["ObjectId", "String", "Int", "Int32", "Bool", "Document", "Double", "Data", "Binary", "Date", "RegularExpression"];
 window.numberTypes = ["Int", "Int32", "Double"];
@@ -25,7 +26,13 @@ Object.assign(window, {
 			throw "invalid type";
 		}
 
-		if (supportedPrimitives.includes(type.name)) {
+		let typeName = type.unwrappedTypeName || type.name
+
+		if (supportedPrimitives.includes(typeName)) {
+			return;
+		}
+
+		if (meowTypes.includes(typeName)) {
 			return;
 		}
 
@@ -38,7 +45,7 @@ Object.assign(window, {
 		});
 
 		if (isGeneric) { return; }
-		
+
 		if (type.isArray) {
 			let arr = type.array;
 			ensureSerializable(arr.elementType || arr.elementTypeName);
@@ -53,7 +60,7 @@ Object.assign(window, {
 		}
 
 		// check if it is already in the queue, and if it is, return:
-		if (serializables.find(t => t.name == type.name)) { return };
+		if (serializables.find(t => t.name == typeName)) { return };
 		serializables.push(type);
 	},
 

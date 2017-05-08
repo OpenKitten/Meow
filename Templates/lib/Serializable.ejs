@@ -6,6 +6,6 @@ if (serializable.kind == "class" || serializable.kind == "struct") {
 } else if (serializable.kind == "protocol") {
 	%><%- include('SerializableProtocol', {serializable}) %><%
 } else {
-	%><%- meowError(`Type of kind '${serializable.kind}' named '${serializable.typeName}' unknown to Meow. Cannot generate Serializable implementation. (${serializable})`) %><%
+	%><%- meowError(`Type of kind '${serializable.kind}' named ${serializable.name} of type '${serializable.typeName}' unknown to Meow. Cannot generate Serializable implementation. (${serializable})`) %><%
 }
 %>
