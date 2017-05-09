@@ -1,5 +1,7 @@
 <%
 
+eval(include('external/pluralize.js'));
+
 // Selects all classes and structs that are either based on a model or embeddable protocol
 window.models = ((types.based["Model"] || []).filter(model => !model.annotations["skip-meow"]) || []);
 window.embeddables = (types.based["Embeddable"] || []);
@@ -99,6 +101,27 @@ Object.assign(window, {
 	*/
 	capitalizeFirstLetter(string) {
 		return string.charAt(0).toUpperCase() + string.slice(1);
+	},
+	
+	/** 
+	Converts "myNiceString" or "MyNiceString" into "My Nice String"
+	*/
+	uncamel(str) {
+		// http://stackoverflow.com/a/6229124
+		return str
+			// insert a space between lower & upper
+			.replace(/([a-z])([A-Z])/g, '$1 $2')
+			// space before last upper in a sequence followed by lower
+			.replace(/\b([A-Z]+)([A-Z])([a-z])/, '$1 $2$3')
+			// uppercase the first character
+			.replace(/^./, function(str){ return str.toUpperCase(); });
+	},
+	
+	/**
+	Converts "My Nice String" or "my nice string" into "my_nice_string"
+	*/
+	underscoreCase(string) {
+		return string.replace(/ /g, "_").toLowerCase();
 	}
 })
 

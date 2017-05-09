@@ -17,7 +17,7 @@ extension ObjectId : KeyRepresentable {
 }
 
 /// Something that can be saved
-public protocol BaseModel : class, SerializableToDocument, Primitive {
+public protocol BaseModel : SerializableToDocument, Primitive {
     /// The collection this entity resides in
     static var collection: MongoKitten.Collection { get }
     
@@ -46,7 +46,7 @@ public protocol BaseModel : class, SerializableToDocument, Primitive {
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
 ///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
-public protocol Model : BaseModel, Hashable {
+public protocol Model : class, BaseModel, Hashable {
     associatedtype Key : KeyRepresentable = String
 }
 

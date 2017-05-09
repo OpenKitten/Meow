@@ -149,7 +149,7 @@ public enum Meow {
             }
             
             if let current = current {
-                assert(current === instance, "two model instances with the same _id is invalid")
+                assert(current === instance as AnyObject, "two model instances with the same _id is invalid")
             } else {
                 print("🐈 Pooling \(instance)")
                 objectPoolQueue.sync {
@@ -162,7 +162,7 @@ public enum Meow {
             objectPoolQueue.sync {
                 // Only pool it if the instance is not invalidated
                 if !invalidatedObjectIds.contains(instance._id) {
-                    storage[instance._id] = instance
+                    storage[instance._id] = instance as AnyObject
                 }
             }
         }

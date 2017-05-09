@@ -49,17 +49,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 	}
 
 	<% if (serializable.based["Model"]) { %>
-	static let collection: MongoKitten.Collection = Meow.database["<%- serializable.name.toLowerCase() %>"]
-
-	func handleDeinit() {
-		do {
-			try self.save()
-
-		} catch {
-			print("error while saving Meow object in deinit: \(error)")
-			assertionFailure()
-		}
-	}
+	static let collection: MongoKitten.Collection = Meow.database["<%- underscoreCase(uncamel(pluralize(serializable.name))) %>"]
 	
 	<%- include('ModelResolvingFunctions', {serializable}); %>
 	<% } %>

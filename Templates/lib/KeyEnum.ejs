@@ -2,7 +2,7 @@ enum Key : String, KeyRepresentable {-%>
 	<% if (serializable.based["Model"]) { %>case _id<% } %>
 	<% serializable.allVariables.forEach(variable => {
 		if(variable.isComputed || variable.name == "_id") { return; }%>
-	case <%- variable.name -%>
+	case <%- variable.name -%> = "<%- underscoreCase(uncamel(variable.name)) %>"
 	<%_})%>
 
 	var keyString: String { return self.rawValue }

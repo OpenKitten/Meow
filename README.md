@@ -151,3 +151,10 @@ We provide a few scripts to facilitate this: `WatchSampleMeow.sh`, `WatchSampleM
 
 We recommend committing the generated code into your application repo. That way you can use the generated code on your Linux machine, as long as your development environment is on macOS.
 </details>
+
+<details>
+<suummary>Attribution</summary>
+
+- Meow includes [Pluralize](https://github.com/blakeembrey/pluralize), which is also licensed under the MIT license
+
+</details>
