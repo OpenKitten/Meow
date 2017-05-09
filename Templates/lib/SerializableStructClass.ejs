@@ -15,7 +15,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 			ensureSerializable(variable.type || variable.typeName);
 			%>
-		self.<%- variable.name %> = try<%- variable.isOptional ? '?' : '' %> document.unpack("<%- variable.name %>")<%
+		self.<%- variable.name %> = try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)<%
 		});
 		%>
 	}
@@ -42,7 +42,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 				ensureSerializable(variable.type);
 			}
 			%>
-		document.pack(self.<%- variable.name %>, as: "<%- variable.name %>")<%
+		document.pack(self.<%- variable.name %>, as: Key.<%- variable.name %>.keyString)<%
 		});
 		%>
 		return document
