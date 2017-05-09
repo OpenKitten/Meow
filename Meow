@@ -4,6 +4,7 @@ DIRNAME=${PWD##*/}
 
 if [ ! -d ".build" ]; then
 	echo "❗️  Meow stores artifacts in the .build directory, but it is not present. Is the working directory a Swift package?"
+	echo "Try running 'swift package update'"
 	exit 1
 fi
 
