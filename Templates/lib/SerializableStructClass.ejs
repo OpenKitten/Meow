@@ -60,6 +60,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 			assertionFailure()
 		}
 	}
+	
+	<%- include('ModelResolvingFunctions', {serializable}); %>
 	<% } %>
 
 	<%- include('KeyEnum', {serializable}); %>

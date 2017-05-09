@@ -89,6 +89,16 @@ Object.assign(window, {
 	*/
 	meowError(text) {
 		return `<# ${text} #>`;
+	},
+	
+	/**
+	Capitalizes the first letter of the given string and returns it.
+	
+	@param {string} string - The input string
+	@return {string} The capitalized string
+	*/
+	capitalizeFirstLetter(string) {
+		return string.charAt(0).toUpperCase() + string.slice(1);
 	}
 })
 
