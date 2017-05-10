@@ -1,5 +1,15 @@
 import MongoKitten
 
+infix operator &=
+public func &=<M : Model>(lhs: inout Reference<M>, rhs: M) {
+    lhs = Reference(to: rhs)
+}
+
+prefix operator *
+public prefix func *<M : Model>(_ reference: Reference<M>) throws -> M {
+    return try reference.resolve()
+}
+
 extension MongoKitten.Collection {
     var model: BaseModel.Type? {
         return Meow.types.flatMap{ $0 as? BaseModel.Type }.first{ $0.collection.fullName == self.fullName }
