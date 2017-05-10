@@ -1,10 +1,27 @@
 // MARK: KeyEnum.ejs
-	enum Key : String, KeyRepresentable {%>
+<% let keyEnumVariables = []; %>
+	enum Key : String, ModelKey {%>
 		<% if (serializable.based["Model"]) { %>case _id<% } %>
 		<%_ serializable.allVariables.forEach(variable => {
-			if(variable.isComputed || variable.name == "_id") { return; } -%>
+			if(variable.isComputed || variable.name == "_id") { return; } 
+			keyEnumVariables.push(variable);
+			-%>
 		case <%- variable.name -%> = "<%- underscoreCase(uncamel(variable.name)) %>"
 		<%_ }) %>
 
 		var keyString: String { return self.rawValue }
+		
+		var type: Any.Type {
+			switch self {
+			<% if (serializable.based["Model"]) { %>case ._id: return ObjectId.self<% } %>
+			<%_ keyEnumVariables.forEach(variable => { -%>
+			case .<%- variable.name -%>: return <%- variable.unwrappedTypeName %>.self
+			<%_ }) -%>
+			}
+		}
+		
+		static var all: [Key] {
+			return [<% if (serializable.based["Model"]) { %>._id<% if (keyEnumVariables.length > 0) {%>, <% }} -%>
+			<%_ %><%- keyEnumVariables.map(v => "." + v.name).join(", ") %>]
+		}
 	}

@@ -4,6 +4,11 @@ public protocol KeyRepresentable : Hashable {
     var keyString: String { get }
 }
 
+public protocol ModelKey : KeyRepresentable {
+    var type: Any.Type { get }
+    static var all: [Self] { get }
+}
+
 extension String : KeyRepresentable {
     public var keyString: String {
         return self
@@ -47,7 +52,7 @@ public protocol BaseModel : SerializableToDocument, Primitive {
 ///
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
 public protocol Model : class, BaseModel, Hashable {
-    associatedtype Key : KeyRepresentable = String
+    associatedtype Key : ModelKey = String
 }
 
 extension Model {
