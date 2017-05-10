@@ -165,8 +165,8 @@ extension BaseModel {
     }
     
     /// Returns all objects matching the query
-    public static func find(_ query: Query? = nil, limitedTo limit: Int? = nil) throws -> CollectionSlice<Self> {
-        return try collection.find(query, limitedTo: limit).flatMap { document in
+    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> CollectionSlice<Self> {
+        return try collection.find(query, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize).flatMap { document in
             do {
                 return try Self.instantiateIfNeeded(document)
             } catch {

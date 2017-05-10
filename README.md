@@ -13,6 +13,7 @@ It manages your database for you, so you can focus on writing your application.
 - [x] Easy migrations to a new model version
 - [x] Supports your own types (like structs and enums) and common types (like String, Int and Date) out of the box with zero configuration
 - [x] Uses the full power of MongoDB
+- [x] Generated code is 100% Linux-compatible
 
 Object serialization and deserialization code is generated automatically using [Sourcery](https://github.com/krzysztofzablocki/Sourcery).
 
@@ -183,12 +184,6 @@ var age: VirtualNumber { ... }
 These "Virtual" types expose an API that is similar to the types provided by the Swift Standard Library. The trick here is that instead their methods return a MongoKitten `Query` instance.
 
 ## ❓Questions
-
-<details>
-<summary>`sourcery` commands for developing Meow</summary>
-
-We provide a few scripts to facilitate this: `WatchSampleMeow.sh`, `WatchSampleMeowVapor.sh`, `GenerateTests.sh`
-</details>
 
 <details>
 <summary>Linux support</summary>
