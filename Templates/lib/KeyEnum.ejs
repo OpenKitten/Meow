@@ -6,7 +6,7 @@
 			if(variable.isComputed || variable.name == "_id") { return; } 
 			keyEnumVariables.push(variable);
 			-%>
-		case <%- variable.name -%> = "<%- underscoreCase(uncamel(variable.name)) %>"
+		case <%- variable.name -%> = "<%- variable.annotations["key"] || underscoreCase(uncamel(variable.name)) %>"
 		<%_ }) %>
 
 		var keyString: String { return self.rawValue }
