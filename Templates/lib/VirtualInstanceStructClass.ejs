@@ -1,5 +1,5 @@
 // MARK: VirtualInstanceStructClass.ejs
-struct VirtualInstance {
+struct VirtualInstance : VirtualModelInstance {
 	var keyPrefix: String
 
 	<% serializable.allVariables.forEach(variable => {

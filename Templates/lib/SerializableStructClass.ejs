@@ -81,7 +81,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 			switch key {
 			<%_ serializable.variables.forEach(variable => { -%>
 			case Key.<%- variable.name %>.keyString:
-				self.<%- variable.name %> = try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)
+				self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)
 			<%_ }) -%>
 			default: break
 			}
@@ -95,6 +95,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 	<% } %>
 
 	<%- include('KeyEnum', {serializable}); %>
+	<%- include('Values', {serializable}); %>
 	<%- include('VirtualInstanceStructClass', {serializable}); %>
 	<%- include('QueryBuilder', {serializable}) %>
 }

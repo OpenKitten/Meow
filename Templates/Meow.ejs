@@ -3,6 +3,9 @@
 <% include('lib/PluginCore') -%>
 <% include('plugins.ejs') -%>
 <%- window.importPluginDependencies() %>
+
+<%- include('lib/Protocols') %>
+
 <%
 // Generate serialization for every serializable
 // It is important to keep this as far down as possible.
@@ -52,4 +55,6 @@ let meows: [Any.Type] = [<%- serializables.map(m => m.name + ".self").join(", ")
 //   <%- models.map(m => m.name).join(", ") %>
 // Serializables: <%- serializables.length %>
 //   <%- serializables.map(s => s.name).join(", ") %>
+// Model protocols: <%- modelProtocols.length %>
+//   <%- modelProtocols.map(s => s.name).join(", ") %>
 // Tuples: <%- serializableTuples.length %>

@@ -1,0 +1,18 @@
+// MARK: Protocols.ejs
+<%
+modelProtocols.forEach(protocol => { %>
+// MARK: - 🐈 for <%- protocol.name %>
+// sourcery:inline:auto:<%- protocol.name %>.Meow
+	
+associatedtype Values : <%- protocol.name %>Values
+	
+// sourcery:end
+	
+protocol <%- protocol.name %>Values : ModelValues {
+	<%_ protocol.allVariables.forEach(variable => { -%>
+	var <%- variable.name -%>: <%- variable.unwrappedTypeName %>? { get set }
+	<%_ }) %>
+}
+<%
+})
+%>

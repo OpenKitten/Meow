@@ -1,0 +1,41 @@
+// MARK: Values.ejs
+	<% let inheritedProtocols = modelProtocols.filter(p => serializable.implements[p.name]); %>
+
+	/// Represents (part of) the values of a <%- serializable.name %>
+	struct Values : ModelValues<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'Values') : '' %> {
+		init() {}
+		init(restoring source: BSON.Primitive) throws {
+			guard let document = source as? BSON.Document else {
+				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.Values.self, source: source, expectedPrimitive: BSON.Document.self);
+			}
+			try self.update(with: document)
+		}
+		
+		<%_ serializable.allVariables.forEach(variable => {
+			if(variable.isComputed || variable.name == "_id") { return; }
+			-%>
+		var <%- variable.name -%>: <%- variable.unwrappedTypeName %>?
+		<%_ }) %>
+		
+		func serialize() -> Document {
+			var document: Document = [:]<% -%>
+			<% serializable.variables.forEach(variable => {
+				if (variable.isComputed || variable.isStatic) { return; } %>
+			document.pack(self.<%- variable.name %>, as: Key.<%- variable.name %>.keyString)<%
+			});
+			%>
+			return document
+		}
+		
+		mutating func update(with document: Document) throws {		
+			for key in document.keys {
+				switch key {
+				<%_ serializable.variables.forEach(variable => { -%>
+				case Key.<%- variable.name %>.keyString:
+					self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)
+				<%_ }) -%>
+				default: break
+				}
+			}
+		}
+	}

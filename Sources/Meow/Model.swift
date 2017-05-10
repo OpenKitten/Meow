@@ -9,6 +9,10 @@ public protocol ModelKey : KeyRepresentable {
     static var all: [Self] { get }
 }
 
+public protocol ModelValues : SerializableToDocument {
+    init()
+}
+
 extension String : KeyRepresentable {
     public var keyString: String {
         return self
@@ -57,6 +61,8 @@ public protocol BaseModel : SerializableToDocument, Primitive {
 /// Embeddables will have a generated Virtual variant of itself for the type safe queries
 public protocol Model : class, BaseModel, Hashable {
     associatedtype Key : ModelKey = String
+    associatedtype VirtualInstance : VirtualModelInstance
+    associatedtype Values : ModelValues
 }
 
 extension Model {
@@ -70,6 +76,10 @@ extension Model {
     
     public static func ==(lhs: Self, rhs: Self) -> Bool {
         return lhs._id == rhs._id
+    }
+    
+    public static func makeQuery(_ closure: ((VirtualInstance) throws -> (Query))) rethrows -> Query {
+        return try closure(VirtualInstance(keyPrefix: ""))
     }
 }
 

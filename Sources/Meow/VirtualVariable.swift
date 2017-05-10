@@ -5,6 +5,10 @@ import MongoKitten
     public typealias NSRegularExpression = RegularExpression
 #endif
 
+public protocol VirtualModelInstance {
+    init(keyPrefix: String)
+}
+
 public protocol VirtualVariable {
     var name: String { get }
 }
