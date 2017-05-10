@@ -49,37 +49,3 @@ public struct Reference<M: Model> : Serializable, Hashable {
         return referenced
     }
 }
-
-extension Document {
-    public func unpack<K: Hashable & Serializable, V: Serializable>(_ key: String) throws -> Dictionary<K, V> {
-        let doc = try self.unpack(key) as Document
-        
-        guard doc.validatesAsArray(), doc.count % 2 == 0 else {
-            throw Meow.Error.missingOrInvalidValue(key: key)
-        }
-        
-        var i = 0
-        let array = doc.arrayValue
-        
-        var dict = Dictionary<K, V>()
-        
-        while i < doc.count {
-            defer { i += 2}
-            
-            let key = try K.init(restoring: array[i])
-            let value = try V.init(restoring: array[i + 1])
-            
-            dict[key] = value
-        }
-        
-        return dict
-    }
-    
-    public mutating func pack<K: Hashable & Serializable, V: Serializable>(_ serializable: Dictionary<K, V>, as key: String) {
-        let primitives: Document = serializable.map { key, value in
-            return [key.serialize(), value.serialize()]
-            }.reduce([], +)
-        
-        self[key] = primitives
-    }
-}

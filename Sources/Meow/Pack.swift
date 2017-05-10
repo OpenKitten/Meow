@@ -55,4 +55,49 @@ extension Document {
     public mutating func pack<S : Sequence>(_ serializables: S, as key: String) where S.Iterator.Element : Serializable {
         self[key] = serializables.map { _pack($0) }
     }
+    
+    public mutating func pack<V: Serializable>(_ serializable: Dictionary<String, V>, as key: String) {
+        let primitives: Document = serializable.map { key, value in
+            return [key, value.serialize()]
+            }.reduce([], +)
+        
+        self[key] = primitives
+    }
+    
+    public func unpack<V: Serializable>(_ key: String) throws -> Dictionary<String, V> {
+        let doc = try self.unpack(key) as Document
+        var dict = [String: V]()
+        
+        for key in doc.keys {
+            dict[key] = try doc.unpack(key)
+        }
+        
+        return dict
+    }
+    
+    public func unpack<K: Hashable & Serializable, V: Serializable>(_ key: String) throws -> Dictionary<K, V> {
+        let doc = try self.unpack(key) as Document
+        
+        var dict = [K: V]()
+        
+        let keys = try doc.unpack("keys") as [K]
+        let values = try doc.unpack("values") as [V]
+        
+        guard keys.count == values.count else {
+            throw Meow.Error.missingOrInvalidValue(key: key)
+        }
+        
+        for i in 0..<keys.count {
+            dict[keys[i]] = values[i]
+        }
+        
+        return dict
+    }
+    
+    public mutating func pack<K: Hashable & Serializable, V: Serializable>(_ serializable: Dictionary<K, V>, as key: String) {
+        self[key] = [
+            "keys": serializable.keys.map { $0.serialize() },
+            "values": serializable.values.map { $0.serialize() }
+        ]
+    }
 }
