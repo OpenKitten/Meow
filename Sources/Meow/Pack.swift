@@ -1,11 +1,3 @@
-//
-//  Pack.swift
-//  Meow
-//
-//  Created by Robbert Brandsma on 27-04-17.
-//
-//
-
 import BSON
 import MongoKitten
 

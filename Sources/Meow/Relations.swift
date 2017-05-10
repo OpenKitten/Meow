@@ -1,11 +1,3 @@
-//
-//  Relations.swift
-//  Meow
-//
-//  Created by Joannis Orlandos on 01/05/2017.
-//
-//
-
 import MongoKitten
 
 extension MongoKitten.Collection {

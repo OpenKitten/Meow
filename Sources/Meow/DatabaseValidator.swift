@@ -1,11 +1,3 @@
-//
-//  DatabaseValidator.swift
-//  Meow
-//
-//  Created by Robbert Brandsma on 02-05-17.
-//
-//
-
 import Foundation
 
 extension Meow {

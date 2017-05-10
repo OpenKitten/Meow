@@ -1,11 +1,3 @@
-//
-//  WeakCollection.swift
-//  Meow
-//
-//  Created by Robbert Brandsma on 24-03-17.
-//
-//
-
 struct Weak<Wrapped : AnyObject> {
     weak var value: Wrapped?
     init(_ value: Wrapped) {

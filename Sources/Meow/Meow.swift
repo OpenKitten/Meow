@@ -1,11 +1,3 @@
-//
-//  Meow.swift
-//  Meow
-//
-//  Created by Robbert Brandsma on 03-01-17.
-//
-//
-
 import MongoKitten
 import Foundation
 import Dispatch

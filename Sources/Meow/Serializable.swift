@@ -1,11 +1,3 @@
-//
-//  Serializable.swift
-//  Meow
-//
-//  Created by Robbert Brandsma on 06-01-17.
-//
-//
-
 import Foundation
 import BSON
 

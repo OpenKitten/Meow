@@ -1,11 +1,3 @@
-//
-//  Indexes.swift
-//  Meow
-//
-//  Created by Joannis Orlandos on 27/01/2017.
-//
-//
-
 import MongoKitten
 
 public enum Attribute {

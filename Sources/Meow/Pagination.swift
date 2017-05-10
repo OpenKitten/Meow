@@ -1,11 +1,3 @@
-//
-//  Pagination.swift
-//  Tikcit
-//
-//  Created by Robbert Brandsma on 10-05-17.
-//
-//
-
 import Foundation
 
 extension Model {
