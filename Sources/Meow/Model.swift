@@ -46,6 +46,10 @@ public protocol BaseModel : SerializableToDocument, Primitive {
     
     /// Will be called when the Model is deleted. At this point, it is no longer in the database and saves will no longer work because the ObjectId is invalidated.
     func didDelete() throws
+    
+    init(newFrom source: BSON.Primitive) throws
+    static func validateUpdate(with document: Document) throws
+    func update(with document: Document) throws
 }
 
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.

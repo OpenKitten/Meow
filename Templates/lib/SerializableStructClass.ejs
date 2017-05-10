@@ -2,7 +2,7 @@
 extension <%- serializable.name %> : SerializableToDocument {
 	<%# Classes need their designated initializers to be in the definition of the body, so we use automatic inline code generation. %>
 	<% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Meow<% } %>
-	<% -%>
+	<%_ -%>
 	<% if (serializable.kind == "class") { %>required <% }%>init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
@@ -17,6 +17,22 @@ extension <%- serializable.name %> : SerializableToDocument {
 			ensureSerializable(variable.type || variable.typeName);
 			%>
 		self.<%- variable.name %> = try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)<%
+		});
+		%>
+	}
+	
+	<% if (serializable.kind == "class") { %>required <% }%>init(newFrom source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		<%
+		serializable.variables.sort((a, b) => (a.defaultValue && !b.defaultValue ? 1 : -1)).forEach(variable => {
+			if (variable.isComputed || variable.isStatic) { return; }
+
+			ensureSerializable(variable.type || variable.typeName);
+			%>
+		self.<%- variable.name %> = (try<%- variable.isOptional || variable.defaultValue ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)) <%- variable.defaultValue ? '?? self.' + variable.name : '' %><%
 		});
 		%>
 	}
