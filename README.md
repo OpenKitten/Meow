@@ -124,6 +124,52 @@ Meow.migrate("My migration description", on: MyModel.self) { migrate in
 
 From the given closure, Meow will create a migration plan. The plan is optimized into a minimum amount of database operations and then executed.
 
+## 🎮 Command Line Interface
+
+We provide a command line interface with Meow, located in the root of the package. To be able to use it, place the following script somewhere in your `$PATH` and call it `meow`:
+
+```bash
+#!/bin/bash
+
+DIRNAME=${PWD##*/}
+pkgName="Meow"	
+if [[ $DIRNAME == "$pkgName" ]]; then
+	PACKAGE_DIR="."
+elif [ -d "Packages/Meow" ]; then
+	PACKAGE_DIR="Packages/$pkgName"
+else
+	PACKAGE_DIR=$(echo ".build/checkouts/$pkgName.git"*)
+	
+	if [ ! -d $PACKAGE_DIR ]; then
+		echo "❗️  Error: Meow was not found. Install it using the Swift Package Manager, the run this command again from the root of your package."
+		exit 1
+	fi
+fi
+$PACKAGE_DIR/Meow "$@"
+```
+
+We'll provide an easier way to install this script in the future. Contributions are welcomed, of course!
+
+### Generating code
+
+You run `meow` like you run [Sourcery](https://github.com/krzysztofzablocki/Sourcery), but without the `--templates` argument.
+
+`meow --sources Sources/MyModule --output Sources/MyModule/Meow.swift`
+
+### Meowfile
+
+You can store your `meow` arguments in a `Meowfile` at the root of your project. For example:
+
+`--sources Sources/MyModule --output Sources/MyModule/Meow.swift`
+
+If you provide no arguments to `Meow`, it will load them from the `Meowfile`.
+
+### Plugins
+
+To use Meow plugins, place a `MeowPlugins` file at the root of your Swift package. This file contains a list of plugin names (the same as the Swift package they come in), separated by newlines. Plugins provide a `MeowPlugin.ejs` template file in the root directory of their package.
+
+We don't have any documentation on writing plugins yet.
+
 ## ℹ About the queries
 
 For the type-safe queries, a `struct VirtualInstance` is embedded in every type. These structs have variables with the same name as the variables in the containing type, but with different types:

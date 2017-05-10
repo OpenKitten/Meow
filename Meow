@@ -8,6 +8,18 @@ if [ ! -d ".build" ]; then
 	exit 1
 fi
 
+if [[ $# == 0 ]]; then
+	if [ -f Meowfile ]; then
+		echo "🐈  Using Meowfile"
+		$0 $(< Meowfile)
+		exit
+	else
+		echo "❗️  Error: no arguments supplied and no Meowfile found"
+		echo "See the Meow readme for more information on how to use this script"
+		exit 1
+	fi
+fi
+
 # Swift Package lookup
 # Stores relative package URL in PACKAGE_DIR
 lookupPackage () {
@@ -32,7 +44,7 @@ MEOW=$PACKAGE_DIR
 
 echo "🐈  Meow directory: $MEOW"
 
-if [ -f meow-plugins ]; then
+if [ -f MeowPlugins ]; then
 	echo "🐈  Reading plugins file"
 	PLUGIN_NUM=0
 	while read PLUGIN; do
@@ -40,9 +52,9 @@ if [ -f meow-plugins ]; then
 		echo "$PLUGIN found in $PACKAGE_DIR"
 		PLUGINS[$PLUGIN_NUM]=$PACKAGE_DIR
 		((PLUGIN_NUM=$PLUGIN_NUM+1))
-	done < meow-plugins
+	done < MeowPlugins
 else
-	echo "ℹ  No plugins file found (./meow-plugins)"
+	echo "ℹ  No plugins file found (./MeowPlugins)"
 fi
 
 # Create templates directory
