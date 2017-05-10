@@ -1,3 +1,4 @@
+// MARK: SerializableStructClass.ejs
 extension <%- serializable.name %> : SerializableToDocument {
 	<%# Classes need their designated initializers to be in the definition of the body, so we use automatic inline code generation. %>
 	<% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Meow<% } %>
@@ -46,6 +47,29 @@ extension <%- serializable.name %> : SerializableToDocument {
 		});
 		%>
 		return document
+	}
+	
+	static func validateUpdate(with document: Document) throws {
+		let keys = document.keys
+		<%_ serializable.variables.forEach(variable => { -%>
+		if keys.contains(Key.<%- variable.name %>.keyString) {
+			_ = (try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)) as <%- variable.typeName.name %>
+		}
+		<%_ }) -%>
+	}
+	
+	<% if (serializable.kind == "struct") { %>mutating <% } %>func update(with document: Document) throws {
+		try <%- serializable.name %>.validateUpdate(with: document)
+		
+		for key in document.keys {
+			switch key {
+			<%_ serializable.variables.forEach(variable => { -%>
+			case Key.<%- variable.name %>.keyString:
+				self.<%- variable.name %> = try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)
+			<%_ }) -%>
+			default: break
+			}
+		}
 	}
 
 	<% if (serializable.based["Model"]) { %>

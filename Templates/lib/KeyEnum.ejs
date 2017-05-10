@@ -1,9 +1,10 @@
-enum Key : String, KeyRepresentable {-%>
-	<% if (serializable.based["Model"]) { %>case _id<% } %>
-	<% serializable.allVariables.forEach(variable => {
-		if(variable.isComputed || variable.name == "_id") { return; }%>
-	case <%- variable.name -%> = "<%- underscoreCase(uncamel(variable.name)) %>"
-	<%_})%>
+// MARK: KeyEnum.ejs
+	enum Key : String, KeyRepresentable {%>
+		<% if (serializable.based["Model"]) { %>case _id<% } %>
+		<%_ serializable.allVariables.forEach(variable => {
+			if(variable.isComputed || variable.name == "_id") { return; } -%>
+		case <%- variable.name -%> = "<%- underscoreCase(uncamel(variable.name)) %>"
+		<%_ }) %>
 
-	var keyString: String { return self.rawValue }
-}
+		var keyString: String { return self.rawValue }
+	}

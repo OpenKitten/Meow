@@ -1,3 +1,4 @@
+// MARK: ModelResolvingFunctions.ejs
 <% serializable.allVariables.forEach(variable => {
 	if(variable.isComputed || variable.name == "_id" || variable.unwrappedTypeName != "String") { return; }%>
 	static func by<%- capitalizeFirstLetter(variable.name) -%>(_ value: <%- variable.unwrappedTypeName %>) throws -> <%- serializable.name %>? {

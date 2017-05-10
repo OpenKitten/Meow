@@ -1,3 +1,4 @@
+// MARK: QueryBuilder.ejs
 <% if (serializable.based["Model"]) { %>
 	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<<%-serializable.name%>> {
 		return try find(closure(VirtualInstance()))

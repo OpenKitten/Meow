@@ -1,4 +1,4 @@
-// fred
+// MARK: SerializableProtocol.ejs
 extension Document {
 	func unpack(_ key: String) throws -> <%- serializable.name %> {
 		guard let document = self[key] as? Document, let ref = DBRef(document, inDatabase: Meow.database) else {

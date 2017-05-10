@@ -1,3 +1,4 @@
+// MARK: SerializableEnum.ejs
 extension <%- serializable.name %> : Serializable {
 	init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) else {
