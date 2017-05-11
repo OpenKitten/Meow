@@ -194,7 +194,7 @@ We recommend committing the generated code into your application repo. That way 
 </details>
 
 <details>
-<suummary>Attribution</summary>
+<summary>Attribution</summary>
 
 - Meow includes [Pluralize](https://github.com/blakeembrey/pluralize), which is also licensed under the MIT license
 
