@@ -3,8 +3,8 @@
 modelProtocols.forEach(protocol => { %>
 // MARK: - 🐈 for <%- protocol.name %>
 // sourcery:inline:auto:<%- protocol.name %>.Meow
-	
-associatedtype Values : <%- protocol.name %>Values
+	associatedtype VirtualInstance : <%- protocol.name %>VirtualInstance
+	associatedtype Values : <%- protocol.name %>Values
 	
 // sourcery:end
 	
@@ -13,6 +13,22 @@ protocol <%- protocol.name %>Values : ModelValues {
 	var <%- variable.name -%>: <%- variable.unwrappedTypeName %>? { get set }
 	<%_ }) %>
 }
+
+protocol <%- protocol.name %>VirtualInstance : VirtualModelInstance {
+	<%_ protocol.allVariables.forEach(variable => {
+	if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
+		 if (numberTypes.includes(variable.unwrappedTypeName)) {
+			 %> var <%- variable.name %>: VirtualNumber { get } <%
+		 } else {
+			 %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { get } <%
+		 }
+	} else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
+		 ensureSerializable(variable.type);
+		 %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { get } <%
+	}
+	}) %>
+}
+
 <%
 })
 %>
