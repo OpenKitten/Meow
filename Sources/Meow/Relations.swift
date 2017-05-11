@@ -42,6 +42,15 @@ public struct Reference<M: Model> : Serializable, Hashable {
         return lhs.reference == rhs.reference
     }
     
+    /// Compares the rhs reference to refer to lhs
+    public static func ==(lhs: M, rhs: Reference<M>) -> Bool {
+        return lhs._id == rhs.reference
+    }
+    
+    /// Compares the lhs reference to refer to rhs
+    public static func ==(lhs: Reference<M>, rhs: M) -> Bool {
+        return lhs.reference == rhs._id
+    }
     
     /// Makes a reference hashable
     public var hashValue: Int {
