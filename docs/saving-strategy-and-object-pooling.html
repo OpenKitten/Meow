@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Getting Started  Reference</title>
+    <title>Saving Strategy and Object Pooling  Reference</title>
     <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,7 +10,7 @@
     
   </head>
   <body>
-    <a title="Getting Started  Reference"></a>
+    <a title="Saving Strategy and Object Pooling  Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="index.html">Meow Docs</a> (59% documented)</p>
@@ -21,7 +21,7 @@
       <p id="breadcrumbs">
         <a href="index.html">Meow Reference</a>
         <img id="carat" src="img/carat.png" />
-        Getting Started  Reference
+        Saving Strategy and Object Pooling  Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -224,73 +224,41 @@
         <section>
           <section class="section">
             
-            <h1 id='getting-started-with-meow' class='heading'>Getting Started with Meow</h1>
-<h3 id='initialisation' class='heading'>Initialisation</h3>
+            <h1 id='meow-object-pool-and-saving-strategy' class='heading'>Meow Object Pool and Saving Strategy</h1>
 
-<p>To get started, import Meow and initialise it during your startup routine:</p>
-<pre class="highlight swift"><code><span class="kd">import</span> <span class="kt">Meow</span>
+<p>Meow is designed to work primarily for server side applications that have a long lifespan. The object pooling mechanism and saving strategy is a result of this.</p>
 
-<span class="k">try</span> <span class="kt">Meow</span><span class="o">.</span><span class="nf">init</span><span class="p">(</span><span class="s">"mongodb://localhost/meow"</span><span class="p">)</span>
-</code></pre>
+<p>This document explains the general workings of the mechanism.</p>
+<h2 id='the-pool' class='heading'>The pool</h2>
 
-<p>You can initialise Meow using a MongoKitten Database object, or a MongoDB connection string.</p>
-<h3 id='defining-models' class='heading'>Defining models</h3>
+<p>Meow objects are automatically added to the object pool on creation, whenever possible. The object pool holds weak references to all alive objects and ensures no more than two instances with the same <code>ObjectId</code> can exist at the same time.</p>
 
-<p>Models are just normal Swift <strong>classes</strong> that look like this:</p>
-<pre class="highlight swift"><code><span class="kd">final</span> <span class="kd">class</span> <span class="kt">User</span><span class="p">:</span> <span class="kt">Model</span> <span class="p">{</span>
-    <span class="k">var</span> <span class="nv">email</span><span class="p">:</span> <span class="kt">String</span>
-    <span class="k">var</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span>
-    <span class="k">var</span> <span class="nv">gender</span><span class="p">:</span> <span class="kt">Gender</span>
-    <span class="k">var</span> <span class="nv">favoriteNumbers</span><span class="p">:</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+<p>For every object, the object pool stores the instantiation date &amp; time, along with a lightweight hash. This hash is used for the autosave mechanism.</p>
+<h2 id='saving' class='heading'>Saving</h2>
 
-    <span class="nf">init</span><span class="p">(</span><span class="nv">email</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">gender</span><span class="p">:</span> <span class="kt">Gender</span><span class="p">)</span> <span class="p">{</span>
-        <span class="k">self</span><span class="o">.</span><span class="n">email</span> <span class="o">=</span> <span class="n">email</span>
-        <span class="k">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="k">self</span><span class="o">.</span><span class="n">gender</span> <span class="o">=</span> <span class="n">gender</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>This class is a valid model, because it states conformance to the Model protocol.</p>
-
-<p>Sourcery and Meow will do the rest: with the definition shown above, you can now query and save users. Serialization and deserialization will be handled for you.</p>
-<h3 id='generating-code' class='heading'>Generating code</h3>
-
-<p>You run <code>meow</code> like you run <a href="https://github.com/krzysztofzablocki/Sourcery">Sourcery</a>, but without the <code>--templates</code> argument.</p>
-
-<p><code>meow --sources Sources/MyModule --output Sources/MyModule/Meow.swift</code></p>
-
-<p>For more information about the Meow CLI, including setting it up, please look at <a href="cli.html">the CLI documentation</a>.</p>
-<h3 id='queries' class='heading'>Queries</h3>
-
-<p>Queries use a syntax that will feel familiar if you ever used the <code>filter</code> syntax on a Swift array:</p>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">users</span> <span class="o">=</span> <span class="kt">User</span><span class="o">.</span><span class="n">find</span> <span class="p">{</span> <span class="n">user</span> <span class="k">in</span>
-    <span class="k">return</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">"henk"</span> <span class="o">&amp;&amp;</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="o">.</span><span class="nf">hasSuffix</span><span class="p">(</span><span class="s">"me.com"</span><span class="p">)</span>
-<span class="p">}</span>
-</code></pre>
-<pre class="highlight swift"><code><span class="k">let</span> <span class="nv">femaleCount</span> <span class="o">=</span> <span class="kt">User</span><span class="o">.</span><span class="n">count</span> <span class="p">{</span> <span class="nv">$0</span><span class="o">.</span><span class="n">gender</span> <span class="o">==</span> <span class="o">.</span><span class="n">female</span> <span class="p">}</span>
-</code></pre>
-
-<p>While it may look like we fetch every user from the database and pass it to your closure, Meow actually uses black magic to generate a MongoDB query from your closure.</p>
-
-<p>For more information, look at the documentation for <code>BaseModel.find(...)</code>.</p>
-<h3 id='variable-types' class='heading'>Variable Types</h3>
-
-<p>Meow currently supports variables of the following kind:</p>
+<p>Meow will save an object under the following circumstances:</p>
 
 <ul>
-<li>Variables of one of the BSON types: <code>String</code>, <code>Int</code>, <code>Int32</code>, <code>Bool</code>, <code>Document</code>, <code>Double</code>, <code>ObjectId</code>, <code>Data</code>, <code>Binary</code>, <code>Date</code>, and <code>RegularExpression</code></li>
-<li><p><code>enum</code>s that have no associated values. For example, the following enum can be used out of the box:</p>
-<pre class="highlight swift"><code><span class="kd">enum</span> <span class="kt">Gender</span> <span class="p">{</span>
-    <span class="k">case</span> <span class="n">male</span><span class="p">,</span> <span class="n">female</span>
-<span class="p">}</span>
-</code></pre>
-
-<p>Support for associated values is on our todo list. If an enum has a underlying type, that type currently has to be supported by BSON.</p></li>
-<li><p>Structs defined in the same module as the model. As long as all their variables are of a kind supported by Meow (including other structs) they should work out of the box.</p></li>
-<li><p>Classes defined in the same module as the model. The same rules apply here as with structs. However, due to a limitation in the Swift language (designated initializers have to be defined within the class definition), these classes also need the <code>sourcery:inline</code> markers.</p></li>
-<li><p>Tuples of which the elements comply to the normal variable rules</p></li>
+<li>The contents of the object have changed since the last save, and the user calls <code>save()</code></li>
+<li>The user calls <code>save(force: true)</code></li>
+<li>The object is being deallocated and its contents have changed since the last save</li>
+<li>The program exits and the contents of the object have changed since the last save</li>
+<li>During maintenance, if object is older than the minimum object lifespan for autosaving (defaults to 5 seconds), and the contents of the object have changed since the last save</li>
 </ul>
+
+<p>The minimum lifespan for objects to be autosaved can be configured by setting <code>Meow.minimumAutosaveAge</code> to a custom value.</p>
+<h2 id='the-maintenance-loop' class='heading'>The maintenance loop</h2>
+
+<p>Meow has a background process, started by <code>Meow.init</code>, that handles some cleanup work as well as the autosaving of objects. By default, the autosave loop is scheduled 5 seconds after the previous loop iteration finished.</p>
+
+<p>The maintenance interval can be configured by setting <code>Meow.maintenanceInterval</code> to a custom value.</p>
+<h2 id='custom-code-init-code-catch' class='heading'>Custom <code>init</code> catch</h2>
+
+<p>Meow cannot automatically pool instances of objects that are created within a custom <code>init</code>, because it has no way of knowing these objects are created. Under most circumstances, this is not a problem, because the <code>_id</code> of the new model is registered with the pool and the generated code ensures that <code>save()</code> is called when the object gets deallocated. </p>
+
+<p>Hoever, ARC will not properly deallocate objects when the program is terminating. Because of this, if an object is created, but not deallocated, manually saved or manually pooled, and the instance still exists at the time the program quits, Meow is not able to save the data.</p>
+
+<p>If you happen to have such objects, you can solve the problem by manually invoking <code>save()</code> on them, or pooling them by calling <code>Meow.pool.pool(myModel)</code>. You can do this in your custom initialiser.</p>
 
           </section>
         </section>
