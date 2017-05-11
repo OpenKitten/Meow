@@ -67,7 +67,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 	
 	static func validateUpdate(with document: Document) throws {
 		let keys = document.keys
-		<%_ serializable.variables.forEach(variable => { -%>
+		<%_ serializable.variables.forEach(variable => {
+			if (variable.isComputed || variable.isStatic) { return; } -%>
 		if keys.contains(Key.<%- variable.name %>.keyString) {
 			_ = (try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)) as <%- variable.typeName.name %>
 		}
@@ -79,7 +80,9 @@ extension <%- serializable.name %> : SerializableToDocument {
 		
 		for key in document.keys {
 			switch key {
-			<%_ serializable.variables.forEach(variable => { -%>
+			<%_ serializable.variables.forEach(variable => { 
+				if (variable.isComputed || variable.isStatic) { return; }
+				-%>
 			case Key.<%- variable.name %>.keyString:
 				self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)
 			<%_ }) -%>
