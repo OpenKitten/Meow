@@ -1,0 +1,20 @@
+author: OpenKitten
+author_url: https://github.com/OpenKitten
+module: Meow
+module_version: development
+github_url: https://github.com/OpenKitten/Meow
+copyright: 'Copyright © 2016 Robbert Brandsma & Joannis Orlandos'
+readme: DocsIndex.md
+documentation: Guides/*.md
+download_badge: false
+xcodebuild_arguments:
+  - -scheme
+  - Meow
+
+custom_categories:
+- name: Guides
+  children:
+    - Getting Started
+    - CLI
+    - Plugins
+    - Saving Strategy and Object Pooling

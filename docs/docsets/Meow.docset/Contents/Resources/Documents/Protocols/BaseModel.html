@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>BaseModel Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/BaseModel" class="dashAnchor"></a>
+    <a title="BaseModel Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">Meow Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        BaseModel Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../getting-started.html">Getting Started</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../cli.html">CLI</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../plugins.html">Plugins</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Guides.html">Other Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../readme.html">README</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Enums.html">Other Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/Attribute.html">Attribute</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow.html">Meow</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Helpers.html">– Helpers</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Error.html">– Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/ObjectPool.html">– ObjectPool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Migrator.html">– Migrator</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Extensions.html">Other Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Extensions/Binary.html">Binary</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Bool.html">Bool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/DBRef.html">DBRef</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Date.html">Date</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Document.html">Document</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Double.html">Double</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/GridFS.html">GridFS</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Int.html">Int</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/ObjectId.html">ObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/RegularExpression.html">RegularExpression</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/ValueConvertible.html">ValueConvertible</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Functions.html">Other Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Other Functions.html#/s:F4Meowop1nFV11MongoKitten5QueryS1_">!(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Functions/&amp;=(_:_:).html">&amp;=(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Functions/*(_:).html">*(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Functions.html#/s:F4Meowoi2eeFTPS_15VirtualVariable_GSqP4BSON9Primitive___V11MongoKitten5Query">==(_:_:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Protocols.html">Other Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/BaseModel.html">BaseModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Protocols.html#/s:P4Meow10MeowNumber">MeowNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Model.html">Model</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ModelKey.html">ModelKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Serializable.html">Serializable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/VirtualVariable.html">VirtualVariable</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Structs.html">Other Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/File.html">File</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/Reference.html">Reference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualArray.html">VirtualArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualBool.html">VirtualBool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualData.html">VirtualData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualDate.html">VirtualDate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualDocument.html">VirtualDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualEmbeddablesArray.html">VirtualEmbeddablesArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualNumber.html">VirtualNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualObjectId.html">VirtualObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualString.html">VirtualString</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Typealiases.html">Other Typealiases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Other Typealiases.html#/s:O4Meow4Meow15DatabaseProblem">DatabaseProblem</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>BaseModel</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">BaseModel</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a></span><span class="p">,</span> <span class="kt">Primitive</span></code></pre>
+
+                </div>
+              </div>
+            <p>Something that can be saved</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZvP4Meow9BaseModel10collectionC11MongoKitten10Collection"></a>
+                    <a name="//apple_ref/swift/Variable/collection" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZvP4Meow9BaseModel10collectionC11MongoKitten10Collection">collection</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The collection this entity resides in</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">static</span> <span class="k">var</span> <span class="nv">collection</span><span class="p">:</span> <span class="kt">MongoKitten</span><span class="o">.</span><span class="kt">Collection</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModel8willSaveFzT_T_"></a>
+                    <a name="//apple_ref/swift/Method/willSave()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModel8willSaveFzT_T_">willSave()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Will be called before saving the Model. Throwing from here will prevent the model from saving.
+Note that, if the model has not been changed, the update may not actually get pushed to the database.</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Will be called before saving the Model. Throwing from here will prevent the model from saving.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">willSave</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModel7didSaveFzT10wasUpdatedSb_T_"></a>
+                    <a name="//apple_ref/swift/Method/didSave(wasUpdated:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModel7didSaveFzT10wasUpdatedSb_T_">didSave(wasUpdated:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Will be called when the Model has been saved.</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Will be called when the Model has been saved to the database.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">didSave</span><span class="p">(</span><span class="nv">wasUpdated</span><span class="p">:</span> <span class="kt">Bool</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>wasUpdated</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>If the save operation actually updated the database</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vP4Meow9BaseModel3_idV4BSON8ObjectId"></a>
+                    <a name="//apple_ref/swift/Property/_id" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vP4Meow9BaseModel3_idV4BSON8ObjectId">_id</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The database identifier. You do <strong>NOT</strong> need to add this yourself. It will be implemented for you using Sourcery.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="k">var</span> <span class="nv">_id</span><span class="p">:</span> <span class="kt">ObjectId</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModel9serializeFT_V4BSON8Document"></a>
+                    <a name="//apple_ref/swift/Method/serialize()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModel9serializeFT_V4BSON8Document">serialize()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Serialize the model into a Document</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">serialize</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kt">Document</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModel10willDeleteFzT_T_"></a>
+                    <a name="//apple_ref/swift/Method/willDelete()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModel10willDeleteFzT_T_">willDelete()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">willDelete</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModel9didDeleteFzT_T_"></a>
+                    <a name="//apple_ref/swift/Method/didDelete()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModel9didDeleteFzT_T_">didDelete()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Will be called when the Model is deleted. At this point, it is no longer in the database and saves will no longer work because the ObjectId is invalidated.</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Will be called when the Model is deleted. At this point, it is no longer in the database and saves will no longer work because the ObjectId is invalidated.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">didDelete</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModelcFzT7newFromP4BSON9Primitive__x"></a>
+                    <a name="//apple_ref/swift/Method/init(newFrom:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModelcFzT7newFromP4BSON9Primitive__x">init(newFrom:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Instantiates this BaseModel from a primitive</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="nf">init</span><span class="p">(</span><span class="n">newFrom</span> <span class="nv">source</span><span class="p">:</span> <span class="kt">BSON</span><span class="o">.</span><span class="kt">Primitive</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFP4Meow9BaseModel14validateUpdateFzT4withV4BSON8Document_T_"></a>
+                    <a name="//apple_ref/swift/Method/validateUpdate(with:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFP4Meow9BaseModel14validateUpdateFzT4withV4BSON8Document_T_">validateUpdate(with:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Validates an update document</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">static</span> <span class="kd">func</span> <span class="nf">validateUpdate</span><span class="p">(</span><span class="n">with</span> <span class="nv">document</span><span class="p">:</span> <span class="kt">Document</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FP4Meow9BaseModel6updateFzT4withV4BSON8Document_T_"></a>
+                    <a name="//apple_ref/swift/Method/update(with:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FP4Meow9BaseModel6updateFzT4withV4BSON8Document_T_">update(with:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Updates a model with a Document</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">update</span><span class="p">(</span><span class="n">with</span> <span class="nv">document</span><span class="p">:</span> <span class="kt">Document</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModeloi2eeFTxx_Sb"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModeloi2eeFTxx_Sb">==(_:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Compares to Base Models</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModeloi2eeFTGSqx_x_Sb"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModeloi2eeFTGSqx_x_Sb">==(_:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Compares to Base Models</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">?,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModeloi2eeFTxGSqx__Sb"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModeloi2eeFTxGSqx__Sb">==(_:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Compares to Base Models</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FE4MeowPS_9BaseModel7convertuRd__10KittenCore8DataTyperFT2toMqd___GSqwd__14SupportedValue_"></a>
+                    <a name="//apple_ref/swift/Method/convert(to:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FE4MeowPS_9BaseModel7convertuRd__10KittenCore8DataTyperFT2toMqd___GSqwd__14SupportedValue_">convert(to:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Converts BaseModel to another KittenCore Type using lossy conversion</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">convert</span><span class="o">&lt;</span><span class="kt">DT</span><span class="o">&gt;</span><span class="p">(</span><span class="n">to</span> <span class="nv">type</span><span class="p">:</span> <span class="kt">DT</span><span class="o">.</span><span class="k">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">DT</span><span class="o">.</span><span class="kt">SupportedValue</span><span class="p">?</span> <span class="k">where</span> <span class="kt">DT</span> <span class="p">:</span> <span class="kt">DataType</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vE4MeowPS_9BaseModel14typeIdentifierVs5UInt8"></a>
+                    <a name="//apple_ref/swift/Property/typeIdentifier" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vE4MeowPS_9BaseModel14typeIdentifierVs5UInt8">typeIdentifier</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Conformance to Primitive</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">typeIdentifier</span><span class="p">:</span> <span class="kt">Byte</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FE4MeowPS_9BaseModel10makeBinaryFT_GSaVs5UInt8_"></a>
+                    <a name="//apple_ref/swift/Method/makeBinary()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FE4MeowPS_9BaseModel10makeBinaryFT_GSaVs5UInt8_">makeBinary()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">BaseModel</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a></span><span class="p">,</span> <span class="kt">Primitive</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModel5countFzTGSqV11MongoKitten5Query_8limitingGSqSi_8skippingGSqSi__Si"></a>
+                    <a name="//apple_ref/swift/Method/count(_:limiting:skipping:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModel5countFzTGSqV11MongoKitten5Query_8limitingGSqSi_8skippingGSqSi__Si">count(_:limiting:skipping:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Counts the amount of objects matching the query</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">count</span><span class="p">(</span><span class="n">_</span> <span class="nv">filter</span><span class="p">:</span> <span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limiting</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FE4MeowPS_9BaseModel6deleteFzT_T_"></a>
+                    <a name="//apple_ref/swift/Method/delete()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FE4MeowPS_9BaseModel6deleteFzT_T_">delete()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Removes this object from the database</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">delete</span><span class="p">()</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModel7findOneFzGSqV11MongoKitten5Query_GSqx_"></a>
+                    <a name="//apple_ref/swift/Method/findOne(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModel7findOneFzGSqV11MongoKitten5Query_GSqx_">findOne(_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns the first object matching the query</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">findOne</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="k">Self</span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FE4MeowPS_9BaseModel4saveFzT5forceSb_T_"></a>
+                    <a name="//apple_ref/swift/Method/save(force:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FE4MeowPS_9BaseModel4saveFzT5forceSb_T_">save(force:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Saves this object</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">save</span><span class="p">(</span><span class="nv">force</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModel6removeFzTGSqV11MongoKitten5Query_9limitedToGSqSi__T_"></a>
+                    <a name="//apple_ref/swift/Method/remove(_:limitedTo:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModel6removeFzTGSqV11MongoKitten5Query_9limitedToGSqSi__T_">remove(_:limitedTo:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Removes all entities matching the query
+Errors that happen during deletion will be collected and a <code>Meow.error.deletingMultiple</code> will be thrown if errors occurred</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">remove</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModel4findFzTGSqV11MongoKitten5Query_8sortedByGSqVS1_4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSi_GCS1_15CollectionSlicex_"></a>
+                    <a name="//apple_ref/swift/Method/find(_:sortedBy:skipping:limitedTo:withBatchSize:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModel4findFzTGSqV11MongoKitten5Query_8sortedByGSqVS1_4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSi_GCS1_15CollectionSlicex_">find(_:sortedBy:skipping:limitedTo:withBatchSize:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Returns all objects matching the query</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">find</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">withBatchSize</span> <span class="nv">batchSize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">CollectionSlice</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_9BaseModel19instantiateIfNeededFzV4BSON8Documentx"></a>
+                    <a name="//apple_ref/swift/Method/instantiateIfNeeded(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModel19instantiateIfNeededFzV4BSON8Documentx">instantiateIfNeeded(_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Intantiates this instance if needed, or pulls the existing entity from memory when able</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">instantiateIfNeeded</span><span class="p">(</span><span class="n">_</span> <span class="nv">document</span><span class="p">:</span> <span class="kt">Document</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="k">Self</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright © 2016 Robbert Brandsma &amp; Joannis Orlandos</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

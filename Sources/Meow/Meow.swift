@@ -88,12 +88,11 @@ public enum Meow {
     
     /// The ObjectPool is used to hold references to models to link them in-memory
     ///
-    /// It also functions as the intelligent brain behind autosaving amongst other functions
+    /// It also functions as the intelligent brain behind autosaving, manages ObjectId's amongst other functions.
     public class ObjectPool {
         /// The queue used to prevent crashes in mutations
         private let objectPoolMutationQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
         
-        /// Creates a new ObjectPool
         fileprivate init() {
             // Save the database contents before exiting
             atexit { Meow.pool.beforeExit() }

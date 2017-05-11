@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Model Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/Model" class="dashAnchor"></a>
+    <a title="Model Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">Meow Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        Model Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../getting-started.html">Getting Started</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../cli.html">CLI</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../plugins.html">Plugins</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Guides.html">Other Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../readme.html">README</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Enums.html">Other Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/Attribute.html">Attribute</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow.html">Meow</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Helpers.html">– Helpers</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Error.html">– Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/ObjectPool.html">– ObjectPool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Migrator.html">– Migrator</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Extensions.html">Other Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Extensions/Binary.html">Binary</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Bool.html">Bool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/DBRef.html">DBRef</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Date.html">Date</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Document.html">Document</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Double.html">Double</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/GridFS.html">GridFS</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Int.html">Int</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/ObjectId.html">ObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/RegularExpression.html">RegularExpression</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/ValueConvertible.html">ValueConvertible</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Functions.html">Other Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Other Functions.html#/s:F4Meowop1nFV11MongoKitten5QueryS1_">!(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Functions/&amp;=(_:_:).html">&amp;=(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Functions/*(_:).html">*(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Functions.html#/s:F4Meowoi2eeFTPS_15VirtualVariable_GSqP4BSON9Primitive___V11MongoKitten5Query">==(_:_:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Protocols.html">Other Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/BaseModel.html">BaseModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Protocols.html#/s:P4Meow10MeowNumber">MeowNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Model.html">Model</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ModelKey.html">ModelKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Serializable.html">Serializable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/VirtualVariable.html">VirtualVariable</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Structs.html">Other Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/File.html">File</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/Reference.html">Reference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualArray.html">VirtualArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualBool.html">VirtualBool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualData.html">VirtualData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualDate.html">VirtualDate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualDocument.html">VirtualDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualEmbeddablesArray.html">VirtualEmbeddablesArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualNumber.html">VirtualNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualObjectId.html">VirtualObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualString.html">VirtualString</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Typealiases.html">Other Typealiases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Other Typealiases.html#/s:O4Meow4Meow15DatabaseProblem">DatabaseProblem</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>Model</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Model</span> <span class="p">:</span> <span class="kd">class</span><span class="p">,</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="p">,</span> <span class="kt">Hashable</span></code></pre>
+
+                </div>
+              </div>
+            <p>When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.</p>
+
+<p>Embeddables will have a generated Virtual variant of itself for the type safe queries</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model5indexFztGVs10Dictionarywx3KeyO11MongoKitten9SortOrder_5namedSS10attributesGSaOS_9Attribute__T_"></a>
+                    <a name="//apple_ref/swift/Method/index(_:named:attributes:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model5indexFztGVs10Dictionarywx3KeyO11MongoKitten9SortOrder_5namedSS10attributesGSaOS_9Attribute__T_">index(_:named:attributes:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates an index on this entity</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">index</span><span class="p">(</span><span class="n">_</span> <span class="nv">keys</span><span class="p">:</span> <span class="p">[</span><span class="kt">Key</span><span class="p">:</span> <span class="kt">SortOrder</span><span class="p">],</span> <span class="n">named</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">attributes</span><span class="p">:</span> <span class="kt"><a href="../Enums/Attribute.html">Attribute</a></span><span class="o">...</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>keys</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The keys so index and their order</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>name</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The index name</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>attributes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The attributes to apply to this index</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model5indexFzTGVs10Dictionarywx3KeyO11MongoKitten9SortOrder_5namedSS10attributesGSaOS_9Attribute__T_"></a>
+                    <a name="//apple_ref/swift/Method/index(_:named:attributes:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model5indexFzTGVs10Dictionarywx3KeyO11MongoKitten9SortOrder_5namedSS10attributesGSaOS_9Attribute__T_">index(_:named:attributes:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Creates an index on this entity</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">index</span><span class="p">(</span><span class="n">_</span> <span class="nv">keys</span><span class="p">:</span> <span class="p">[</span><span class="kt">Key</span><span class="p">:</span> <span class="kt">SortOrder</span><span class="p">],</span> <span class="n">named</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">attributes</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Enums/Attribute.html">Attribute</a></span><span class="p">])</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>keys</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The keys so index and their order</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>name</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The index name</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>attributes</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The attributes to apply to this index</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vE4MeowPS_5Model9keyStringSS"></a>
+                    <a name="//apple_ref/swift/Property/keyString" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vE4MeowPS_5Model9keyStringSS">keyString</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Model</span> <span class="p">:</span> <span class="kd">class</span><span class="p">,</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="p">,</span> <span class="kt">Hashable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vE4MeowPS_5Model9hashValueSi"></a>
+                    <a name="//apple_ref/swift/Property/hashValue" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vE4MeowPS_5Model9hashValueSi">hashValue</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Makes the model hashable, thus unique, thus usable in a Dictionary</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">hashValue</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Modeloi2eeFTxx_Sb"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Modeloi2eeFTxx_Sb">==(_:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Checks if two models are referring to the same instance</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model9makeQueryFzFzwx15VirtualInstanceV11MongoKitten5QueryS3_"></a>
+                    <a name="//apple_ref/swift/Method/makeQuery(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model9makeQueryFzFzwx15VirtualInstanceV11MongoKitten5QueryS3_">makeQuery(_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A helper to make type-safe query for this model</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">makeQuery</span><span class="p">(</span><span class="n">_</span> <span class="nv">closure</span><span class="p">:</span> <span class="p">((</span><span class="kt">VirtualInstance</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">Query</span><span class="p">)))</span> <span class="k">rethrows</span> <span class="o">-&gt;</span> <span class="kt">Query</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model13paginatedFindFzTGSqV11MongoKitten5Query_8sortedByGSqVS1_4Sort_4pageSi7perPageSi_T5totalSi7perPageSi11currentPageSi8lastPageSi4fromSi2toSi4dataGCS1_15CollectionSlicex__"></a>
+                    <a name="//apple_ref/swift/Method/paginatedFind(_:sortedBy:page:perPage:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model13paginatedFindFzTGSqV11MongoKitten5Query_8sortedByGSqVS1_4Sort_4pageSi7perPageSi_T5totalSi7perPageSi11currentPageSi8lastPageSi4fromSi2toSi4dataGCS1_15CollectionSlicex__">paginatedFind(_:sortedBy:page:perPage:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs a find on the model, with support for pagination.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">paginatedFind</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">MongoKitten</span><span class="o">.</span><span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">page</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">perPage</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a></span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The find query</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>sort</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Standard MongoKitten sort parameter</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>page</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The page number, starting at 1 (thus, specifying a page of 0 is invalid and will throw an error)</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>perPage</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The amount of results to include on a page, defaulting to 25</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright © 2016 Robbert Brandsma &amp; Joannis Orlandos</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
