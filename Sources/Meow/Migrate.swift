@@ -141,7 +141,7 @@ extension Meow {
     
     /// Perform a migration
     public static func migrate(_ description: String, on model: BaseModel.Type, migration: (Migrator) throws -> ()) throws {
-        if let migrator = try Migrator(description, on: model) {
+        if let migrator = try Migrator("\(model.collection.name) - \(description)", on: model) {
             try migrator.execute(migration)
         } else {
             print("🐈 Migration \"\(description)\" not needed")
