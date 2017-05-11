@@ -41,15 +41,24 @@
                 <a href="../plugins.html">Plugins</a>
               </li>
               <li class="nav-group-task">
+                <a href="../migrations.html">Migrations</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../data-format.html">Data Format</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../saving-strategy-and-object-pooling.html">Saving Strategy and Object Pooling</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="../Other Enums.html">Other Enums</a>
+            <a href="../Core Types.html">Core Types</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Enums/Attribute.html">Attribute</a>
+                <a href="../Protocols/BaseModel.html">BaseModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Model.html">Model</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Enums/Meow.html">Meow</a>
@@ -63,8 +72,21 @@
               <li class="nav-group-task">
                 <a href="../Enums/Meow/ObjectPool.html">– ObjectPool</a>
               </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Classes.html">Other Classes</a>
+            <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Enums/Meow/Migrator.html">– Migrator</a>
+                <a href="../Classes/Migrator.html">Migrator</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Enums.html">Other Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/IndexAttribute.html">IndexAttribute</a>
               </li>
             </ul>
           </li>
@@ -136,16 +158,10 @@
             <a href="../Other Protocols.html">Other Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Protocols/BaseModel.html">BaseModel</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Other Protocols.html#/s:P4Meow10MeowNumber">MeowNumber</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Protocols/Model.html">Model</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/ModelKey.html">ModelKey</a>
@@ -523,37 +539,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:CO4Meow4Meow8Migrator"></a>
-                    <a name="//apple_ref/swift/Class/Migrator" class="dashAnchor"></a>
-                    <a class="token" href="#/s:CO4Meow4Meow8Migrator">Migrator</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Represents a single migration</p>
-
-                        <a href="../Enums/Meow/Migrator.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">Migrator</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:ZFO4Meow4Meow7migrateFzTSS2onPMPS_9BaseModel_9migrationFzCS0_8MigratorT__T_"></a>
+                    <a name="/s:ZFO4Meow4Meow7migrateFzTSS2onPMPS_9BaseModel_9migrationFzCS_8MigratorT__T_"></a>
                     <a name="//apple_ref/swift/Method/migrate(_:on:migration:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZFO4Meow4Meow7migrateFzTSS2onPMPS_9BaseModel_9migrationFzCS0_8MigratorT__T_">migrate(_:on:migration:)</a>
+                    <a class="token" href="#/s:ZFO4Meow4Meow7migrateFzTSS2onPMPS_9BaseModel_9migrationFzCS_8MigratorT__T_">migrate(_:on:migration:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -568,7 +556,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">migrate</span><span class="p">(</span><span class="n">_</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">on</span> <span class="nv">model</span><span class="p">:</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">migration</span><span class="p">:</span> <span class="p">(</span><span class="kt"><a href="../Enums/Meow/Migrator.html">Migrator</a></span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">())</span> <span class="k">throws</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">migrate</span><span class="p">(</span><span class="n">_</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">on</span> <span class="nv">model</span><span class="p">:</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">migration</span><span class="p">:</span> <span class="p">(</span><span class="kt"><a href="../Classes/Migrator.html">Migrator</a></span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">())</span> <span class="k">throws</span></code></pre>
 
                         </div>
                       </div>

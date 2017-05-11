@@ -17,4 +17,12 @@ custom_categories:
     - Getting Started
     - CLI
     - Plugins
+    - Migrations
+    - Data Format
     - Saving Strategy and Object Pooling
+
+- name: Core Types
+  children:
+    - BaseModel
+    - Model
+    - Meow

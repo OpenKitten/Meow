@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Data Format  Reference</title>
+    <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="js/jquery.min.js" defer></script>
+    <script src="js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a title="Data Format  Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="index.html">Meow Docs</a> (59% documented)</p>
+        <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="index.html">Meow Reference</a>
+        <img id="carat" src="img/carat.png" />
+        Data Format  Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="getting-started.html">Getting Started</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="cli.html">CLI</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="plugins.html">Plugins</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="migrations.html">Migrations</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="data-format.html">Data Format</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="saving-strategy-and-object-pooling.html">Saving Strategy and Object Pooling</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Core Types.html">Core Types</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols/BaseModel.html">BaseModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Model.html">Model</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/Meow.html">Meow</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/Meow/Helpers.html">– Helpers</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/Meow/Error.html">– Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/Meow/ObjectPool.html">– ObjectPool</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Classes.html">Other Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Classes/Migrator.html">Migrator</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Enums.html">Other Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/IndexAttribute.html">IndexAttribute</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Extensions.html">Other Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Extensions/Binary.html">Binary</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Bool.html">Bool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/DBRef.html">DBRef</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Date.html">Date</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Document.html">Document</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Double.html">Double</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/GridFS.html">GridFS</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Int.html">Int</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/ObjectId.html">ObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/RegularExpression.html">RegularExpression</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/ValueConvertible.html">ValueConvertible</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Functions.html">Other Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Other Functions.html#/s:F4Meowop1nFV11MongoKitten5QueryS1_">!(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Functions/&amp;=(_:_:).html">&amp;=(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Functions/*(_:).html">*(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Other Functions.html#/s:F4Meowoi2eeFTPS_15VirtualVariable_GSqP4BSON9Primitive___V11MongoKitten5Query">==(_:_:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Protocols.html">Other Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Protocols/KeyRepresentable.html">KeyRepresentable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Other Protocols.html#/s:P4Meow10MeowNumber">MeowNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/ModelKey.html">ModelKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Serializable.html">Serializable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/SerializableToDocument.html">SerializableToDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/VirtualVariable.html">VirtualVariable</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Structs.html">Other Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Structs/File.html">File</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/Reference.html">Reference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualArray.html">VirtualArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualBool.html">VirtualBool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualData.html">VirtualData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualDate.html">VirtualDate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualDocument.html">VirtualDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualEmbeddablesArray.html">VirtualEmbeddablesArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualNumber.html">VirtualNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualObjectId.html">VirtualObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Structs/VirtualString.html">VirtualString</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Typealiases.html">Other Typealiases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Other Typealiases.html#/s:O4Meow4Meow15DatabaseProblem">DatabaseProblem</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            
+            <h1 id='meow-data-format' class='heading'>Meow Data Format</h1>
+
+<p>This document describes, in general, the data format Meow uses to store your documents in MongoDB.</p>
+<h2 id='collection-naming' class='heading'>Collection naming</h2>
+
+<p>The name of the collection is based on the name of the class that is stored in it. CamelCase is converted to snake_case, and the class name is made plural. Some examples (class: collection):</p>
+
+<ul>
+<li><code>User</code>: <code>users</code></li>
+<li><code>Man</code>: <code>men</code></li>
+<li><code>CarWheel</code>: <code>car_wheels</code></li>
+</ul>
+<h2 id='property-naming' class='heading'>Property naming</h2>
+
+<p>By default, property names are converted from camelCase to snake_case. For example:</p>
+
+<ul>
+<li><code>firstName</code>: <code>first_name</code></li>
+<li><code>event</code>: <code>event</code></li>
+</ul>
+
+<p>As you can see, this mostly works, but sometimes you might want some more control. For example, for a property named <code>linkedIn</code>, Meow will by default use <code>linked_in</code> as the key. To customize this, you can place a sourcery annotation next to the variable:</p>
+<pre class="highlight swift"><code><span class="c1">// sourcery: key = linkedin</span>
+<span class="k">var</span> <span class="nv">linkedIn</span><span class="p">:</span> <span class="kt">String</span>
+</code></pre>
+<h2 id='the-key-enum' class='heading'>The Key enum</h2>
+
+<p>Meow will store all property names in an enum named <code>Key</code> in every model. You can use this enum if you ever need to acccess the raw (database) name of a property.</p>
+
+<p>To access the key name of a property <code>MyProperty</code> on <code>MyModel</code>:  <code>MyModel.Key.myProperty.keyString</code></p>
+
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright © 2016 Robbert Brandsma &amp; Joannis Orlandos</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

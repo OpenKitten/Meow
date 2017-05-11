@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Migrator Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/Migrator" class="dashAnchor"></a>
+    <a title="Migrator Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">Meow Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        Migrator Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Guides.html">Guides</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../getting-started.html">Getting Started</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../cli.html">CLI</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../plugins.html">Plugins</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../migrations.html">Migrations</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../data-format.html">Data Format</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../saving-strategy-and-object-pooling.html">Saving Strategy and Object Pooling</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Core Types.html">Core Types</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/BaseModel.html">BaseModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Model.html">Model</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow.html">Meow</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Helpers.html">– Helpers</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/Error.html">– Error</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/Meow/ObjectPool.html">– ObjectPool</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Classes.html">Other Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/Migrator.html">Migrator</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Enums.html">Other Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/IndexAttribute.html">IndexAttribute</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Extensions.html">Other Extensions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Extensions/Binary.html">Binary</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Bool.html">Bool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/DBRef.html">DBRef</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Data.html">Data</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Date.html">Date</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Document.html">Document</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Double.html">Double</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/GridFS.html">GridFS</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Int.html">Int</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/ObjectId.html">ObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/RegularExpression.html">RegularExpression</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/String.html">String</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/ValueConvertible.html">ValueConvertible</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Functions.html">Other Functions</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Other Functions.html#/s:F4Meowop1nFV11MongoKitten5QueryS1_">!(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Functions/&amp;=(_:_:).html">&amp;=(_:_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Functions/*(_:).html">*(_:)</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Functions.html#/s:F4Meowoi2eeFTPS_15VirtualVariable_GSqP4BSON9Primitive___V11MongoKitten5Query">==(_:_:)</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Protocols.html">Other Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Protocols.html#/s:P4Meow10MeowNumber">MeowNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ModelKey.html">ModelKey</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Serializable.html">Serializable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/VirtualVariable.html">VirtualVariable</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Structs.html">Other Structs</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/File.html">File</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/Reference.html">Reference</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualArray.html">VirtualArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualBool.html">VirtualBool</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualData.html">VirtualData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualDate.html">VirtualDate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualDocument.html">VirtualDocument</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualEmbeddablesArray.html">VirtualEmbeddablesArray</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualNumber.html">VirtualNumber</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualObjectId.html">VirtualObjectId</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/VirtualString.html">VirtualString</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Other Typealiases.html">Other Typealiases</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Other Typealiases.html#/s:O4Meow4Meow15DatabaseProblem">DatabaseProblem</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>Migrator</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="kt">Migrator</span></code></pre>
+
+                </div>
+              </div>
+            <p>An instance of <code>Migrator</code> handles a single migration. It is responsible for the actual database updating,
+and it generates the migration plan.</p>
+
+<p>You do not create instances of <code>Migrator</code> yourself. When you want to perform a migration, call
+<code><a href="../Enums/Meow.html#/s:ZFO4Meow4Meow7migrateFzTSS2onPMPS_9BaseModel_9migrationFzCS_8MigratorT__T_">Meow.migrate(...)</a></code>. The closure you pass to the <code>migrate(...)</code> method will be called with an instance of <code>Migrator</code>
+if the migration is necessary.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vC4Meow8Migrator11descriptionSS"></a>
+                    <a name="//apple_ref/swift/Property/description" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vC4Meow8Migrator11descriptionSS">description</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The migration description - must be unique but human readable</p>
+
+<p>The description is used, together with the target collection name, as <code>_id</code> field in the migrations collection
+to identify the migration.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">description</span><span class="p">:</span> <span class="kt">String</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:vC4Meow8Migrator5modelPMPS_9BaseModel_"></a>
+                    <a name="//apple_ref/swift/Property/model" class="dashAnchor"></a>
+                    <a class="token" href="#/s:vC4Meow8Migrator5modelPMPS_9BaseModel_">model</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>The model type this migration affects</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">model</span><span class="p">:</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC4Meow8Migrator6renameFTSS2toSS_T_"></a>
+                    <a name="//apple_ref/swift/Method/rename(_:to:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC4Meow8Migrator6renameFTSS2toSS_T_">rename(_:to:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Rename a property</p>
+
+<p>This function performs a <code>$rename</code> operation on the collection using the literal names you provide.
+This means that, with the default naming rules enabled, if you want to rename a property <code>myProperty</code> to
+<code>myNewProperty</code>, your call to <code>rename(...)</code> would look like this:</p>
+
+<p><code>migrate.rename(&quot;my_property&quot;, to: &quot;my_new_property&quot;)</code></p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">rename</span><span class="p">(</span><span class="n">_</span> <span class="nv">property</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">to</span> <span class="nv">newName</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>property</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The old name (in the Document) of the property</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>newName</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The new name (in the Document) of the property</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC4Meow8Migrator3mapFFzV4BSON8DocumentS2_T_"></a>
+                    <a name="//apple_ref/swift/Method/map(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC4Meow8Migrator3mapFFzV4BSON8DocumentS2_T_">map(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Transform the entire model, on Document level.</p>
+
+<p>You may use this function to make any adaptions you like on the actual stored documents of your Model.
+This provides maximum flexibility.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">map</span><span class="p">(</span><span class="n">_</span> <span class="nv">transform</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">Document</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">Document</span><span class="p">))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>transform</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A closure that will be executed on every model document in the database. The returned document from this closure replaces the existing document in the database.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC4Meow8Migrator3mapFTSSFzGSqP4BSON9Primitive__GSqPS2____T_"></a>
+                    <a name="//apple_ref/swift/Method/map(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC4Meow8Migrator3mapFTSSFzGSqP4BSON9Primitive__GSqPS2____T_">map(_:_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Transform a single property, on Primitive level</p>
+
+<p>You may use this function, for example, if you have changed the data type of a property.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">map</span><span class="p">(</span><span class="n">_</span> <span class="nv">property</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="n">_</span> <span class="nv">transform</span><span class="p">:</span> <span class="kd">@escaping</span> <span class="p">(</span><span class="kt">BSON</span><span class="o">.</span><span class="kt">Primitive</span><span class="p">?)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">BSON</span><span class="o">.</span><span class="kt">Primitive</span><span class="p">?))</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>property</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The name (in the database) of the property you want to transform</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>transform</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>A closure that will be executed for every instance in the database</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:FC4Meow8Migrator6removeFSST_"></a>
+                    <a name="//apple_ref/swift/Method/remove(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:FC4Meow8Migrator6removeFSST_">remove(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Remove a property from the model</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">remove</span><span class="p">(</span><span class="n">_</span> <span class="nv">property</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>property</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The database name of the property to remove</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>Copyright © 2016 Robbert Brandsma &amp; Joannis Orlandos</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.1</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

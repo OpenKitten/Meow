@@ -40,15 +40,24 @@
                 <a href="plugins.html">Plugins</a>
               </li>
               <li class="nav-group-task">
+                <a href="migrations.html">Migrations</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="data-format.html">Data Format</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="saving-strategy-and-object-pooling.html">Saving Strategy and Object Pooling</a>
               </li>
             </ul>
           </li>
           <li class="nav-group-name">
-            <a href="Other Enums.html">Other Enums</a>
+            <a href="Core Types.html">Core Types</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Enums/Attribute.html">Attribute</a>
+                <a href="Protocols/BaseModel.html">BaseModel</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Model.html">Model</a>
               </li>
               <li class="nav-group-task">
                 <a href="Enums/Meow.html">Meow</a>
@@ -62,8 +71,21 @@
               <li class="nav-group-task">
                 <a href="Enums/Meow/ObjectPool.html">– ObjectPool</a>
               </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Classes.html">Other Classes</a>
+            <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Enums/Meow/Migrator.html">– Migrator</a>
+                <a href="Classes/Migrator.html">Migrator</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="Other Enums.html">Other Enums</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="Enums/IndexAttribute.html">IndexAttribute</a>
               </li>
             </ul>
           </li>
@@ -135,16 +157,10 @@
             <a href="Other Protocols.html">Other Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Protocols/BaseModel.html">BaseModel</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="Protocols/KeyRepresentable.html">KeyRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="Other Protocols.html#/s:P4Meow10MeowNumber">MeowNumber</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Protocols/Model.html">Model</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/ModelKey.html">ModelKey</a>
@@ -233,36 +249,6 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:P4Meow5Model"></a>
-                    <a name="//apple_ref/swift/Protocol/Model" class="dashAnchor"></a>
-                    <a class="token" href="#/s:P4Meow5Model">Model</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.</p>
-
-<p>Embeddables will have a generated Virtual variant of itself for the type safe queries</p>
-
-                        <a href="Protocols/Model.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Model</span> <span class="p">:</span> <span class="kd">class</span><span class="p">,</span> <span class="kt"><a href="Protocols/BaseModel.html">BaseModel</a></span><span class="p">,</span> <span class="kt">Hashable</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
                     <a name="/s:P4Meow16KeyRepresentable"></a>
                     <a name="//apple_ref/swift/Protocol/KeyRepresentable" class="dashAnchor"></a>
                     <a class="token" href="#/s:P4Meow16KeyRepresentable">KeyRepresentable</a>
@@ -338,34 +324,6 @@
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">ModelValues</span> <span class="p">:</span> <span class="kt"><a href="Protocols/SerializableToDocument.html">SerializableToDocument</a></span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:P4Meow9BaseModel"></a>
-                    <a name="//apple_ref/swift/Protocol/BaseModel" class="dashAnchor"></a>
-                    <a class="token" href="#/s:P4Meow9BaseModel">BaseModel</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Something that can be saved</p>
-
-                        <a href="Protocols/BaseModel.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">BaseModel</span> <span class="p">:</span> <span class="kt"><a href="Protocols/SerializableToDocument.html">SerializableToDocument</a></span><span class="p">,</span> <span class="kt">Primitive</span></code></pre>
 
                         </div>
                       </div>
