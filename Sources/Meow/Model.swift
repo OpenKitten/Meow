@@ -1,24 +1,29 @@
 @_exported import MongoKitten
 
+/// Something that can represent itself as a String (key)
 public protocol KeyRepresentable : Hashable {
     var keyString: String { get }
 }
 
+/// Used to define all keys in a Model
 public protocol ModelKey : KeyRepresentable {
     var type: Any.Type { get }
     static var all: [Self] { get }
 }
 
+/// Used to define the default values for a model
 public protocol ModelValues : SerializableToDocument {
     init()
 }
 
+/// Makes a String able to represent a Key
 extension String : KeyRepresentable {
     public var keyString: String {
         return self
     }
 }
 
+/// Makes an ObjectId able to represent a Key
 extension ObjectId : KeyRepresentable {
     public var keyString: String {
         return hexString
@@ -51,8 +56,13 @@ public protocol BaseModel : SerializableToDocument, Primitive {
     /// Will be called when the Model is deleted. At this point, it is no longer in the database and saves will no longer work because the ObjectId is invalidated.
     func didDelete() throws
     
+    /// Instantiates this BaseModel from a primitive
     init(newFrom source: BSON.Primitive) throws
+    
+    /// Validates an update document
     static func validateUpdate(with document: Document) throws
+    
+    /// Updates a model with a Document
     func update(with document: Document) throws
 }
 
@@ -70,28 +80,34 @@ extension Model {
         return _id.hexString
     }
     
+    /// Makes the model hashable, thus unique, thus usable in a Dictionary
     public var hashValue: Int {
         return _id.hashValue
     }
     
+    /// Checks if two models are referring to the same instance
     public static func ==(lhs: Self, rhs: Self) -> Bool {
         return lhs._id == rhs._id
     }
     
+    /// A helper to make type-safe query for this model
     public static func makeQuery(_ closure: ((VirtualInstance) throws -> (Query))) rethrows -> Query {
         return try closure(VirtualInstance(keyPrefix: ""))
     }
 }
 
 extension BaseModel {
+    /// Compares to Base Models
     public static func ==(lhs: Self, rhs: Self) -> Bool {
         return lhs._id == rhs._id
     }
     
+    /// Compares to Base Models
     public static func ==(lhs: Self?, rhs: Self) -> Bool {
         return lhs?._id == rhs._id
     }
     
+    /// Compares to Base Models
     public static func ==(lhs: Self, rhs: Self?) -> Bool {
         return lhs._id == rhs?._id
     }
@@ -114,10 +130,12 @@ public extension BaseModel {
 
 /// Implementes basic CRUD functionality for the object
 extension BaseModel {
+    /// Converts BaseModel to another KittenCore Type using lossy conversion
     public func convert<DT>(to type: DT.Type) -> DT.SupportedValue? where DT : DataType {
         return self.serialize().convert(to: type)
     }
     
+    /// Conformance to Primitive
     public var typeIdentifier: Byte {
         return 0x03 // document
     }
@@ -206,6 +224,7 @@ extension BaseModel {
         }
     }
     
+    /// Intantiates this instance if needed, or pulls the existing entity from memory when able
     public static func instantiateIfNeeded(_ document: Document) throws -> Self {
         return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
     }

@@ -1,6 +1,7 @@
 import Foundation
 
 extension Model {
+    /// A pagination result
     public typealias PaginatedFindResult = (total: Int, perPage: Int, currentPage: Int, lastPage: Int, from: Int, to: Int, data: CollectionSlice<Self>)
     
     /// Performs a find on the model, with support for pagination.

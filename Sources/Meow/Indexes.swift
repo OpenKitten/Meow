@@ -1,8 +1,11 @@
 import MongoKitten
 
+/// An Index attribute
 public enum Attribute {
+    /// Makes the indexes keys unique
     case unique
     
+    /// Creates a MongoKitten IndexParameter
     var indexParameter: IndexParameter {
         switch self {
         case .unique:
@@ -11,21 +14,21 @@ public enum Attribute {
     }
 }
 
-public struct Fields : ExpressibleByDictionaryLiteral {
-    var sort = Document()
-    
-    public init(dictionaryLiteral elements: (String, SortOrder)...) {
-        for (key, order) in elements {
-            sort[key] = order
-        }
-    }
-}
-
 extension Model {
+    /// Creates an index on this entity
+    ///
+    /// - parameter keys: The keys so index and their order
+    /// - parameter name: The index name
+    /// - parameter attributes: The attributes to apply to this index
     public static func index(_ keys: [Key: SortOrder], named name: String, attributes: Attribute...) throws {
         try self.index(keys, named: name, attributes: attributes)
     }
     
+    /// Creates an index on this entity
+    ///
+    /// - parameter keys: The keys so index and their order
+    /// - parameter name: The index name
+    /// - parameter attributes: The attributes to apply to this index
     public static func index(_ keys: [Key: SortOrder], named name: String, attributes: [Attribute]) throws {
         let sort = IndexParameter.sortedCompound(fields: keys.map { key, order in
             return (key.keyString, order)

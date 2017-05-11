@@ -1,8 +1,10 @@
 import Foundation
 
 extension Meow {
+    /// A problem found when validating the database
     public typealias DatabaseProblem = (model: BaseModel.Type?, id: BSON.Primitive?, error: Swift.Error)
     
+    /// The error found
     enum ValidationError : Swift.Error {
         case cannotValidateBecauseOfAliveObjects(objects: [Any])
         case circularReference(stillAlive: Any)

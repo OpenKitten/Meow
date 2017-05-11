@@ -58,6 +58,7 @@ public enum Meow {
         case infiniteReferenceLoop(type: BaseModel.Type, id: ObjectId)
     }
     
+    /// An ObjectPool that is used to link models in-memory
     public static var pool: ObjectPool!
     
     internal static let maintenanceQueue = DispatchQueue(label: "org.openkitten.meow.maintenance", qos: .background)
@@ -85,13 +86,20 @@ public enum Meow {
         maintenanceQueue.asyncAfter(deadline: DispatchTime(secondsFromNow: maintenanceInterval), execute: Meow.maintenance)
     }
     
+    /// The ObjectPool is used to hold references to models to link them in-memory
+    ///
+    /// It also functions as the intelligent brain behind autosaving amongst other functions
     public class ObjectPool {
+        /// The queue used to prevent crashes in mutations
         private let objectPoolMutationQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
         
+        /// Creates a new ObjectPool
         fileprivate init() {
+            // Save the database contents before exiting
             atexit { Meow.pool.beforeExit() }
         }
         
+        /// Saves the database contents before exiting
         private func beforeExit() {
             print("🐈 Performing pre-exit save")
             
@@ -114,11 +122,19 @@ public enum Meow {
             }
         }
         
+        /// The internal storage that's used to hold metadata and references to objects
         internal private(set) var storage = [ObjectId: (instance: Weak<AnyObject>, instantiation: Date, hash: Int?)](minimumCapacity: 1000)
+        
+        /// A set of unsaved ObjectIds that need to be saves, still
         private var unsavedObjectIds = Set<ObjectId>()
+        
+        /// A set of entity's ObjectIds that are invalidated because they were removed
         private var invalidatedObjectIds = Set<ObjectId>()
+        
+        /// A set of entity's ObjectIds that are currently being instantiated
         private var currentlyInstantiating = Set<ObjectId>()
         
+        /// Generated a new ObjectId
         public func newObjectId() -> ObjectId {
             let id = ObjectId()
             
@@ -129,6 +145,7 @@ public enum Meow {
             return id
         }
         
+        /// Instantiates a model from a Document unless the model is alraedy in-memory
         public func instantiateIfNeeded<M : BaseModel>(type: M.Type, document: Document) throws -> M {
             guard let id = ObjectId(document["_id"]) else {
                 throw Error.missingOrInvalidValue(key: "_id")
@@ -160,6 +177,7 @@ public enum Meow {
             return instance
         }
         
+        /// Stored an entity in the pool
         public func pool<M: BaseModel>(_ instance: M, hash: Int? = nil) {
             var current: AnyObject?
             
@@ -204,6 +222,7 @@ public enum Meow {
             }
         }
         
+        /// Frees an objectId fromthe unsavedObjectIds
         public func free(_ id: ObjectId) {
             objectPoolMutationQueue.sync {
                 if let index = unsavedObjectIds.index(of: id) {
@@ -220,6 +239,7 @@ public enum Meow {
             }
         }
         
+        /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
             do {
                 try instance.save()
@@ -256,6 +276,7 @@ public enum Meow {
             }
         }
         
+        /// Handles automatically saving models so they don't get lost when the server randomly crashes/shuts down
         fileprivate func autoSave() throws {
             let oldObjects = storage.filter({ $0.value.instantiation.timeIntervalSinceNow < -(minimumAutosaveAge) })
             for (_, val) in oldObjects {

@@ -10,6 +10,7 @@ import Foundation
 import BSON
 
 extension Document {
+    /// Hashes a Document for internal comparison
     internal var meowHash: Int {
         let bytes = self.bytes
         
