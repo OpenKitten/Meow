@@ -31,18 +31,31 @@ class Breed : Model {
     }
 
 // sourcery:inline:auto:Breed.Meow
-		required init(restoring source: BSON.Primitive) throws {
+	required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
 
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
-		self.name = try document.unpack("name")
-		self.country = try? document.unpack("country")
-		self.origin = try? document.unpack("origin")
-		self.kaas = try document.unpack("kaas")
-		self.geval = try? document.unpack("geval")
+		self.name = try document.unpack(Key.name.keyString)
+		self.country = try? document.unpack(Key.country.keyString)
+		self.origin = try? document.unpack(Key.origin.keyString)
+		self.kaas = try document.unpack(Key.kaas.keyString)
+		self.geval = try? document.unpack(Key.geval.keyString)
+	}
+	
+	required init(newFrom source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		
+		self.geval = (try? document.unpack(Key.geval.keyString)) 
+		self.kaas = (try document.unpack(Key.kaas.keyString)) 
+		self.origin = (try? document.unpack(Key.origin.keyString)) 
+		self.country = (try? document.unpack(Key.country.keyString)) 
+		self.name = (try document.unpack(Key.name.keyString)) 
 	}
 
 	
@@ -73,17 +86,29 @@ class Cat : Model, CatLike {
     }
 
 // sourcery:inline:auto:Cat.Meow
-		required init(restoring source: BSON.Primitive) throws {
+	required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
 
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
-		self.name = try document.unpack("name")
-		self.breed = try document.unpack("breed")
-		self.bestFriend = try? document.unpack("bestFriend")
-		self.family = try document.unpack("family")
+		self.name = try document.unpack(Key.name.keyString)
+		self.breed = try document.unpack(Key.breed.keyString)
+		self.bestFriend = try? document.unpack(Key.bestFriend.keyString)
+		self.family = try document.unpack(Key.family.keyString)
+	}
+	
+	required init(newFrom source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		
+		self.family = (try document.unpack(Key.family.keyString)) 
+		self.bestFriend = (try? document.unpack(Key.bestFriend.keyString)) 
+		self.breed = (try document.unpack(Key.breed.keyString)) 
+		self.name = (try document.unpack(Key.name.keyString)) 
 	}
 
 	

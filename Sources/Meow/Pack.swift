@@ -52,8 +52,8 @@ extension Document {
         return try Set(unpack(key) as [S])
     }
     
-    public mutating func pack<S : Sequence>(_ serializables: S, as key: String) where S.Iterator.Element : Serializable {
-        self[key] = serializables.map { _pack($0) }
+    public mutating func pack<S : Sequence>(_ serializables: S?, as key: String) where S.Iterator.Element : Serializable {
+        self[key] = serializables?.map { _pack($0) }
     }
     
     public mutating func pack<V: Serializable>(_ serializable: Dictionary<String, V>, as key: String) {

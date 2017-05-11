@@ -21,14 +21,23 @@ class Tiger : Model {
     
 
 // sourcery:inline:auto:Tiger.Meow
-		required init(restoring source: BSON.Primitive) throws {
+	required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
 
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
-		self.breed = try document.unpack("breed")
+		self.breed = try document.unpack(Key.breed.keyString)
+	}
+	
+	required init(newFrom source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		
+		self.breed = (try document.unpack(Key.breed.keyString)) 
 	}
 
 	
@@ -49,14 +58,23 @@ class CatReferencing : Model {
     }
 
 // sourcery:inline:auto:CatReferencing.Meow
-		required init(restoring source: BSON.Primitive) throws {
+	required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
 
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
-		self.cat = try document.unpack("cat")
+		self.cat = try document.unpack(Key.cat.keyString)
+	}
+	
+	required init(newFrom source: BSON.Primitive) throws {
+		guard let document = source as? BSON.Document else {
+			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
+		}
+
+		
+		self.cat = (try document.unpack(Key.cat.keyString)) 
 	}
 
 	

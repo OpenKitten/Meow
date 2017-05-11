@@ -22,6 +22,8 @@ public enum Meow {
         Meow.database = db
         Meow.types = types
         Meow.pool = ObjectPool()
+        
+        scheduleMaintenance()
     }
     
     /// Initializes the static Meow database state with a MongoKitten.Database from a connection string
@@ -58,8 +60,33 @@ public enum Meow {
     
     public static var pool: ObjectPool!
     
+    internal static let maintenanceQueue = DispatchQueue(label: "org.openkitten.meow.maintenance", qos: .background)
+    
+    public static var maintenanceInterval: TimeInterval = 5
+    public static var minimumAutosaveAge: TimeInterval = 5
+    
+    private static func maintenance() {
+        print("🐈 Performing maintenance")
+        
+        do {
+            Meow.pool.clean()
+            try Meow.pool.autoSave()
+        } catch {
+            print("🐈❗ Error while performing maintenance")
+            print(error)
+            assertionFailure("\(error)")
+        }
+        
+        // Schedule next maintenance
+        scheduleMaintenance()
+    }
+    
+    private static func scheduleMaintenance() {
+        maintenanceQueue.asyncAfter(deadline: DispatchTime(secondsFromNow: maintenanceInterval), execute: Meow.maintenance)
+    }
+    
     public class ObjectPool {
-        private let objectPoolQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
+        private let objectPoolMutationQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
         
         fileprivate init() {
             atexit { Meow.pool.beforeExit() }
@@ -87,7 +114,7 @@ public enum Meow {
             }
         }
         
-        internal private(set) var storage = WeakDictionary<ObjectId, AnyObject>(minimumCapacity: 1000)
+        internal private(set) var storage = [ObjectId: (instance: Weak<AnyObject>, instantiation: Date, hash: Int?)](minimumCapacity: 1000)
         private var unsavedObjectIds = Set<ObjectId>()
         private var invalidatedObjectIds = Set<ObjectId>()
         private var currentlyInstantiating = Set<ObjectId>()
@@ -95,7 +122,7 @@ public enum Meow {
         public func newObjectId() -> ObjectId {
             let id = ObjectId()
             
-            objectPoolQueue.sync {
+            objectPoolMutationQueue.sync {
                 _ = unsavedObjectIds.insert(id)
             }
             
@@ -108,9 +135,9 @@ public enum Meow {
             }
             
             var existingInstance: M?
-                
-            objectPoolQueue.sync {
-                existingInstance = storage[id] as? M
+            
+            objectPoolMutationQueue.sync {
+                existingInstance = storage[id]?.instance.value as? M
             }
             
             if let existingInstance = existingInstance {
@@ -129,39 +156,48 @@ public enum Meow {
             
             currentlyInstantiating.remove(id)
             
-            self.pool(instance)
+            self.pool(instance, hash: document.meowHash)
             return instance
         }
         
-        public func pool<M: BaseModel>(_ instance: M) {
+        public func pool<M: BaseModel>(_ instance: M, hash: Int? = nil) {
             var current: AnyObject?
             
-            objectPoolQueue.sync {
-                current = storage[instance._id]
+            objectPoolMutationQueue.sync {
+                current = storage[instance._id]?.instance.value
             }
             
             if let current = current {
                 assert(current === instance as AnyObject, "two model instances with the same _id is invalid")
+                return
             } else {
                 print("🐈 Pooling \(instance)")
-                objectPoolQueue.sync {
+                objectPoolMutationQueue.sync {
                     if let index = unsavedObjectIds.index(of: instance._id) {
                         unsavedObjectIds.remove(at: index)
                     }
                 }
             }
             
-            objectPoolQueue.sync {
+            objectPoolMutationQueue.sync {
                 // Only pool it if the instance is not invalidated
                 if !invalidatedObjectIds.contains(instance._id) {
-                    storage[instance._id] = instance as AnyObject
+                    storage[instance._id] = (instance: Weak(instance as AnyObject), instantiation: Date(), hash: hash)
                 }
             }
         }
         
+        internal func existingHash(for instance: BaseModel) -> Int? {
+            return storage[instance._id]?.hash
+        }
+        
+        internal func updateHash(for instance: BaseModel, with newHash: Int?) {
+            storage[instance._id]?.hash = newHash
+        }
+        
         /// Invalidates the given ObjectId. Called when removing an object
         internal func invalidate(_ id: ObjectId) {
-            objectPoolQueue.sync {
+            objectPoolMutationQueue.sync {
                 // remove the instance from the pool
                 storage[id] = nil
                 invalidatedObjectIds.insert(id)
@@ -169,7 +205,7 @@ public enum Meow {
         }
         
         public func free(_ id: ObjectId) {
-            objectPoolQueue.sync {
+            objectPoolMutationQueue.sync {
                 if let index = unsavedObjectIds.index(of: id) {
                     print("🐈 Unregistering ObjectId \(id)")
                     unsavedObjectIds.remove(at: index)
@@ -179,7 +215,7 @@ public enum Meow {
         
         /// Returns if `instance` is currently in the pool
         public func isPooled<M: BaseModel>(_ instance: M) -> Bool {
-            return objectPoolQueue.sync {
+            return objectPoolMutationQueue.sync {
                 return storage[instance._id] != nil
             }
         }
@@ -193,7 +229,7 @@ public enum Meow {
             }
             print("🐈 Unpooling \(instance)")
             
-            objectPoolQueue.sync {
+            objectPoolMutationQueue.sync {
                 storage[instance._id] = nil
                 
                 // remove if invalidated to free up memory:
@@ -203,14 +239,28 @@ public enum Meow {
         
         /// The amount of pooled objects
         public var count: Int {
-            return objectPoolQueue.sync {
-                return storage.count()
+            self.clean()
+            return objectPoolMutationQueue.sync {
+                return storage.count
             }
         }
         
-        /// Removes deallocated entries from the pool, possibly saving around 12 bytes per model
+        /// Removes deallocated entries from the pool
         public func clean() {
-            storage.removeDeallocated()
+            return objectPoolMutationQueue.sync {
+                for (id, val) in storage {
+                    if val.instance.value == nil {
+                        storage[id] = nil
+                    }
+                }
+            }
+        }
+        
+        fileprivate func autoSave() throws {
+            let oldObjects = storage.filter({ $0.value.instantiation.timeIntervalSinceNow < -(minimumAutosaveAge) })
+            for (_, val) in oldObjects {
+                try (val.instance.value as? BaseModel)?.save()
+            }
         }
     }
 }

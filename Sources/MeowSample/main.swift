@@ -1,6 +1,5 @@
 import Meow
-
-// Sample for just Meow - for MeowVapor, see the MeowVaporSample
+import Foundation
 
 try Meow.init("mongodb://localhost:27017/meow-sample", meows)
 
@@ -66,6 +65,11 @@ guard let otherSuperCatClone = try Cat.findOne({ cat in
 }) else {
     fatalError("MEOW NO! :(")
 }
+
+otherSuperCatClone.name = "Superket"
+
+Thread.sleep(forTimeInterval: 6)
+Thread.sleep(forTimeInterval: 6)
 
 try Meow.migrate("Test migration", on: Breed.self) { migrate in
     migrate.remove("country")

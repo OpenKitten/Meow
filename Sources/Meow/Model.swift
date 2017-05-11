@@ -30,14 +30,14 @@ public protocol BaseModel : SerializableToDocument, Primitive {
     /// The collection this entity resides in
     static var collection: MongoKitten.Collection { get }
     
-    /// Saves this object
-    func save() throws
-    
     /// Will be called before saving the Model. Throwing from here will prevent the model from saving.
+    /// Note that, if the model has not been changed, the update may not actually get pushed to the database.
     func willSave() throws
     
-    /// Will be called when the Model has been saved to the database.
-    func didSave() throws
+    /// Will be called when the Model has been saved.
+    ///
+    /// - parameter wasUpdated: If the save operation actually updated the database
+    func didSave(wasUpdated: Bool) throws
     
     /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you using Sourcery.
     var _id: ObjectId { get set }
@@ -102,7 +102,7 @@ public extension BaseModel {
     public func willSave() throws {}
     
     /// Will be called when the Model has been saved to the database.
-    public func didSave() throws {}
+    public func didSave(wasUpdated: Bool) throws {}
     
     /// Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.
     public func willDelete() throws {}
@@ -150,20 +150,30 @@ extension BaseModel {
     }
     
     /// Saves this object
-    public func save() throws {
+    public func save(force: Bool = false) throws {
         try self.willSave()
-        print("🐈 Saving \(self)")
         
         let document = self.serialize()
-        
         Meow.pool.pool(self)
+        
+        let hash = document.meowHash
+        
+        guard force || hash != Meow.pool.existingHash(for: self) else {
+            print("🐈 Not saving \(self) because it is unchanged")
+            try self.didSave(wasUpdated: false)
+            return
+        }
+        
+        print("🐈 Saving \(self)")
         
         try Self.collection.update("_id" == self._id,
                                    to: document,
                                    upserting: true
         )
         
-        try self.didSave()
+        Meow.pool.updateHash(for: self, with: hash)
+        
+        try self.didSave(wasUpdated: true)
     }
     
     /// Removes all entities matching the query
