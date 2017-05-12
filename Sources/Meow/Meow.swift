@@ -17,7 +17,7 @@ public enum Meow {
     internal static var types: [Any.Type]!
     
     /// Initializes the static Meow database state with a MongoKitten.Database
-    public static func `init`(_ db: MongoKitten.Database, _ types: [Any.Type] = []) {
+    public static func `init`(_ db: MongoKitten.Database, _ types: [Any.Type]) {
         print("🐈 Init")
         Meow.database = db
         Meow.types = types

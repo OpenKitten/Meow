@@ -1,5 +1,6 @@
 // MARK: Protocols.ejs
 <%
+
 modelProtocols.forEach(protocol => { %>
 // MARK: - 🐈 for <%- protocol.name %>
 // sourcery:inline:auto:<%- protocol.name %>.Meow
@@ -8,14 +9,16 @@ modelProtocols.forEach(protocol => { %>
 	
 // sourcery:end
 	
-protocol <%- protocol.name %>Values : ModelValues {
-	<%_ protocol.allVariables.forEach(variable => { -%>
+<% const superModelProtocols = protocol.inheritedTypes.filter(t => modelProtocols.find(p => p.name == t)); %>
+	
+protocol <%- protocol.name %>Values : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "Values").join(",") : "ModelValues" %> {
+	<%_ protocol.variables.forEach(variable => { -%>
 	var <%- variable.name -%>: <%- variable.unwrappedTypeName %>? { get set }
 	<%_ }) %>
 }
 
-protocol <%- protocol.name %>VirtualInstance : VirtualModelInstance {
-	<%_ protocol.allVariables.forEach(variable => {
+protocol <%- protocol.name %>VirtualInstance : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "VirtualInstance").join(",") : "VirtualModelInstance" %> {
+	<%_ protocol.variables.forEach(variable => {
 	if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 		 if (numberTypes.includes(variable.unwrappedTypeName)) {
 			 %> var <%- variable.name %>: VirtualNumber { get } <%
@@ -25,7 +28,8 @@ protocol <%- protocol.name %>VirtualInstance : VirtualModelInstance {
 	} else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 		 ensureSerializable(variable.type);
 		 %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { get } <%
-	}
+	}%>
+	<%
 	}) %>
 }
 

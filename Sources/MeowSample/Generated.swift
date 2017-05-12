@@ -3,6 +3,12 @@
 
 
 // MARK: Meow.ejs
+// MARK: MeowCore.ejs
+
+
+// MARK: - General Information
+// Supported Primitives: ObjectId, String, Int, Int32, Bool, Document, Double, Data, Binary, Date, RegularExpression
+// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class Cat, class CatReferencing, class Tiger
 import Foundation
 import Meow
 import ExtendedJSON

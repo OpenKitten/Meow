@@ -1,5 +1,5 @@
 // MARK: Meow.ejs
-<% include('lib/MeowCore') -%>
+<%- include('lib/MeowCore') -%>
 <% include('lib/PluginCore') -%>
 <% include('plugins.ejs') -%>
 <%- window.importPluginDependencies() %>
@@ -48,7 +48,17 @@ generateSerializables()
 
 %>
 
-let meows: [Any.Type] = [<%- serializables.map(m => m.name + ".self").join(", ") %>]
+fileprivate let meows: [Any.Type] = [<%- serializables.map(m => m.name + ".self").join(", ") %>]
+
+extension Meow {
+	static func `init`(_ connectionString: String) throws {
+		try Meow.init(connectionString, meows)
+	}
+	
+	static func `init`(_ db: MongoKitten.Database) {
+		Meow.init(db, meows)
+	}
+}
 
 // 🐈 Statistics
 // Models: <%- models.length %>
