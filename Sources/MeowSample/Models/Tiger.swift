@@ -8,14 +8,14 @@
 
 import Meow
 
-protocol CatLike : BaseModel {
+public protocol CatLike : BaseModel {
     var breed: Breed { get }
 }
 
-class Tiger : Model {
-    var breed: Breed
+public class Tiger : Model {
+    public var breed: Breed
     
-    init(breed: Breed) {
+    public init(breed: Breed) {
         self.breed = breed
     }
     
@@ -51,10 +51,10 @@ class Tiger : Model {
 // sourcery:end
 }
 
-class CatReferencing : Model {
-    var cat: CatLike
+public class CatReferencing : Model {
+    public var cat: CatLike
     
-    init(cat: CatLike) {
+    public init(cat: CatLike) {
         self.cat = cat
     }
 
