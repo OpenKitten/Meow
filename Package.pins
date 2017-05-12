@@ -17,7 +17,7 @@
       "package": "CryptoSwift",
       "reason": null,
       "repositoryURL": "https://github.com/krzyzanowskim/CryptoSwift.git",
-      "version": "0.6.7"
+      "version": "0.6.9"
     },
     {
       "package": "KittenCore",
@@ -29,7 +29,7 @@
       "package": "MongoKitten",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",
-      "version": "0.0.30"
+      "version": "4.0.1"
     },
     {
       "package": "Schrodinger",

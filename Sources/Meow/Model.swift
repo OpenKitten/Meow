@@ -166,8 +166,8 @@ extension BaseModel {
     }
     
     /// Counts the amount of objects matching the query
-    public static func count(_ filter: Query? = nil, limiting limit: Int? = nil, skipping skip: Int? = nil) throws -> Int {
-        return try collection.count(filter, limiting: limit, skipping: skip)
+    public static func count(_ filter: Query? = nil, limitedTo limit: Int? = nil, skipping skip: Int? = nil) throws -> Int {
+        return try collection.count(filter, limitedTo: limit, skipping: skip)
     }
     
     /// Removes this object from the database

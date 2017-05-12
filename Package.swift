@@ -7,6 +7,6 @@ let package = Package(
         Target(name: "MeowSample", dependencies: ["Meow"])
     ],
     dependencies: [
-       .Package(url: "https://github.com/OpenKitten/MongoKitten.git", Version(0,0,30))
+       .Package(url: "https://github.com/OpenKitten/MongoKitten.git", majorVersion: 4)
     ]
 )
