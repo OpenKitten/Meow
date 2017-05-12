@@ -2,7 +2,7 @@
 	<% let inheritedProtocols = modelProtocols.filter(p => serializable.implements[p.name]); %>
 
 	/// Represents (part of) the values of a <%- serializable.name %>
-	struct Values : ModelValues<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'Values') : '' %> {
+	struct Values : ModelValues<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'Values').join("") : '' %> {
 		init() {}
 		init(restoring source: BSON.Primitive) throws {
 			guard let document = source as? BSON.Document else {
