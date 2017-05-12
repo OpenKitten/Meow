@@ -218,7 +218,7 @@ public enum Meow {
             }
             
             if let current = current {
-                assert(current === instance as AnyObject, "two model instances with the same _id is invalid")
+                assert(current === instance.object, "two model instances with the same _id is invalid")
                 return
             } else {
                 print("🐈 Pooling \(instance)")
@@ -232,7 +232,7 @@ public enum Meow {
             objectPoolMutationQueue.sync {
                 // Only pool it if the instance is not invalidated
                 if !invalidatedObjectIds.contains(instance._id) {
-                    storage[instance._id] = (instance: Weak(instance as AnyObject), instantiation: Date(), hash: hash)
+                    storage[instance._id] = (instance: Weak(instance.object), instantiation: Date(), hash: hash)
                 }
             }
         }
@@ -315,5 +315,15 @@ public enum Meow {
                 try (val.instance.value as? BaseModel)?.save()
             }
         }
+    }
+}
+
+fileprivate extension BaseModel {
+    var object: AnyObject {
+        #if os(Linux)
+            return self as! AnyObject
+        #else
+            return self as AnyObject
+        #endif
     }
 }
