@@ -1,8 +1,10 @@
 // MARK: SerializableStructClass.ejs
+<% serializable.isModel = !!serializable.based["Model"]; %>
 extension <%- serializable.name %> : SerializableToDocument {
 	<%# Classes need their designated initializers to be in the definition of the body, so we use automatic inline code generation. %>
 	<% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Meow<% } %>
 	<%_ -%>
+	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	<% if (serializable.kind == "class") { %>required <% }%>init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);

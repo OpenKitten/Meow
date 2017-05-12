@@ -1,31 +1,43 @@
 <%
-window.imports = {
-  "Foundation": true,
-  "Meow": true,
-  "ExtendedJSON": true
-};
+Object.assign(window, {
+	serializableGenerators: [],
+	modelGenerators: [],
+	
+	imports: {
+		"Foundation": true,
+		"Meow": true,
+		"ExtendedJSON": true
+	},
+	
+	execute(closures, argument) {
+		var code = "";
+		closures.forEach(closure => {
+	    	code += closure(argument) + "\n";
+	  	});
 
-window.execute = function(closures, argument) {
-	var code = "";
-	closures.forEach(closure => {
-    code += closure(argument) + "\n";
-  });
+		return code
+	},
+	
+	importPluginDependencies() {
+		var imports = "";
 
-	return code
-}
+		for(var key in window.imports) {
+		  if(window.imports.hasOwnProperty(key)) {
+				imports += `import ${key}\n`;
+			}
+		}
 
-window.importPluginDependencies = function() {
-	var imports = "";
-
-	for(var key in window.imports) {
-	  if(window.imports.hasOwnProperty(key)) {
-			imports += `import ${key}\n`;
+		return imports;
+	},
+	
+	forEachSerializable(func) {
+		serializableGenerators.push(func);
+	},
+	
+	swiftImport() {
+		for (let i = 0; i < arguments.length; i++) {
+			imports[arguments[i]] = true
 		}
 	}
-
-	return imports;
-}
-
-window.serializableGenerators = [];
-window.initialization = [window.importPluginDependencies];
+});
 %>
