@@ -158,6 +158,8 @@ extension Breed : SerializableToDocument {
 		}
 	}
 	// MARK: VirtualInstanceStructClass.ejs
+
+
 struct VirtualInstance : VirtualModelInstance {
 	var keyPrefix: String
 
@@ -177,17 +179,6 @@ struct VirtualInstance : VirtualModelInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
-	// MARK: QueryBuilder.ejs
-
-	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<Breed> {
-		return try find(closure(VirtualInstance()))
-	}
-
-	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> Breed? {
-		return try findOne(closure(VirtualInstance()))
-	}
-
-
 }
 
 extension Breed : CustomStringConvertible {
@@ -333,6 +324,8 @@ extension Cat : SerializableToDocument {
 		}
 	}
 	// MARK: VirtualInstanceStructClass.ejs
+
+
 struct VirtualInstance : VirtualModelInstance {
 	var keyPrefix: String
 
@@ -350,17 +343,6 @@ struct VirtualInstance : VirtualModelInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
-	// MARK: QueryBuilder.ejs
-
-	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<Cat> {
-		return try find(closure(VirtualInstance()))
-	}
-
-	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> Cat? {
-		return try findOne(closure(VirtualInstance()))
-	}
-
-
 }
 
 extension Cat : CustomStringConvertible {
@@ -466,6 +448,8 @@ extension CatReferencing : SerializableToDocument {
 		}
 	}
 	// MARK: VirtualInstanceStructClass.ejs
+
+
 struct VirtualInstance : VirtualModelInstance {
 	var keyPrefix: String
 
@@ -477,17 +461,6 @@ struct VirtualInstance : VirtualModelInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
-	// MARK: QueryBuilder.ejs
-
-	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<CatReferencing> {
-		return try find(closure(VirtualInstance()))
-	}
-
-	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> CatReferencing? {
-		return try findOne(closure(VirtualInstance()))
-	}
-
-
 }
 
 extension CatReferencing : CustomStringConvertible {
@@ -593,6 +566,8 @@ extension Tiger : SerializableToDocument {
 		}
 	}
 	// MARK: VirtualInstanceStructClass.ejs
+
+
 struct VirtualInstance : VirtualModelInstance {
 	var keyPrefix: String
 
@@ -604,17 +579,6 @@ struct VirtualInstance : VirtualModelInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
-	// MARK: QueryBuilder.ejs
-
-	public static func find(_ amount: Int? = nil, _ closure: ((VirtualInstance)->(Query))) throws -> CollectionSlice<Tiger> {
-		return try find(closure(VirtualInstance()))
-	}
-
-	public static func findOne(_ closure: ((VirtualInstance)->(Query))) throws -> Tiger? {
-		return try findOne(closure(VirtualInstance()))
-	}
-
-
 }
 
 extension Tiger : CustomStringConvertible {
@@ -842,6 +806,8 @@ extension Breed.Thing : SerializableToDocument {
 		}
 	}
 	// MARK: VirtualInstanceStructClass.ejs
+
+
 struct VirtualInstance : VirtualModelInstance {
 	var keyPrefix: String
 
@@ -855,9 +821,6 @@ struct VirtualInstance : VirtualModelInstance {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
-	// MARK: QueryBuilder.ejs
-
-
 }
 
 extension Breed.Thing : CustomStringConvertible {

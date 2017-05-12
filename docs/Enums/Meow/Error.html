@@ -14,7 +14,7 @@
     <a title="Error Enum Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../../index.html">Meow Docs</a> (59% documented)</p>
+        <p><a href="../../index.html">Meow Docs</a> (89% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -176,9 +176,6 @@
                 <a href="../../Protocols/SerializableToDocument.html">SerializableToDocument</a>
               </li>
               <li class="nav-group-task">
-                <a href="../../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
               </li>
               <li class="nav-group-task">
@@ -266,14 +263,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The value for the given key is missing, or invalid</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">missingOrInvalidValue</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -297,14 +294,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The value for the given key is missing</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">missingValue</span><span class="p">(</span><span class="nv">key</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -328,14 +325,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A reference to <code>type</code> with id <code>id</code> cannot be resolved</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">referenceError</span><span class="p">(</span><span class="nv">id</span><span class="p">:</span> <span class="kt">ObjectId</span><span class="p">,</span> <span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -359,14 +356,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>An object cannot be deleted, because of <code>reason</code></p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">undeletableObject</span><span class="p">(</span><span class="nv">reason</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -390,14 +387,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The given case for the <code>enum</code> could not be found while deserializing an object</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">enumCaseNotFound</span><span class="p">(</span><span class="nv">enum</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">name</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -421,14 +418,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>A file cannot be stored because it exceeds the maximum size</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">fileTooLarge</span><span class="p">(</span><span class="nv">size</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">maximum</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -452,14 +449,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The serializable <code>type</code> cannot be deserialized from <code>source</code> because it is not <code>expectedPrimtive</code></p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">cannotDeserialize</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../../Protocols/Serializable.html">Serializable</a></span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">source</span><span class="p">:</span> <span class="kt">BSON</span><span class="o">.</span><span class="kt">Primitive</span><span class="p">?,</span> <span class="nv">expectedPrimitive</span><span class="p">:</span> <span class="kt">BSON</span><span class="o">.</span><span class="kt">Primitive</span><span class="o">.</span><span class="k">Type</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -483,14 +480,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The given DBRef is not valid</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">brokenReference</span><span class="p">(</span><span class="nv">in</span><span class="p">:</span> <span class="p">[</span><span class="kt">DBRef</span><span class="p">])</span></code></pre>
 
                         </div>
                       </div>
@@ -514,14 +511,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>One or more errors occurred while mass-deleting objects. The <code>errors</code> array contains the specific object identifier and error pairs.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">deletingMultiple</span><span class="p">(</span><span class="nv">errors</span><span class="p">:</span> <span class="p">[(</span><span class="kt">ObjectId</span><span class="p">,</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span><span class="p">)])</span></code></pre>
 
                         </div>
                       </div>
@@ -545,14 +542,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Meow was not able to validate the database, because <code>reason</code></p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">cannotValidate</span><span class="p">(</span><span class="nv">reason</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -576,14 +573,23 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>An infinite reference loop has occurred while trying to deserialize an object.
+This happens if you reference objects like this: <code>a</code> -&gt; <code>b</code> -&gt; <code>a</code></p>
+
+<p>That&rsquo;s bad practice, both under ARC and in Meow. Meow is not able to instantiate <code>a</code>
+nor <code>b</code> in the above example, because it would create an infinite loop while trying to
+resolve the references.</p>
+
+<p>You can solve the infinite reference loop by making one of the references lazy, by
+using the <code><a href="../../Structs/Reference.html">Reference</a></code> type. So instead of <code>var myReference: MyModel</code>, you would use
+<code>var myReference: Reference&lt;MyModel&gt;</code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Error</span> <span class="p">:</span> <span class="kt">Swift</span><span class="o">.</span><span class="kt">Error</span></code></pre>
+                          <pre class="highlight"><code><span class="k">case</span> <span class="nf">infiniteReferenceLoop</span><span class="p">(</span><span class="nv">type</span><span class="p">:</span> <span class="kt"><a href="../../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span><span class="p">,</span> <span class="nv">id</span><span class="p">:</span> <span class="kt">ObjectId</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>

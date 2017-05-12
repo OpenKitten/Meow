@@ -14,7 +14,7 @@
     <a title="Model Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p><a href="../index.html">Meow Docs</a> (89% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -174,9 +174,6 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
@@ -408,36 +405,6 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:vE4MeowPS_5Model9keyStringSS"></a>
-                    <a name="//apple_ref/swift/Property/keyString" class="dashAnchor"></a>
-                    <a class="token" href="#/s:vE4MeowPS_5Model9keyStringSS">keyString</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">Model</span> <span class="p">:</span> <span class="kd">class</span><span class="p">,</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="p">,</span> <span class="kt">Hashable</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
                     <a name="/s:vE4MeowPS_5Model9hashValueSi"></a>
                     <a name="//apple_ref/swift/Property/hashValue" class="dashAnchor"></a>
                     <a class="token" href="#/s:vE4MeowPS_5Model9hashValueSi">hashValue</a>
@@ -468,36 +435,6 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:ZFE4MeowPS_5Modeloi2eeFTxx_Sb"></a>
-                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZFE4MeowPS_5Modeloi2eeFTxx_Sb">==(_:_:)</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Checks if two models are referring to the same instance</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
                     <a name="/s:ZFE4MeowPS_5Model9makeQueryFzFzwx15VirtualInstanceV11MongoKitten5QueryS3_"></a>
                     <a name="//apple_ref/swift/Method/makeQuery(_:)" class="dashAnchor"></a>
                     <a class="token" href="#/s:ZFE4MeowPS_5Model9makeQueryFzFzwx15VirtualInstanceV11MongoKitten5QueryS3_">makeQuery(_:)</a>
@@ -511,14 +448,112 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>A helper to make type-safe query for this model</p>
+                        <p>Make a type-safe query for this model</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">makeQuery</span><span class="p">(</span><span class="n">_</span> <span class="nv">closure</span><span class="p">:</span> <span class="p">((</span><span class="kt">VirtualInstance</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">(</span><span class="kt">Query</span><span class="p">)))</span> <span class="k">rethrows</span> <span class="o">-&gt;</span> <span class="kt">Query</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">makeQuery</span><span class="p">(</span><span class="n">_</span> <span class="nv">closure</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">rethrows</span> <span class="o">-&gt;</span> <span class="kt">Query</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model6removeFzT9limitedToGSqSi_Fzwx15VirtualInstanceV11MongoKitten5Query_T_"></a>
+                    <a name="//apple_ref/swift/Method/remove(limitedTo:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model6removeFzT9limitedToGSqSi_Fzwx15VirtualInstanceV11MongoKitten5Query_T_">remove(limitedTo:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Remove all instances matching the query.</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">remove</span><span class="p">(</span><span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model4findFzT8sortedByGSqV11MongoKitten4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS1_5Query_GCS1_15CollectionSlicex_"></a>
+                    <a name="//apple_ref/swift/Method/find(sortedBy:skipping:limitedTo:withBatchSize:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model4findFzT8sortedByGSqV11MongoKitten4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS1_5Query_GCS1_15CollectionSlicex_">find(sortedBy:skipping:limitedTo:withBatchSize:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs a find operation using a type-safe query.</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">find</span><span class="p">(</span><span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">withBatchSize</span> <span class="nv">batchSize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">CollectionSlice</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model7findOneFzFzwx15VirtualInstanceV11MongoKitten5QueryGSqx_"></a>
+                    <a name="//apple_ref/swift/Method/findOne(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model7findOneFzFzwx15VirtualInstanceV11MongoKitten5QueryGSqx_">findOne(_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs a findOne operation using a type-safe query.</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">findOne</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="k">Self</span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>

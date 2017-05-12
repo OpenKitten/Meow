@@ -14,7 +14,7 @@
     <a title="BaseModel Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p><a href="../index.html">Meow Docs</a> (89% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -176,9 +176,6 @@
                 <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
               </li>
               <li class="nav-group-task">
@@ -243,7 +240,7 @@
             <h1>BaseModel</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">BaseModel</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a></span><span class="p">,</span> <span class="kt">Primitive</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">BaseModel</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a></span><span class="p">,</span> <span class="kt">Convertible</span></code></pre>
 
                 </div>
               </div>
@@ -595,7 +592,7 @@ Note that, if the model has not been changed, the update may not actually get pu
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Compares to Base Models</p>
+                        <p>Provides <code>Equatable</code> conformance. Just calls <code>===</code> because two instances pointing to the same model cannot exist.</p>
 
                       </div>
                       <div class="declaration">
@@ -603,66 +600,6 @@ Note that, if the model has not been changed, the update may not actually get pu
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:ZFE4MeowPS_9BaseModeloi2eeFTGSqx_x_Sb"></a>
-                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModeloi2eeFTGSqx_x_Sb">==(_:_:)</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Compares to Base Models</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">?,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:ZFE4MeowPS_9BaseModeloi2eeFTxGSqx__Sb"></a>
-                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZFE4MeowPS_9BaseModeloi2eeFTxGSqx__Sb">==(_:_:)</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Compares to Base Models</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="k">Self</span><span class="p">?)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -697,66 +634,6 @@ Note that, if the model has not been changed, the update may not actually get pu
                         <div class="language">
                           <p class="aside-title">Swift</p>
                           <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="n">convert</span><span class="o">&lt;</span><span class="kt">DT</span><span class="o">&gt;</span><span class="p">(</span><span class="n">to</span> <span class="nv">type</span><span class="p">:</span> <span class="kt">DT</span><span class="o">.</span><span class="k">Type</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">DT</span><span class="o">.</span><span class="kt">SupportedValue</span><span class="p">?</span> <span class="k">where</span> <span class="kt">DT</span> <span class="p">:</span> <span class="kt">DataType</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:vE4MeowPS_9BaseModel14typeIdentifierVs5UInt8"></a>
-                    <a name="//apple_ref/swift/Property/typeIdentifier" class="dashAnchor"></a>
-                    <a class="token" href="#/s:vE4MeowPS_9BaseModel14typeIdentifierVs5UInt8">typeIdentifier</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Conformance to Primitive</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">typeIdentifier</span><span class="p">:</span> <span class="kt">Byte</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:FE4MeowPS_9BaseModel10makeBinaryFT_GSaVs5UInt8_"></a>
-                    <a name="//apple_ref/swift/Method/makeBinary()" class="dashAnchor"></a>
-                    <a class="token" href="#/s:FE4MeowPS_9BaseModel10makeBinaryFT_GSaVs5UInt8_">makeBinary()</a>
-                    </code>
-                      <span class="declaration-note">
-                        Extension method
-                      </span>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">BaseModel</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a></span><span class="p">,</span> <span class="kt">Primitive</span></code></pre>
 
                         </div>
                       </div>
@@ -810,6 +687,9 @@ Note that, if the model has not been changed, the update may not actually get pu
                       <div class="pointer"></div>
                       <div class="abstract">
                         <p>Removes this object from the database</p>
+
+<p>Before deleting, <code><a href="../Protocols/BaseModel.html#/s:FP4Meow9BaseModel10willDeleteFzT_T_">willDelete()</a></code> is called. <code><a href="../Protocols/BaseModel.html#/s:FP4Meow9BaseModel10willDeleteFzT_T_">willDelete()</a></code> can throw to prevent the deletion.
+When the deletion is complete, <code><a href="../Protocols/BaseModel.html#/s:FP4Meow9BaseModel9didDeleteFzT_T_">didDelete()</a></code> is called.</p>
 
                       </div>
                       <div class="declaration">
@@ -869,7 +749,7 @@ Note that, if the model has not been changed, the update may not actually get pu
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Saves this object</p>
+                        <p>Saves this object to the database</p>
 
                       </div>
                       <div class="declaration">
@@ -879,6 +759,25 @@ Note that, if the model has not been changed, the update may not actually get pu
                           <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">save</span><span class="p">(</span><span class="nv">force</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">false</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>force</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Defaults to <code>false</code>. If set to true, the object is saved even if it has not been changed.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -910,6 +809,37 @@ Errors that happen during deletion will be collected and a <code>Meow.error.dele
                           <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">remove</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">)</span> <span class="k">throws</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The query to apply to the remove operation</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>limit</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The maximum number of objects to remove</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

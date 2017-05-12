@@ -14,7 +14,7 @@
     <a title="VirtualModelInstance Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p><a href="../index.html">Meow Docs</a> (89% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -176,9 +176,6 @@
                 <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
-              </li>
-              <li class="nav-group-task">
                 <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
               </li>
               <li class="nav-group-task">
@@ -241,7 +238,17 @@
         <section>
           <section class="section">
             <h1>VirtualModelInstance</h1>
-            <p>Undocumented</p>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">VirtualModelInstance</span></code></pre>
+
+                </div>
+              </div>
+            <p>A VirtualInstance is generated for every Serializable by Meow.</p>
+
+<p>It serves as a generator and building block of the type safe query system.</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
 
           </section>
           <section class="section task-group-section">
@@ -260,8 +267,36 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Initialise a VirtualInstance using the given KeyPrefix</p>
 
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="nf">init</span><span class="p">(</span><span class="nv">keyPrefix</span><span class="p">:</span> <span class="kt">String</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>keyPrefix</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The keyPrefix is prefixed to all query keys as returned from the VirtualInstance, for the
+purpose of being able to embed structs.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

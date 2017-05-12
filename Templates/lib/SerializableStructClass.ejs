@@ -100,7 +100,6 @@ extension <%- serializable.name %> : SerializableToDocument {
 	<%- include('KeyEnum', {serializable}); %>
 	<%- include('Values', {serializable}); %>
 	<%- include('VirtualInstanceStructClass', {serializable}); %>
-	<%- include('QueryBuilder', {serializable}) %>
 }
 
 extension <%- serializable.name %> : CustomStringConvertible {

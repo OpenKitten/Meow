@@ -25,6 +25,7 @@ extension ValueConvertible {
 }
 
 extension GridFS {
+    /// The default Meow GridFS instance.
     public static var `default`: GridFS = {
         return try! Meow.database.makeGridFS()
     }()

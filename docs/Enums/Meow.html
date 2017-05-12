@@ -14,7 +14,7 @@
     <a title="Meow Enum Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Meow Docs</a> (59% documented)</p>
+        <p><a href="../index.html">Meow Docs</a> (89% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -174,9 +174,6 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/SerializableToDocument.html">SerializableToDocument</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Other Protocols.html#/s:P4Meow17VirtualComparable">VirtualComparable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/VirtualModelInstance.html">VirtualModelInstance</a>
@@ -403,7 +400,7 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>An ObjectPool that is used to link models in-memory</p>
+                        <p>The Object Pool instance. For more information, look at the <code><a href="../Enums/Meow/ObjectPool.html">ObjectPool</a></code> documentation.</p>
 
                       </div>
                       <div class="declaration">
@@ -430,14 +427,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The time interval, in seconds, at which the maintenance loop runs. Defaults to 5.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Meow</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">maintenanceInterval</span><span class="p">:</span> <span class="kt">TimeInterval</span> <span class="o">=</span> <span class="mi">5</span></code></pre>
 
                         </div>
                       </div>
@@ -457,14 +454,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>The minimum age an object must have before it can be autosaved, in seconds. Defualts to 5.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">Meow</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="k">var</span> <span class="nv">minimumAutosaveAge</span><span class="p">:</span> <span class="kt">TimeInterval</span> <span class="o">=</span> <span class="mi">5</span></code></pre>
 
                         </div>
                       </div>

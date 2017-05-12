@@ -9,10 +9,17 @@ include('lib/MeowCore');
 supportedPrimitives.forEach(primitive => {
 	%>
 extension <%- primitive %> : Serializable {
+    /// Tries to initialize a <%- primitive %> from a BSON Primitive
+    ///
+    /// - parameter source: The BSON primitive
+    /// - throws: When the primitive is of the wrong type
 	public init(restoring source: Primitive) throws {
 		self = try Meow.Helpers.requireValue(<%- primitive %>(source), keyForError: "primitive <%- primitive %>")
 	}
-	
+
+    /// Serializes the <%- primitive %> into a BSON primitive
+    ///
+    /// It just returns `self`
 	public func serialize() -> BSON.Primitive {
 		return self
 	}
