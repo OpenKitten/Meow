@@ -157,7 +157,7 @@ public enum Meow {
         /// The internal storage that's used to hold metadata and references to objects
         internal private(set) var storage = [ObjectId: (instance: Weak<AnyObject>, instantiation: Date, hash: Int?)](minimumCapacity: 1000)
         
-        /// A set of unsaved ObjectIds that need to be saves, still
+        /// A set of unsaved ObjectIds that need to be saved, still
         private var unsavedObjectIds = Set<ObjectId>()
         
         /// A set of entity's ObjectIds that are invalidated because they were removed
