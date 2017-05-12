@@ -164,7 +164,7 @@ public enum Meow {
         private var invalidatedObjectIds = Set<ObjectId>()
         
         /// A set of entity's ObjectIds that are currently being instantiated
-        private var currentlyInstantiating = Set<ObjectId>()
+        private var currentlyInstantiating = [ObjectId: Thread]()
         
         /// Generated a new ObjectId
         public func newObjectId() -> ObjectId {
@@ -194,16 +194,16 @@ public enum Meow {
                 return existingInstance
             }
             
-            guard !currentlyInstantiating.contains(id) else {
+            guard currentlyInstantiating[id] == Thread.current else {
                 throw Meow.Error.infiniteReferenceLoop(type: M.self, id: id)
             }
             
-            currentlyInstantiating.insert(id)
+            currentlyInstantiating[id] = Thread.current
             
             let instance = try M(restoring: document)
             print("🐈 Returning fresh instance \(instance)")
             
-            currentlyInstantiating.remove(id)
+            currentlyInstantiating[id] = nil
             
             self.pool(instance, hash: document.meowHash)
             return instance
