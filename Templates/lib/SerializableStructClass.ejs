@@ -106,6 +106,10 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 extension <%- serializable.name %> : CustomStringConvertible {
 	public var description: String {
-		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	<% if (serializable.kind == "class") { %>
+		return "<%- serializable.name %><\(ObjectIdentifier(self).hashValue),\((self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString())>"
+	<% } else { %>
+		return "<%- serializable.name %><" + (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString() + ">"
+	<% } %>
 	}
 }
