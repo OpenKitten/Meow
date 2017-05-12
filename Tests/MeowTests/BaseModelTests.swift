@@ -7,3 +7,16 @@
 //
 
 import Foundation
+import XCTest
+import Meow
+import MeowSample
+
+class ModelTests : XCTestCase {
+    override func setUp() {
+        try! Meow.init("mongodb://localhost")
+    }
+    
+    func testFind() throws {
+        
+    }
+}

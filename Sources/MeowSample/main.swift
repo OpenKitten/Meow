@@ -1,7 +1,7 @@
 import Meow
 import Foundation
 
-try Meow.init("mongodb://localhost:27017/meow-sample", meows)
+try Meow.init("mongodb://localhost:27017/meow-sample")
 
 do {
     var problems = try Meow.validateDatabaseIntegrity()

@@ -21,7 +21,8 @@ class Tiger : Model {
     
 
 // sourcery:inline:auto:Tiger.Meow
-	required init(restoring source: BSON.Primitive) throws {
+	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
+	public required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -30,8 +31,8 @@ class Tiger : Model {
 		self._id = try document.unpack("_id")
 		self.breed = try document.unpack(Key.breed.keyString)
 	}
-	
-	required init(newFrom source: BSON.Primitive) throws {
+
+	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -42,7 +43,7 @@ class Tiger : Model {
 
 	
 	
-	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
+	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
@@ -58,7 +59,8 @@ class CatReferencing : Model {
     }
 
 // sourcery:inline:auto:CatReferencing.Meow
-	required init(restoring source: BSON.Primitive) throws {
+	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
+	public required init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -67,8 +69,8 @@ class CatReferencing : Model {
 		self._id = try document.unpack("_id")
 		self.cat = try document.unpack(Key.cat.keyString)
 	}
-	
-	required init(newFrom source: BSON.Primitive) throws {
+
+	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -79,7 +81,7 @@ class CatReferencing : Model {
 
 	
 	
-	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
+	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)

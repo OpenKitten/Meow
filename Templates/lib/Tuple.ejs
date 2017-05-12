@@ -1,19 +1,19 @@
 // MARK: Tuple.ejs
 extension Document {
-	mutating func pack(_ tuple: <%- tupleName.unwrappedTypeName %>?, as key: String) {
+	public mutating func pack(_ tuple: <%- tupleName.unwrappedTypeName %>?, as key: String) {
 		guard let tuple = tuple else {
 			self[key] = nil
 			return
 		}
-		
+
 		var document: Document = [:]-%>
 		<% tuple.elements.forEach(element => { %>
 		document.pack(tuple.<%- element.name %>, as: "<%- element.name %>")<% -%>
 		<% }) %>
 		self[key] = document
 	}
-	
-	func unpack(_ key: String) throws -> <%- tupleName.unwrappedTypeName %> {
+
+	public func unpack(_ key: String) throws -> <%- tupleName.unwrappedTypeName %> {
 		guard let document = Document(self[key]) else {
 			throw Meow.Error.cannotDeserialize(type: Document.self, source: self[key], expectedPrimitive: Document.self)
 		}

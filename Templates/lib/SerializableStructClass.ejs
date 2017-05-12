@@ -5,7 +5,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 	<% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Meow<% } %>
 	<%_ -%>
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	<% if (serializable.kind == "class") { %>required <% }%>init(restoring source: BSON.Primitive) throws {
+	public <% if (serializable.kind == "class") { %>required <% }%>init(restoring source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -22,8 +22,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 		});
 		%>
 	}
-	
-	<% if (serializable.kind == "class") { %>required <% }%>init(newFrom source: BSON.Primitive) throws {
+
+	public <% if (serializable.kind == "class") { %>required <% }%>init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -41,7 +41,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 	<% if (serializable.kind == "class") { %>
 	<% if (serializable.based["Model"]) { %>
-	var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
+	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
@@ -50,7 +50,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		// sourcery:end
 	<% } %>
 
-	func serialize() -> Document {
+	public func serialize() -> Document {
 		var document: Document = [:]
 		<% if (serializable.based["Model"]) { %>document.pack(self._id, as: "_id")<% }
 
@@ -66,8 +66,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 		%>
 		return document
 	}
-	
-	static func validateUpdate(with document: Document) throws {
+
+	public static func validateUpdate(with document: Document) throws {
 		let keys = document.keys
 		<%_ serializable.variables.forEach(variable => {
 			if (variable.isComputed || variable.isStatic) { return; } -%>
@@ -76,13 +76,13 @@ extension <%- serializable.name %> : SerializableToDocument {
 		}
 		<%_ }) -%>
 	}
-	
+
 	<% if (serializable.kind == "struct") { %>mutating <% } %>func update(with document: Document) throws {
 		try <%- serializable.name %>.validateUpdate(with: document)
-		
+
 		for key in document.keys {
 			switch key {
-			<%_ serializable.variables.forEach(variable => { 
+			<%_ serializable.variables.forEach(variable => {
 				if (variable.isComputed || variable.isStatic) { return; }
 				-%>
 			case Key.<%- variable.name %>.keyString:
@@ -94,8 +94,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 	}
 
 	<% if (serializable.based["Model"]) { %>
-	static let collection: MongoKitten.Collection = Meow.database["<%- underscoreCase(uncamel(pluralize(serializable.name))) %>"]
-	
+	public static let collection: MongoKitten.Collection = Meow.database["<%- underscoreCase(uncamel(pluralize(serializable.name))) %>"]
+
 	<%- include('ModelResolvingFunctions', {serializable}); %>
 	<% } %>
 
@@ -105,7 +105,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 }
 
 extension <%- serializable.name %> : CustomStringConvertible {
-	var description: String {
+	public var description: String {
 		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
 	}
 }

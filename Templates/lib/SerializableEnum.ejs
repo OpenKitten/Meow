@@ -1,6 +1,6 @@
 // MARK: SerializableEnum.ejs
 extension <%- serializable.name %> : Serializable {
-	init(restoring source: BSON.Primitive) throws {
+	public init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) else {
 				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: String.self)
 		}
@@ -12,14 +12,14 @@ extension <%- serializable.name %> : Serializable {
 			default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
 		}
 	}
-	
-	func serialize() -> BSON.Primitive {
+
+	public func serialize() -> BSON.Primitive {
 		switch self {
 			<% serializable.cases.forEach(enumCase => { -%>
 		case .<%- enumCase.name %>: return "<%- enumCase.name %>"
 			<%})%>
 		}
 	}
-	
+
 	<%- include('VirtualInstanceEnum', {serializable}); %>
 }

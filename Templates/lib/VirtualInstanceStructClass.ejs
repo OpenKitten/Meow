@@ -1,8 +1,8 @@
 // MARK: VirtualInstanceStructClass.ejs
 <% let inheritedProtocols = modelProtocols.filter(p => serializable.implements[p.name]); %>
 
-struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'VirtualInstance').join("") : '' %> {
-	var keyPrefix: String
+public struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'VirtualInstance').join("") : '' %> {
+	public var keyPrefix: String
 
 	<% serializable.allVariables.forEach(variable => {
 			if(variable.isComputed || variable.isStatic) { return; } %>
@@ -20,7 +20,7 @@ struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.length > 0 ?
 		 }
 	}) %>
 
-	init(keyPrefix: String = "") {
+	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance

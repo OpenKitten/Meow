@@ -6,18 +6,18 @@ modelProtocols.forEach(protocol => { %>
 // sourcery:inline:auto:<%- protocol.name %>.Meow
 	associatedtype VirtualInstance : <%- protocol.name %>VirtualInstance
 	associatedtype Values : <%- protocol.name %>Values
-	
+
 // sourcery:end
-	
+
 <% const superModelProtocols = protocol.inheritedTypes.filter(t => modelProtocols.find(p => p.name == t)); %>
-	
-protocol <%- protocol.name %>Values : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "Values").join(",") : "ModelValues" %> {
+
+public protocol <%- protocol.name %>Values : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "Values").join(",") : "ModelValues" %> {
 	<%_ protocol.variables.forEach(variable => { -%>
 	var <%- variable.name -%>: <%- variable.unwrappedTypeName %>? { get set }
 	<%_ }) %>
 }
 
-protocol <%- protocol.name %>VirtualInstance : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "VirtualInstance").join(",") : "VirtualModelInstance" %> {
+public protocol <%- protocol.name %>VirtualInstance : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "VirtualInstance").join(",") : "VirtualModelInstance" %> {
 	<%_ protocol.variables.forEach(variable => {
 	if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 		 if (numberTypes.includes(variable.unwrappedTypeName)) {
