@@ -10,13 +10,13 @@ public struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.lengt
 		 <%
 		 if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 			 if (numberTypes.includes(variable.unwrappedTypeName)) {
-				 %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.<%- variable.name %>.keyString) } <%
+				 %>public var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.<%- variable.name %>.keyString) } <%
 			 } else {
-				 %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+				 %>public var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
 			 }
 		 } else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 			 ensureSerializable(variable.type);
-			 %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			 %>public var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
 		 }
 	}) %>
 

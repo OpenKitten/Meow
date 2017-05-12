@@ -19,7 +19,6 @@ public class Tiger : Model {
         self.breed = breed
     }
     
-
 // sourcery:inline:auto:Tiger.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive) throws {

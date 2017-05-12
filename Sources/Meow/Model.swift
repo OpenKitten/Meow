@@ -134,6 +134,13 @@ extension Model {
     public static func findOne(_ query: QueryBuilder) throws -> Self? {
         return try findOne(makeQuery(query))
     }
+    
+    /// Performs a findOne operation using a type-safe query.
+    ///
+    /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
+    public static func count(_ query: QueryBuilder) throws -> Int {
+        return try count(makeQuery(query))
+    }
 }
 
 extension BaseModel {

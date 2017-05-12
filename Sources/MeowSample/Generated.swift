@@ -175,15 +175,15 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 		 /// name: String
-		  var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
+		 public var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
 		 /// country: Country?
-		  var country: Country.VirtualInstance { return Country.VirtualInstance(keyPrefix: keyPrefix + Key.country.keyString) } 
+		 public var country: Country.VirtualInstance { return Country.VirtualInstance(keyPrefix: keyPrefix + Key.country.keyString) } 
 		 /// origin: Origin?
-		  var origin: Origin.VirtualInstance { return Origin.VirtualInstance(keyPrefix: keyPrefix + Key.origin.keyString) } 
+		 public var origin: Origin.VirtualInstance { return Origin.VirtualInstance(keyPrefix: keyPrefix + Key.origin.keyString) } 
 		 /// kaas: (String,String,String)
 		 
 		 /// geval: Thing?
-		  var geval: Thing.VirtualInstance { return Thing.VirtualInstance(keyPrefix: keyPrefix + Key.geval.keyString) } 
+		 public var geval: Thing.VirtualInstance { return Thing.VirtualInstance(keyPrefix: keyPrefix + Key.geval.keyString) } 
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -345,9 +345,9 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 		 /// name: String
-		  var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
+		 public var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
 		 /// breed: Breed
-		  var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
 		 /// bestFriend: Reference<Cat>?
 		 
 		 /// family: [Cat]
@@ -595,7 +595,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 		 /// breed: Breed
-		  var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -843,9 +843,9 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 		 /// henk: String
-		  var henk: VirtualString { return VirtualString(name: keyPrefix + Key.henk.keyString) } 
+		 public var henk: VirtualString { return VirtualString(name: keyPrefix + Key.henk.keyString) } 
 		 /// fred: Int
-		  var fred: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.fred.keyString) } 
+		 public var fred: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.fred.keyString) } 
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix

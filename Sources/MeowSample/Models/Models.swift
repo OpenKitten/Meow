@@ -1,7 +1,7 @@
 import Meow
 import Foundation
 
-public class Breed : Model {
+public class Breed : Model, ExpressibleByStringLiteral {
     public enum Country : String {
       case ethopia, greece, unitedStates, brazil
     }
@@ -13,6 +13,18 @@ public class Breed : Model {
     public struct Thing {
         public var henk: String
         public var fred: Int
+    }
+    
+    public required convenience init(stringLiteral value: String) {
+        self.init(name: value)
+    }
+    
+    public required convenience init(unicodeScalarLiteral value: String) {
+        self.init(name: value)
+    }
+    
+    public required convenience init(extendedGraphemeClusterLiteral value: String) {
+        self.init(name: value)
     }
 
     public var name: String
