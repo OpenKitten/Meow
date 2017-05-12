@@ -123,6 +123,49 @@ public enum Meow {
     ///
     /// It also functions as the intelligent brain behind autosaving, manages ObjectId's amongst other functions.
     public class ObjectPool {
+        private class RunningInstantiation {
+            enum Result {
+                case success(BaseModel)
+                case error(Swift.Error)
+            }
+            
+            var thread = Thread.current
+            private var lock = NSLock()
+            var result: Result?
+            
+            init() {
+                lock.lock()
+            }
+            
+            func `do`<M : BaseModel>(_ closure: () throws -> (M)) throws -> M {
+                do {
+                    let m = try closure()
+                    result = .success(m)
+                    lock.unlock()
+                    return m
+                } catch {
+                    result = .error(error)
+                    throw error
+                }
+            }
+            
+            func await() throws -> BaseModel {
+                lock.lock()
+                lock.unlock()
+                
+                switch result! {
+                case .success(let m): return m
+                case .error(let error): throw error
+                }
+            }
+            
+            deinit {
+                if result == nil {
+                    lock.unlock()
+                }
+            }
+        }
+        
         /// The queue used to prevent crashes in mutations
         private let objectPoolMutationQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
         
@@ -164,7 +207,7 @@ public enum Meow {
         private var invalidatedObjectIds = Set<ObjectId>()
         
         /// A set of entity's ObjectIds that are currently being instantiated
-        private var currentlyInstantiating = [ObjectId: Thread]()
+        private var currentlyInstantiating = [ObjectId: RunningInstantiation]()
         
         /// Generated a new ObjectId
         public func newObjectId() -> ObjectId {
@@ -194,19 +237,40 @@ public enum Meow {
                 return existingInstance
             }
             
-            guard currentlyInstantiating[id] == Thread.current else {
-                throw Meow.Error.infiniteReferenceLoop(type: M.self, id: id)
+            let instantiation: RunningInstantiation = try objectPoolMutationQueue.sync {
+                let instantiation = currentlyInstantiating[id]
+                guard instantiation == nil || instantiation!.thread != Thread.current else {
+                    throw Meow.Error.infiniteReferenceLoop(type: M.self, id: id)
+                }
+                
+                if let instantiation = instantiation {
+                    return instantiation
+                } else {
+                    let instantiation = RunningInstantiation()
+                    currentlyInstantiating[id] = instantiation
+                    return instantiation
+                }
             }
             
-            currentlyInstantiating[id] = Thread.current
+            if instantiation.thread != Thread.current {
+                print("🐈 Waiting for instance from other thread")
+                let instance = try instantiation.await() as! M
+                print("🐈 Returning \(instance) from instantiation in other thread")
+                return instance
+            }
             
-            let instance = try M(restoring: document)
-            print("🐈 Returning fresh instance \(instance)")
-            
-            currentlyInstantiating[id] = nil
-            
-            self.pool(instance, hash: document.meowHash)
-            return instance
+            return try instantiation.do {
+                let instance = try M(restoring: document)
+                print("🐈 Returning fresh instance \(instance)")
+                
+                self.pool(instance, hash: document.meowHash)
+                
+                objectPoolMutationQueue.sync {
+                    currentlyInstantiating[id] = nil
+                }
+                
+                return instance
+            }
         }
         
         /// Stored an entity in the pool
