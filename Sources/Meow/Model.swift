@@ -248,6 +248,9 @@ extension BaseModel {
     }
     
     /// Returns all objects matching the query
+    ///
+    /// - parameter query: The query to compare the database entities with
+    /// - parameter sort: The order to sort the entities by
     public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> CollectionSlice<Self> {
         return try collection.find(query, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize).flatMap { document in
             do {

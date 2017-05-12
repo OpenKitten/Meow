@@ -2,10 +2,25 @@
 <% let inheritedProtocols = modelProtocols.filter(p => serializable.implements[p.name]); %>
 
 public struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'VirtualInstance').join("") : '' %> {
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
+		<% if(models.includes(serializable)) { %>
+		return (lhs.keyPrefix + ".$id") == rhs?._id
+		<% } else { %>
+		return lhs.keyPrefix == rhs?.serialize()
+		<% } %>
+	}
+
 	public var keyPrefix: String
 
+	<% if(models.includes(serializable)) { %>
+	public var _id: VirtualObjectId {
+		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+	}
+	<% } %>
+
 	<% serializable.allVariables.forEach(variable => {
-			if(variable.isComputed || variable.isStatic) { return; } %>
+			if(variable.isComputed || variable.isStatic || variable.name == "_id") { return; } %>
 		 /// <%- variable.name %>: <%- variable.typeName.name %>
 		 <%
 		 if (supportedPrimitives.includes(variable.unwrappedTypeName)) {

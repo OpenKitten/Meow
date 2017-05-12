@@ -19,7 +19,6 @@ public protocol VirtualVariable {
     
     /// The name (key) of the variable.
     var name: String { get }
-    
 }
 
 /// Generates a query which compares if a BSON primitive is equal to the property of a virutal variable
