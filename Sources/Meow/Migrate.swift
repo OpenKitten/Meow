@@ -1,4 +1,5 @@
 import MongoKitten
+import BSON
 import Foundation
 
 extension Meow {
@@ -6,7 +7,7 @@ extension Meow {
     fileprivate static var migrationsCollection: MongoKitten.Collection { return Meow.database["meow_migrations"] }
     
     /// Perform a migration
-    public static func migrate(_ description: String, on model: BaseModel.Type, migration: (Migrator) throws -> ()) throws {
+    public static func migrate<M : Model>(_ description: String, on model: M.Type, migration: (Migrator<M>) throws -> ()) throws {
         if let migrator = try Migrator("\(model.collection.name) - \(description)", on: model) {
             try migrator.execute(migration)
         } else {
@@ -21,16 +22,13 @@ extension Meow {
 /// You do not create instances of `Migrator` yourself. When you want to perform a migration, call
 /// `Meow.migrate(...)`. The closure you pass to the `migrate(...)` method will be called with an instance of `Migrator`
 /// if the migration is necessary.
-public final class Migrator {
+public final class Migrator<M : Model> {
     
     /// The migration description - must be unique but human readable
     ///
     /// The description is used, together with the target collection name, as `_id` field in the migrations collection
     /// to identify the migration.
     public private(set) var description: String
-    
-    /// The model type this migration affects
-    public private(set) var model: BaseModel.Type
     
     /// A single migration step
     private enum Step {
@@ -71,18 +69,17 @@ public final class Migrator {
     private var plan = [Step]()
     
     /// Initializes a new migration. Returns nil if the migration has already been performed
-    fileprivate init?(_ description: String, on model: BaseModel.Type) throws {
+    fileprivate init?(_ description: String, on model: M.Type) throws {
         if try Meow.migrationsCollection.count("_id" == description) > 0 {
             return nil
         }
         
         self.description = description
-        self.model = model
     }
     
     /// Executes the migration. If there are no models of the given type, the migration will be skipped.
     fileprivate func execute(_ migration: (Migrator) throws -> ()) throws {
-        guard try model.collection.count() > 0 else {
+        guard try M.collection.count() > 0 else {
             print("🐈 Skipping migration \"\(description)\"")
             try Meow.migrationsCollection.insert([
                 "_id": description,
@@ -113,7 +110,7 @@ public final class Migrator {
     /// Runs the migration plan.
     private func runPlan() throws {
         for step in plan {
-            try  step.execute(on: model)
+            try step.execute(on: M.self)
         }
     }
     
@@ -175,5 +172,24 @@ public final class Migrator {
     /// - parameter property: The database name of the property to remove
     public func remove(_ property: String) {
         addStep(.update(["$unset": [property: ""]]))
+    }
+    
+    /// Converts a certain property, which currently contains an ObjectId, to a reference (`DBRef`).
+    ///
+    /// Because `DBRef`s are used for both `var ref: MyModel` and `var ref: Reference<MyModel>`-style references,
+    /// this migration is suitable for both.
+    ///
+    /// - parameter property: The database name of the property to convert
+    /// - parameter target: The target entity to reference
+    public func mapObjectIdToReference(_ property: String, target: BaseModel.Type) {
+        addStep(.map([{ document in
+            var document = document
+            guard let objectId = ObjectId(document[property]) else {
+                return document
+            }
+            
+            document[property] = DBRef(referencing: objectId, inCollection: target.collection)
+            return document
+            }]))
     }
 }

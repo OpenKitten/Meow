@@ -6,6 +6,14 @@ import MongoKitten
 import BSON
 import Foundation
 
+// MARK: MeowCore.ejs
+
+
+// MARK: - General Information
+// Supported Primitives: ObjectId, String, Int, Int32, Bool, Document, Double, Data, Binary, Date, RegularExpression
+// Sourcery Types: extension DBRef, extension DispatchTime, extension Document, extension Double, struct File, extension GridFS, enum IndexAttribute, extension Int, extension Int32, enum Meow, enum Meow.Error, enum Meow.Helpers, class Meow.ObjectPool, enum Meow.ValidationError, class Migrator, enum Migrator.Step, extension MongoKitten.Collection, extension ObjectId, struct Reference, extension String, struct VirtualArray, struct VirtualBool, struct VirtualData, struct VirtualDate, struct VirtualDocument, struct VirtualEmbeddablesArray, struct VirtualNumber, struct VirtualObjectId, struct VirtualString, struct Weak
+
+// MARK: SupportedPrimitives.ejs
 
 extension ObjectId : Serializable {
     /// Tries to initialize a ObjectId from a BSON Primitive
@@ -194,3 +202,24 @@ extension RegularExpression : Serializable {
 	}
 }
 	
+// MARK: Migrator.ejs
+
+extension Migrator {
+	
+		public func rename(property: M.Key, to newName: String) {
+			self.rename(property.keyString, to: newName)
+		}
+		
+		public func map(property: M.Key, transform: @escaping (BSON.Primitive?) throws -> (BSON.Primitive?)) {
+			self.map(property.keyString, transform)
+		}
+		
+		public func remove(property: M.Key) {
+			self.remove(property.keyString)
+		}
+		
+		public func mapObjectIdToReference(property: M.Key, target : BaseModel.Type) {
+			self.mapObjectIdToReference(property.keyString, target: target)
+		}
+		
+}
