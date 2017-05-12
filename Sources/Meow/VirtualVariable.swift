@@ -1,10 +1,6 @@
 import Foundation
 import MongoKitten
 
-#if os(Linux)
-    public typealias NSRegularExpression = RegularExpression
-#endif
-
 /// A VirtualInstance is generated for every Serializable by Meow.
 ///
 /// It serves as a generator and building block of the type safe query system.
