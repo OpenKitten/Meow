@@ -77,7 +77,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		<%_ }) -%>
 	}
 
-	<% if (serializable.kind == "struct") { %>mutating <% } %>func update(with document: Document) throws {
+	public <% if (serializable.kind == "struct") { %>mutating <% } %>func update(with document: Document) throws {
 		try <%- serializable.name %>.validateUpdate(with: document)
 
 		for key in document.keys {

@@ -57,7 +57,7 @@ extension Breed : SerializableToDocument {
 		}
 	}
 
-	func update(with document: Document) throws {
+	public func update(with document: Document) throws {
 		try Breed.validateUpdate(with: document)
 
 		for key in document.keys {
@@ -235,7 +235,7 @@ extension Cat : SerializableToDocument {
 		}
 	}
 
-	func update(with document: Document) throws {
+	public func update(with document: Document) throws {
 		try Cat.validateUpdate(with: document)
 
 		for key in document.keys {
@@ -391,7 +391,7 @@ extension CatReferencing : SerializableToDocument {
 		}
 	}
 
-	func update(with document: Document) throws {
+	public func update(with document: Document) throws {
 		try CatReferencing.validateUpdate(with: document)
 
 		for key in document.keys {
@@ -513,7 +513,7 @@ extension Tiger : SerializableToDocument {
 		}
 	}
 
-	func update(with document: Document) throws {
+	public func update(with document: Document) throws {
 		try Tiger.validateUpdate(with: document)
 
 		for key in document.keys {
@@ -759,7 +759,7 @@ extension Breed.Thing : SerializableToDocument {
 		}
 	}
 
-	mutating func update(with document: Document) throws {
+	public mutating func update(with document: Document) throws {
 		try Breed.Thing.validateUpdate(with: document)
 
 		for key in document.keys {

@@ -1,32 +1,32 @@
 import Meow
 import Foundation
 
-class Breed : Model {
-    enum Country : String {
+public class Breed : Model {
+    public enum Country : String {
       case ethopia, greece, unitedStates, brazil
     }
 
-    enum Origin {
+    public enum Origin {
       case natural, mutation, crossbreed, hybrid, hybridCrossbreed
     }
     
-    struct Thing {
-        var henk: String
-        var fred: Int
+    public struct Thing {
+        public var henk: String
+        public var fred: Int
     }
 
-    var name: String
-    var country: Country?
-    var origin: Origin?
-    var kaas: (String,String,String)
-    var geval: Thing?
+    public var name: String
+    public var country: Country?
+    public var origin: Origin?
+    public var kaas: (String,String,String)
+    public var geval: Thing?
     
-    init(name: String) {
+    public init(name: String) {
       self.name = name
         self.kaas = (name, name, name)
     }
 
-    func purr() {
+    public func purr() {
         print("Purr.")
     }
 
