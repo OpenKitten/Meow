@@ -49,6 +49,18 @@ class CRUDTests : XCTestCase {
         XCTAssertNil(try Tiger.findOne("_id" == tiger._id))
     }
     
+    func testDeleteBulk() throws {
+        try testFindBulk()
+        
+        let tigerBreed = try Breed.findOne()
+        
+        try Tiger.remove(limitedTo: 2) {
+            $0.breed == tigerBreed
+        }
+        
+        XCTAssertEqual(try Tiger.count(), 2)
+    }
+    
     func testFindBulk() throws {
         let tigerBreed = Breed(name: "Normal")
         try tigerBreed.save()
