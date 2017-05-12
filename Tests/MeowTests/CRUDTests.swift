@@ -86,6 +86,12 @@ class CRUDTests : XCTestCase {
         }
         
         XCTAssertEqual(counter, 4)
+        
+        let results = try Tiger.find(limitedTo: 10) { $0.breed == tigerBreed }
+        
+        for _ in results {
+            counter += 1
+        }
     }
     
     func testFindOne() throws {
