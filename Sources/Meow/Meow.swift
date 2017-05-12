@@ -337,6 +337,10 @@ public enum Meow {
         
         /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
+            guard storage[instance._id] != nil else {
+                return
+            }
+            
             do {
                 try instance.save()
             } catch {
