@@ -119,7 +119,7 @@ class CRUDTests : XCTestCase {
 //        
 //        XCTAssertEqual(tigerCount, 1)
         
-        tigerCount = try Tiger.count { tiger in
+        var tigerCount = try Tiger.count { tiger in
             return tiger.breed == tigerBreed
         }
         
