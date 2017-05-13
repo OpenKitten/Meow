@@ -113,11 +113,11 @@ class CRUDTests : XCTestCase {
         let tiger = Tiger(breed: tigerBreed)
         try tiger.save()
         
-        var tigerCount = try Tiger.count { tiger in
-            return tiger.breed.name == "Normal"
-        }
-        
-        XCTAssertEqual(tigerCount, 1)
+//        var tigerCount = try Tiger.count { tiger in
+//            return tiger.breed.name == "Normal"
+//        }
+//        
+//        XCTAssertEqual(tigerCount, 1)
         
         tigerCount = try Tiger.count { tiger in
             return tiger.breed == tigerBreed
