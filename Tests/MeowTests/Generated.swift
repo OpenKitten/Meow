@@ -8,7 +8,7 @@
 
 // MARK: - General Information
 // Supported Primitives: ObjectId, String, Int, Int32, Bool, Document, Double, Data, Binary, Date, RegularExpression
-// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class CRUDTests, class Cat, class CatReferencing, class Tiger
+// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class CRUDTests, class Cat, class CatReferencing, enum SocialMedia, class Tiger
 import Foundation
 import Meow
 import ExtendedJSON
@@ -229,6 +229,7 @@ extension Cat : SerializableToDocument {
 		document.pack(self._id, as: "_id")
 		document.pack(self.name, as: Key.name.keyString)
 		document.pack(self.breed, as: Key.breed.keyString)
+		document.pack(self.social, as: Key.social.keyString)
 		document.pack(self.bestFriend, as: Key.bestFriend.keyString)
 		document.pack(self.family, as: Key.family.keyString)
 		return document
@@ -241,6 +242,9 @@ extension Cat : SerializableToDocument {
 		}
 		if keys.contains(Key.breed.keyString) {
 			_ = (try document.unpack(Key.breed.keyString)) as Breed
+		}
+		if keys.contains(Key.social.keyString) {
+			_ = (try? document.unpack(Key.social.keyString)) as SocialMedia?
 		}
 		if keys.contains(Key.bestFriend.keyString) {
 			_ = (try? document.unpack(Key.bestFriend.keyString)) as Reference<Cat>?
@@ -259,6 +263,8 @@ extension Cat : SerializableToDocument {
 				self.name = try document.unpack(Key.name.keyString)
 			case Key.breed.keyString:
 				self.breed = try document.unpack(Key.breed.keyString)
+			case Key.social.keyString:
+				self.social = try document.unpack(Key.social.keyString)
 			case Key.bestFriend.keyString:
 				self.bestFriend = try document.unpack(Key.bestFriend.keyString)
 			case Key.family.keyString:
@@ -286,6 +292,7 @@ extension Cat : SerializableToDocument {
 		case _id
 		case name = "name"
 		case breed = "breed"
+		case social = "social"
 		case bestFriend = "best_friend"
 		case family = "family"
 
@@ -297,13 +304,14 @@ extension Cat : SerializableToDocument {
 			case ._id: return ObjectId.self
 			case .name: return String.self
 			case .breed: return Breed.self
+			case .social: return SocialMedia.self
 			case .bestFriend: return Reference<Cat>.self
 			case .family: return [Cat].self
 			}
 		}
 
 		public static var all: [Key] {
-			return [._id, .name, .breed, .bestFriend, .family]
+			return [._id, .name, .breed, .social, .bestFriend, .family]
 		}
 	}
 
@@ -322,6 +330,7 @@ extension Cat : SerializableToDocument {
 
 		var name: String?
 		var breed: Breed?
+		var social: SocialMedia?
 		var bestFriend: Reference<Cat>?
 		var family: [Cat]?
 
@@ -330,6 +339,7 @@ extension Cat : SerializableToDocument {
 			var document: Document = [:]			
 			document.pack(self.name, as: Key.name.keyString)
 			document.pack(self.breed, as: Key.breed.keyString)
+			document.pack(self.social, as: Key.social.keyString)
 			document.pack(self.bestFriend, as: Key.bestFriend.keyString)
 			document.pack(self.family, as: Key.family.keyString)
 			return document
@@ -342,6 +352,8 @@ extension Cat : SerializableToDocument {
 					self.name = try document.unpack(Key.name.keyString)
 				case Key.breed.keyString:
 					self.breed = try document.unpack(Key.breed.keyString)
+				case Key.social.keyString:
+					self.social = try document.unpack(Key.social.keyString)
 				case Key.bestFriend.keyString:
 					self.bestFriend = try document.unpack(Key.bestFriend.keyString)
 				case Key.family.keyString:
@@ -376,6 +388,8 @@ public struct VirtualInstance : VirtualModelInstance {
 		 public var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
 		 /// breed: Breed
 		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+		 /// social: SocialMedia?
+		 public var social: SocialMedia.VirtualInstance { return SocialMedia.VirtualInstance(keyPrefix: keyPrefix + Key.social.keyString) } 
 		 /// bestFriend: Reference<Cat>?
 		 
 		 /// family: [Cat]
@@ -678,27 +692,29 @@ extension Tiger : CustomStringConvertible {
 // MARK: SerializableEnum.ejs
 extension Breed.Country : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
-		guard let rawValue = String(source) else {
-				throw Meow.Error.cannotDeserialize(type: Breed.Country.self, source: source, expectedPrimitive: String.self)
+		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+			throw Meow.Error.cannotDeserialize(type: Breed.Country.self, source: source, expectedPrimitive: String.self)
 		}
 
 		switch rawValue {
-			 case "ethopia": self = .ethopia
-			 case "greece": self = .greece
-			 case "unitedStates": self = .unitedStates
-			 case "brazil": self = .brazil
-			
-			default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Country", name: rawValue)
+			case "ethopia":
+							self = .ethopia
+						case "greece":
+							self = .greece
+						case "unitedStates":
+							self = .unitedStates
+						case "brazil":
+							self = .brazil
+					default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Country", name: rawValue)
 		}
 	}
 
 	public func serialize() -> BSON.Primitive {
 		switch self {
-					case .ethopia: return "ethopia"
-					case .greece: return "greece"
-					case .unitedStates: return "unitedStates"
-					case .brazil: return "brazil"
-			
+		case .ethopia: return "ethopia"
+		case .greece: return "greece"
+		case .unitedStates: return "unitedStates"
+		case .brazil: return "brazil"
 		}
 	}
 
@@ -726,29 +742,32 @@ public struct VirtualInstance {
 // MARK: SerializableEnum.ejs
 extension Breed.Origin : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
-		guard let rawValue = String(source) else {
-				throw Meow.Error.cannotDeserialize(type: Breed.Origin.self, source: source, expectedPrimitive: String.self)
+		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+			throw Meow.Error.cannotDeserialize(type: Breed.Origin.self, source: source, expectedPrimitive: String.self)
 		}
 
 		switch rawValue {
-			 case "natural": self = .natural
-			 case "mutation": self = .mutation
-			 case "crossbreed": self = .crossbreed
-			 case "hybrid": self = .hybrid
-			 case "hybridCrossbreed": self = .hybridCrossbreed
-			
-			default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Origin", name: rawValue)
+			case "natural":
+							self = .natural
+						case "mutation":
+							self = .mutation
+						case "crossbreed":
+							self = .crossbreed
+						case "hybrid":
+							self = .hybrid
+						case "hybridCrossbreed":
+							self = .hybridCrossbreed
+					default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Origin", name: rawValue)
 		}
 	}
 
 	public func serialize() -> BSON.Primitive {
 		switch self {
-					case .natural: return "natural"
-					case .mutation: return "mutation"
-					case .crossbreed: return "crossbreed"
-					case .hybrid: return "hybrid"
-					case .hybridCrossbreed: return "hybridCrossbreed"
-			
+		case .natural: return "natural"
+		case .mutation: return "mutation"
+		case .crossbreed: return "crossbreed"
+		case .hybrid: return "hybrid"
+		case .hybridCrossbreed: return "hybridCrossbreed"
 		}
 	}
 
@@ -934,6 +953,94 @@ extension Breed.Thing : CustomStringConvertible {
 
 
 
+// MARK: - 🐈 for SocialMedia
+// MARK: Serializable.ejs
+// MARK: SerializableEnum.ejs
+extension SocialMedia : Serializable {
+	public init(restoring source: BSON.Primitive) throws {
+		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+			throw Meow.Error.cannotDeserialize(type: SocialMedia.self, source: source, expectedPrimitive: String.self)
+		}
+
+		switch rawValue {
+			case "facebook":
+						guard let document = Document(source) else {
+				throw Meow.Error.cannotDeserialize(type: SocialMedia.self, source: source, expectedPrimitive: String.self)
+			}
+				let value0: String = try document.unpack("1")
+
+
+				self = .facebook(name: value0)
+			case "twitter":
+						guard let document = Document(source) else {
+				throw Meow.Error.cannotDeserialize(type: SocialMedia.self, source: source, expectedPrimitive: String.self)
+			}
+				let value0: String = try document.unpack("1")
+
+
+				self = .twitter(handle: value0)
+			case "reddit":
+						guard let document = Document(source) else {
+				throw Meow.Error.cannotDeserialize(type: SocialMedia.self, source: source, expectedPrimitive: String.self)
+			}
+				let value0: String = try document.unpack("1")
+				let value1: [String] = try document.unpack("2")
+
+
+				self = .reddit(username: value0, activeSubreddits: value1)
+			case "none":
+							self = .none
+					default: throw Meow.Error.enumCaseNotFound(enum: "SocialMedia", name: rawValue)
+		}
+	}
+
+	public func serialize() -> BSON.Primitive {
+		switch self {
+		case .facebook(let value0):
+			var document: Document = []
+
+			document.append("facebook")
+			document.pack(value0, as: "1")
+
+			return document
+		case .twitter(let value0):
+			var document: Document = []
+
+			document.append("twitter")
+			document.pack(value0, as: "1")
+
+			return document
+		case .reddit(let value0, let value1):
+			var document: Document = []
+
+			document.append("reddit")
+			document.pack(value0, as: "1")
+			document.pack(value1, as: "2")
+
+			return document
+		case .none: return "none"
+		}
+	}
+
+	// MARK: VirtualInstanceEnum.ejs
+public struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: SocialMedia?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	public var keyPrefix: String
+
+	public init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}
+
+}
+
+
+
+
 // MARK: - 🐈 for CatLike
 // MARK: Serializable.ejs
 // MARK: SerializableProtocol.ejs
@@ -960,7 +1067,7 @@ extension Document {
 			self[key] = nil
 			return
 		}
-
+		
 		var document: Document = [:]		
 		document.pack(tuple.0, as: "0")		
 		document.pack(tuple.1, as: "1")		
@@ -983,7 +1090,7 @@ extension Document {
 
 		
 
-fileprivate let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, CatLike.self]
+fileprivate let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, SocialMedia.self, CatLike.self]
 
 extension Meow {
 	static func `init`(_ connectionString: String) throws {
@@ -998,8 +1105,8 @@ extension Meow {
 // 🐈 Statistics
 // Models: 4
 //   Breed, Cat, CatReferencing, Tiger
-// Serializables: 8
-//   Breed, Cat, CatReferencing, Tiger, Breed.Country, Breed.Origin, Breed.Thing, CatLike
+// Serializables: 9
+//   Breed, Cat, CatReferencing, Tiger, Breed.Country, Breed.Origin, Breed.Thing, SocialMedia, CatLike
 // Model protocols: 0
 //   
 // Tuples: 1

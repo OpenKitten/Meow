@@ -1,25 +1,71 @@
 // MARK: SerializableEnum.ejs
+<%
+	if(serializable.rawTypeName && supportedPrimitives.includes(serializable.rawTypeName)) {
+		throw "unsuported";
+	} else {
+-%>
 extension <%- serializable.name %> : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
-		guard let rawValue = String(source) else {
-				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: String.self)
+		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: String.self)
 		}
 
 		switch rawValue {
-			<% serializable.cases.forEach(enumCase => {
-				%> case "<%- enumCase.name %>": self = .<%- enumCase.name %>
-			<%})%>
-			default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
+			<%_ serializable.cases.forEach(enumCase => {-%>
+			case "<%- enumCase.name %>":
+			<% if(enumCase.hasAssociatedValue) {-%>
+			guard let document = Document(source) else {
+				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: String.self)
+			}
+			<%_
+				let parameters = [];
+
+				for(let i = 0; i < enumCase.associatedValues.length; i++) {
+					let value = enumCase.associatedValues[i]
+					let caseType = value.unwrappedTypeName;
+					if(value.localName) {
+						parameters.push(`${value.localName}: value${i}`);
+					} else {
+						parameters.push(`value${i}`);
+					}-%>
+				let value<%-i%>: <%-caseType%> = try document.unpack("<%-i + 1%>")
+				<%_ } -%>
+
+
+				self = .<%-enumCase.name %>(<%-parameters.join(", ")%>)
+			<%_ } else { -%>
+				self = .<%- enumCase.name %>
+			<%	}
+			});-%>
+		default: throw Meow.Error.enumCaseNotFound(enum: "<%- serializable.name %>", name: rawValue)
 		}
 	}
 
 	public func serialize() -> BSON.Primitive {
 		switch self {
-			<% serializable.cases.forEach(enumCase => { -%>
+			<%_ serializable.cases.forEach(enumCase => {
+				if(enumCase.hasAssociatedValue) {
+					let parameters = [];
+
+					for(let i = 0; i < enumCase.associatedValues.length; i++) {
+						parameters.push(`let value${i}`);
+					}-%>
+		case .<%- enumCase.name %>(<%-parameters.join(", ")%>):
+			var document: Document = []
+
+			document.append("<%- enumCase.name %>")
+			<%_ for(let i = 0; i < enumCase.associatedValues.length; i++) {-%>
+			document.pack(value<%-i%>, as: "<%-i + 1%>")
+			<%_ } -%>
+
+			return document
+				<%_} else {-%>
 		case .<%- enumCase.name %>: return "<%- enumCase.name %>"
-			<%})%>
+			<%_}
+      });-%>
 		}
 	}
 
 	<%- include('VirtualInstanceEnum', {serializable}); %>
 }
+<% } -%>

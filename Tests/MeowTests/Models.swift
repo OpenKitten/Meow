@@ -161,9 +161,17 @@ public class Breed : Model, ExpressibleByStringLiteral {
     // sourcery:end
 }
 
+enum SocialMedia {
+    case facebook(name: String)
+    case twitter(handle: String)
+    case reddit(username: String, activeSubreddits: [String])
+    case none
+}
+
 class Cat : Model, CatLike {
     var name: String
     var breed: Breed
+    var social: SocialMedia?
     var bestFriend: Reference<Cat>?
     var family: [Cat]
     
@@ -189,6 +197,7 @@ class Cat : Model, CatLike {
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
 		self.breed = try document.unpack(Key.breed.keyString)
+		self.social = try? document.unpack(Key.social.keyString)
 		self.bestFriend = try? document.unpack(Key.bestFriend.keyString)
 		self.family = try document.unpack(Key.family.keyString)
 	}
@@ -201,6 +210,7 @@ class Cat : Model, CatLike {
 		
 		self.family = (try document.unpack(Key.family.keyString)) 
 		self.bestFriend = (try? document.unpack(Key.bestFriend.keyString)) 
+		self.social = (try? document.unpack(Key.social.keyString)) 
 		self.breed = (try document.unpack(Key.breed.keyString)) 
 		self.name = (try document.unpack(Key.name.keyString)) 
 	}
