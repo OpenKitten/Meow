@@ -49,6 +49,22 @@ class CRUDTests : XCTestCase {
         XCTAssertNil(try Tiger.findOne("_id" == tiger._id))
     }
     
+    func testEnums() throws {
+        let cat = Cat(name: "MoopCat", breed: "SuperCat", bestFriend: nil, family: [])
+        cat.social = SocialMedia.facebook(name: "MoopCat")
+        try cat.save()
+        
+        XCTAssertEqual(try Cat.count({ cat in
+            return cat.social == .facebook(name: "MoopCat")
+        }), 1)
+        
+        XCTAssertEqual(try Cat.count({ cat in
+            return cat.social == .twitter(handle: "MoopCat")
+        }), 0)
+        
+        XCTAssertEqual(Numbers.two.serialize() as? Int, 2)
+    }
+    
     func testDeleteBulk() throws {
         try testFindBulk()
         

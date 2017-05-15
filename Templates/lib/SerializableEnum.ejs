@@ -1,9 +1,22 @@
 // MARK: SerializableEnum.ejs
-<%
-	if(serializable.rawTypeName && supportedPrimitives.includes(serializable.rawTypeName)) {
-		throw "unsuported";
-	} else {
--%>
+<% if(serializable.rawTypeName && supportedRawValues.includes(serializable.rawTypeName.unwrappedTypeName)) {
+	let rawType = serializable.rawTypeName.unwrappedTypeName; -%>
+extension <%- serializable.name %> : Serializable {
+	public init(restoring source: BSON.Primitive) throws {
+		guard let value = <%-rawType%>(source), let me = <%-serializable.name%>(rawValue: value) else {
+			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: <%-rawType%>.self)
+		}
+
+		self = me
+	}
+
+	public func serialize() -> Primitive {
+		return self.rawValue
+	}
+
+	<%- include('VirtualInstanceEnum', {serializable}); %>
+}
+<%_	} else { -%>
 extension <%- serializable.name %> : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {

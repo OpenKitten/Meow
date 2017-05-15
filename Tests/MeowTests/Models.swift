@@ -5,6 +5,12 @@ public protocol CatLike : BaseModel {
     var breed: Breed { get }
 }
 
+public enum Numbers : Int {
+    case one = 1
+    case two = 2
+    case three = 3
+}
+
 public class Tiger : Model {
     public var breed: Breed
     
@@ -174,6 +180,7 @@ class Cat : Model, CatLike {
     var social: SocialMedia?
     var bestFriend: Reference<Cat>?
     var family: [Cat]
+    var favouriteNumber: Numbers?
     
     init(name: String, breed: Breed, bestFriend: Cat?, family: [Cat]) {
         self.name = name
@@ -200,6 +207,7 @@ class Cat : Model, CatLike {
 		self.social = try? document.unpack(Key.social.keyString)
 		self.bestFriend = try? document.unpack(Key.bestFriend.keyString)
 		self.family = try document.unpack(Key.family.keyString)
+		self.favouriteNumber = try? document.unpack(Key.favouriteNumber.keyString)
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
@@ -208,6 +216,7 @@ class Cat : Model, CatLike {
 		}
 
 		
+		self.favouriteNumber = (try? document.unpack(Key.favouriteNumber.keyString)) 
 		self.family = (try document.unpack(Key.family.keyString)) 
 		self.bestFriend = (try? document.unpack(Key.bestFriend.keyString)) 
 		self.social = (try? document.unpack(Key.social.keyString)) 

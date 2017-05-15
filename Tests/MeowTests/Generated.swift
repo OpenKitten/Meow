@@ -8,7 +8,7 @@
 
 // MARK: - General Information
 // Supported Primitives: ObjectId, String, Int, Int32, Bool, Document, Double, Data, Binary, Date, RegularExpression
-// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class CRUDTests, class Cat, class CatReferencing, enum SocialMedia, class Tiger
+// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class CRUDTests, class Cat, class CatReferencing, enum Numbers, enum SocialMedia, class Tiger
 import Foundation
 import Meow
 import ExtendedJSON
@@ -232,6 +232,7 @@ extension Cat : SerializableToDocument {
 		document.pack(self.social, as: Key.social.keyString)
 		document.pack(self.bestFriend, as: Key.bestFriend.keyString)
 		document.pack(self.family, as: Key.family.keyString)
+		document.pack(self.favouriteNumber, as: Key.favouriteNumber.keyString)
 		return document
 	}
 
@@ -252,6 +253,9 @@ extension Cat : SerializableToDocument {
 		if keys.contains(Key.family.keyString) {
 			_ = (try document.unpack(Key.family.keyString)) as [Cat]
 		}
+		if keys.contains(Key.favouriteNumber.keyString) {
+			_ = (try? document.unpack(Key.favouriteNumber.keyString)) as Numbers?
+		}
 	}
 
 	public func update(with document: Document) throws {
@@ -269,6 +273,8 @@ extension Cat : SerializableToDocument {
 				self.bestFriend = try document.unpack(Key.bestFriend.keyString)
 			case Key.family.keyString:
 				self.family = try document.unpack(Key.family.keyString)
+			case Key.favouriteNumber.keyString:
+				self.favouriteNumber = try document.unpack(Key.favouriteNumber.keyString)
 			default: break
 			}
 		}
@@ -295,6 +301,7 @@ extension Cat : SerializableToDocument {
 		case social = "social"
 		case bestFriend = "best_friend"
 		case family = "family"
+		case favouriteNumber = "favourite_number"
 
 
 		public var keyString: String { return self.rawValue }
@@ -307,11 +314,12 @@ extension Cat : SerializableToDocument {
 			case .social: return SocialMedia.self
 			case .bestFriend: return Reference<Cat>.self
 			case .family: return [Cat].self
+			case .favouriteNumber: return Numbers.self
 			}
 		}
 
 		public static var all: [Key] {
-			return [._id, .name, .breed, .social, .bestFriend, .family]
+			return [._id, .name, .breed, .social, .bestFriend, .family, .favouriteNumber]
 		}
 	}
 
@@ -333,6 +341,7 @@ extension Cat : SerializableToDocument {
 		var social: SocialMedia?
 		var bestFriend: Reference<Cat>?
 		var family: [Cat]?
+		var favouriteNumber: Numbers?
 
 
 		public func serialize() -> Document {
@@ -342,6 +351,7 @@ extension Cat : SerializableToDocument {
 			document.pack(self.social, as: Key.social.keyString)
 			document.pack(self.bestFriend, as: Key.bestFriend.keyString)
 			document.pack(self.family, as: Key.family.keyString)
+			document.pack(self.favouriteNumber, as: Key.favouriteNumber.keyString)
 			return document
 		}
 
@@ -358,6 +368,8 @@ extension Cat : SerializableToDocument {
 					self.bestFriend = try document.unpack(Key.bestFriend.keyString)
 				case Key.family.keyString:
 					self.family = try document.unpack(Key.family.keyString)
+				case Key.favouriteNumber.keyString:
+					self.favouriteNumber = try document.unpack(Key.favouriteNumber.keyString)
 				default: break
 				}
 			}
@@ -394,6 +406,8 @@ public struct VirtualInstance : VirtualModelInstance {
 		 
 		 /// family: [Cat]
 		 
+		 /// favouriteNumber: Numbers?
+		 public var favouriteNumber: Numbers.VirtualInstance { return Numbers.VirtualInstance(keyPrefix: keyPrefix + Key.favouriteNumber.keyString) } 
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -692,30 +706,15 @@ extension Tiger : CustomStringConvertible {
 // MARK: SerializableEnum.ejs
 extension Breed.Country : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
-		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+		guard let value = String(source), let me = Breed.Country(rawValue: value) else {
 			throw Meow.Error.cannotDeserialize(type: Breed.Country.self, source: source, expectedPrimitive: String.self)
 		}
 
-		switch rawValue {
-			case "ethopia":
-							self = .ethopia
-						case "greece":
-							self = .greece
-						case "unitedStates":
-							self = .unitedStates
-						case "brazil":
-							self = .brazil
-					default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Country", name: rawValue)
-		}
+		self = me
 	}
 
-	public func serialize() -> BSON.Primitive {
-		switch self {
-		case .ethopia: return "ethopia"
-		case .greece: return "greece"
-		case .unitedStates: return "unitedStates"
-		case .brazil: return "brazil"
-		}
+	public func serialize() -> Primitive {
+		return self.rawValue
 	}
 
 	// MARK: VirtualInstanceEnum.ejs
@@ -1041,6 +1040,41 @@ public struct VirtualInstance {
 
 
 
+// MARK: - 🐈 for Numbers
+// MARK: Serializable.ejs
+// MARK: SerializableEnum.ejs
+extension Numbers : Serializable {
+	public init(restoring source: BSON.Primitive) throws {
+		guard let value = Int(source), let me = Numbers(rawValue: value) else {
+			throw Meow.Error.cannotDeserialize(type: Numbers.self, source: source, expectedPrimitive: Int.self)
+		}
+
+		self = me
+	}
+
+	public func serialize() -> Primitive {
+		return self.rawValue
+	}
+
+	// MARK: VirtualInstanceEnum.ejs
+public struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: Numbers?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	public var keyPrefix: String
+
+	public init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}
+
+}
+
+
+
+
 // MARK: - 🐈 for CatLike
 // MARK: Serializable.ejs
 // MARK: SerializableProtocol.ejs
@@ -1090,7 +1124,7 @@ extension Document {
 
 		
 
-fileprivate let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, SocialMedia.self, CatLike.self]
+fileprivate let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, SocialMedia.self, Numbers.self, CatLike.self]
 
 extension Meow {
 	static func `init`(_ connectionString: String) throws {
@@ -1105,8 +1139,8 @@ extension Meow {
 // 🐈 Statistics
 // Models: 4
 //   Breed, Cat, CatReferencing, Tiger
-// Serializables: 9
-//   Breed, Cat, CatReferencing, Tiger, Breed.Country, Breed.Origin, Breed.Thing, SocialMedia, CatLike
+// Serializables: 10
+//   Breed, Cat, CatReferencing, Tiger, Breed.Country, Breed.Origin, Breed.Thing, SocialMedia, Numbers, CatLike
 // Model protocols: 0
 //   
 // Tuples: 1
