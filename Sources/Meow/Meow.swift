@@ -338,7 +338,9 @@ public enum Meow {
         /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
             do {
-                try instance.save()
+                if !invalidatedObjectIds.contains(instance._id) {
+                    try instance.save()
+                }
             } catch {
                 print("🐈 Error while saving \(type(of: instance)) \(instance._id) in deinit: \(error)")
                 assertionFailure()
