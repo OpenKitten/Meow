@@ -72,7 +72,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		<%_ serializable.variables.forEach(variable => {
 			if (variable.isComputed || variable.isStatic) { return; } -%>
 		if keys.contains(Key.<%- variable.name %>.keyString) {
-			_ = (try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)) as <%- variable.typeName.name %>
+			_ = (try document.unpack(Key.<%- variable.name %>.keyString)) as <%- variable.typeName.name %>
 		}
 		<%_ }) -%>
 	}

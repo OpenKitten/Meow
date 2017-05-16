@@ -48,6 +48,11 @@ extension ObjectId : KeyRepresentable {
     }
 }
 
+/// Something with an ObjectId
+public protocol Identifyable {
+    var databaseIdentifier: ObjectId { get }
+}
+
 /// `BaseModel` is the base protocol that every model conforms to.
 ///
 /// Models are not expected to conform directly to `BaseModel`. They state conformance to `Model`, which inherits from
@@ -58,7 +63,7 @@ extension ObjectId : KeyRepresentable {
 /// making the function generic.
 ///
 /// When possible, model methods are added to the `BaseModel` protocol, and not the `Model` protocol. 
-public protocol BaseModel : SerializableToDocument, Convertible {
+public protocol BaseModel : SerializableToDocument, Convertible, Identifyable {
     /// The collection this entity resides in
     static var collection: MongoKitten.Collection { get }
     
@@ -88,6 +93,10 @@ public protocol BaseModel : SerializableToDocument, Convertible {
     
     /// Updates a model with a Document, overriding its own properties with those from the document
     func update(with document: Document) throws
+}
+
+extension BaseModel {
+    public var databaseIdentifier: ObjectId { return _id }
 }
 
 /// When implemented, indicated that this is a model that resides at the lowest level of a collection, as a separate entity.
