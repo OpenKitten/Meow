@@ -29,3 +29,58 @@ var linkedIn: String
 Meow will store all property names in an enum named `Key` in every model. You can use this enum if you ever need to acccess the raw (database) name of a property.
 
 To access the key name of a property `MyProperty` on `MyModel`:  `MyModel.Key.myProperty.keyString`
+
+## Structs and classes
+
+Meow stores structs and classes as BSON documents. The key enum (see above) is used to define the keys in these documents.
+
+For example, the following model:
+
+```swift
+class User : Model {
+    enum Gender {
+        case male, female
+    }
+    
+    struct Details {
+        var gender: Gender
+        var firstName: String
+        var lastName: String
+    }
+    
+    var username: String
+    var details: Details
+    
+    init(...) { ... }
+}
+```
+
+will be serialized to this (in OpenKitten BSON notation):
+
+```swift
+[
+	"_id": ObjectId(),
+	"username": "Bob26",
+	"details": [
+		"gender": "malae",
+		"first_name": "Bob",
+		"last_name": "Something"
+	]
+]
+```
+
+## Supported primitives
+
+The following types are supported by BSON and will be stored as-is without conversion.
+
+- ObjectId
+- String
+- Int
+- Int32
+- Bool
+- Document
+- Double
+- Data
+- Binary
+- Date
+- BSON.RegularExpression
