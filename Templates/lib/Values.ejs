@@ -11,7 +11,7 @@
 			try self.update(with: document)
 		}
 
-		<%_ serializable.allVariables.forEach(variable => {
+		<%_ serializable.instanceVariables.forEach(variable => {
 			if(variable.isComputed || variable.name == "_id") { return; }
 			-%>
 		<%- acl %> var <%- variable.name -%>: <%- variable.unwrappedTypeName %>?
@@ -30,7 +30,7 @@
 		<%- acl %> mutating func update(with document: Document) throws {
 			for key in document.keys {
 				switch key {
-				<%_ serializable.variables.forEach(variable => {
+				<%_ serializable.instanceVariables.forEach(variable => {
 				if (variable.isComputed || variable.isStatic) { return; } -%>
 				case Key.<%- variable.name %>.keyString:
 					self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)

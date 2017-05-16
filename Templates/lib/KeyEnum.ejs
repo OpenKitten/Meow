@@ -2,7 +2,7 @@
 <% let keyEnumVariables = []; %>
 	<%- acl %> enum Key : String, ModelKey {%>
 		<% if (serializable.based["Model"]) { %>case _id<% } %>
-		<%_ serializable.allVariables.forEach(variable => {
+		<%_ serializable.instanceVariables.forEach(variable => {
 			if(variable.isComputed || variable.name == "_id") { return; }
 			keyEnumVariables.push(variable);
 			-%>
