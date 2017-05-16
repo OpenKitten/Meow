@@ -27,7 +27,11 @@ modelProtocols.forEach(protocol => { %>
 		 }
 	} else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 		 ensureSerializable(variable.type);
+		if (variable.type.based["Model"]) {
+		 %>var <%- variable.name %>: VirtualReference<<%- variable.unwrappedTypeName %>> { get } <%
+		} else {
 		 %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { get } <%
+		}
 	}%>
 	<%
 	}) %>

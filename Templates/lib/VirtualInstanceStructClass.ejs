@@ -31,7 +31,13 @@
 			 }
 		 } else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 			 ensureSerializable(variable.type);
+			
+			// reference
+			if (variable.type.based["Model"]) {
+			 %><%- acl %> var <%- variable.name %>: VirtualReference<<%- variable.unwrappedTypeName %>> { VirtualReference(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			} else {
 			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			}
 		 }
 	}) %>
 
