@@ -33,7 +33,7 @@ extension DBRef {
 }
 
 /// Reference to a Model
-public struct Reference<M: Model> : Serializable, Hashable {
+public struct Reference<M: BaseModel> : Serializable, Hashable {
     /// The referenced id
     let reference: ObjectId
     

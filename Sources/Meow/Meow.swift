@@ -86,6 +86,9 @@ public enum Meow {
         /// using the `Reference` type. So instead of `var myReference: MyModel`, you would use
         /// `var myReference: Reference<MyModel>`.
         case infiniteReferenceLoop(type: BaseModel.Type, id: ObjectId)
+        
+        /// The file cannot be found in GridFS
+        case brokenFileReference(ObjectId)
     }
     
     /// The Object Pool instance. For more information, look at the `ObjectPool` documentation.

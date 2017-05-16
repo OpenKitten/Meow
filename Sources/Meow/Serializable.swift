@@ -12,6 +12,17 @@ public protocol Serializable {
     func serialize() -> BSON.Primitive
 }
 
+/// Something that can be restored using a static func instead of an init. Exists because we don't want Self or associated type requirements in `Serializable`.
+public protocol Restorable : Serializable {
+    static func restore(_ source: BSON.Primitive) throws -> Self
+}
+
+extension Restorable {
+    public init(restoring source: BSON.Primitive) throws {
+        self = try Self.restore(source)
+    }
+}
+
 /// Something that can be converted to (and from) a Document
 public protocol SerializableToDocument : Serializable {
     func serialize() -> BSON.Document

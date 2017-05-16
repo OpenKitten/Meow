@@ -100,7 +100,7 @@ public struct VirtualArray<V: VirtualVariable> : VirtualVariable {
 
 /// A queryable reference to `M`
 // sourcery: donotequate
-public struct VirtualReference<M : Model> : VirtualVariable {
+public struct VirtualReference<M : BaseModel> : VirtualVariable {
     /// :nodoc:
     public var name: String
     /// :nodoc:
