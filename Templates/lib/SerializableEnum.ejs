@@ -2,7 +2,7 @@
 <% if(serializable.rawTypeName && supportedRawValues.includes(serializable.rawTypeName.unwrappedTypeName)) {
 	let rawType = serializable.rawTypeName.unwrappedTypeName; -%>
 extension <%- serializable.name %> : Serializable {
-	public init(restoring source: BSON.Primitive) throws {
+	<%- acl %> init(restoring source: BSON.Primitive) throws {
 		guard let value = <%-rawType%>(source), let me = <%-serializable.name%>(rawValue: value) else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: <%-rawType%>.self)
 		}
@@ -10,7 +10,7 @@ extension <%- serializable.name %> : Serializable {
 		self = me
 	}
 
-	public func serialize() -> Primitive {
+	<%- acl %> func serialize() -> Primitive {
 		return self.rawValue
 	}
 
@@ -18,7 +18,7 @@ extension <%- serializable.name %> : Serializable {
 }
 <%_	} else { -%>
 extension <%- serializable.name %> : Serializable {
-	public init(restoring source: BSON.Primitive) throws {
+	<%- acl %> init(restoring source: BSON.Primitive) throws {
 		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: String.self)
 		}
@@ -54,7 +54,7 @@ extension <%- serializable.name %> : Serializable {
 		}
 	}
 
-	public func serialize() -> BSON.Primitive {
+	<%- acl %> func serialize() -> BSON.Primitive {
 		switch self {
 			<%_ serializable.cases.forEach(enumCase => {
 				if(enumCase.hasAssociatedValue) {

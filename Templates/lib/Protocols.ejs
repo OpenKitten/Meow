@@ -11,13 +11,13 @@ modelProtocols.forEach(protocol => { %>
 
 <% const superModelProtocols = protocol.inheritedTypes.filter(t => modelProtocols.find(p => p.name == t)); %>
 
-public protocol <%- protocol.name %>Values : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "Values").join(",") : "ModelValues" %> {
+<%- acl %> protocol <%- protocol.name %>Values : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "Values").join(",") : "ModelValues" %> {
 	<%_ protocol.variables.forEach(variable => { -%>
 	var <%- variable.name -%>: <%- variable.unwrappedTypeName %>? { get set }
 	<%_ }) %>
 }
 
-public protocol <%- protocol.name %>VirtualInstance : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "VirtualInstance").join(",") : "VirtualModelInstance" %> {
+<%- acl %> protocol <%- protocol.name %>VirtualInstance : <%- superModelProtocols.length > 0 ? superModelProtocols.map(p => p + "VirtualInstance").join(",") : "VirtualModelInstance" %> {
 	<%_ protocol.variables.forEach(variable => {
 	if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 		 if (numberTypes.includes(variable.unwrappedTypeName)) {

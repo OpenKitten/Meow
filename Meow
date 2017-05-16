@@ -8,18 +8,6 @@ if [ ! -d ".build" ]; then
 	exit 1
 fi
 
-if [[ $# == 0 ]]; then
-	if [ -f Meowfile ]; then
-		echo "🐈  Using Meowfile"
-		$0 $(< Meowfile)
-		exit
-	else
-		echo "❗️  Error: no arguments supplied and no Meowfile found"
-		echo "See the Meow readme for more information on how to use this script"
-		exit 1
-	fi
-fi
-
 # Swift Package lookup
 # Stores relative package URL in PACKAGE_DIR
 lookupPackage () {
@@ -44,18 +32,44 @@ MEOW=$PACKAGE_DIR
 
 echo "🐈  Meow directory: $MEOW"
 
-if [ -f MeowPlugins ]; then
-	echo "🐈  Reading plugins file"
-	PLUGIN_NUM=0
-	while read PLUGIN; do
-		lookupPackage "$PLUGIN"
-		echo "$PLUGIN found in $PACKAGE_DIR"
-		PLUGINS[$PLUGIN_NUM]=$PACKAGE_DIR
-		((PLUGIN_NUM=$PLUGIN_NUM+1))
-	done < MeowPlugins
-else
-	echo "ℹ  No plugins file found (./MeowPlugins)"
+if [[ $1 == "init" ]]; then
+	if [ -f MeowConfig ]; then
+		echo "❗️  Error: MeowConfig already exists. Refusing to overwrite."
+		exit 1
+	fi
+	
+	cp "$MEOW/MeowConfig.template" "./MeowConfig"
+	echo "🐈  Config file saved as MeowConfig"
+	echo "Please edit the config file, then run 'meow' to generate code."
+	
+	exit 0
 fi
+
+if [ ! -f MeowConfig ]; then
+	echo "❗️  Error: MeowConfig not found"
+	echo "See the Meow documentation for information on creating a config file"
+	echo "Run '$0 init' to create a basic config file"
+	exit 1
+fi
+
+source "$MEOW/MeowConfig.defaults"
+
+echo "🐈  Loading config file"
+source "MeowConfig"
+
+if [[ ${#plugins[@]} == 0 ]]; then
+	echo "🐈  No plugins to resolve"
+else
+	echo "🐈  Resolving plugins"
+fi
+
+PLUGIN_NUM=0
+for plugin in "${plugins[@]}"; do
+	lookupPackage "$plugin"
+	echo "$plugin found in $PACKAGE_DIR"
+	PLUGINS[$PLUGIN_NUM]=$PACKAGE_DIR
+	((PLUGIN_NUM=$PLUGIN_NUM+1))
+done
 
 # Create templates directory
 if [ -d ".build/meow-templates" ]; then
@@ -76,6 +90,6 @@ done
 
 echo "🐈  Running sourcery"
 
-sourcery --templates ".build/meow-templates/Meow.ejs" "$@"
+sourcery --templates ".build/meow-templates/Meow.ejs" --sources "$sources" --output "$output" --args accesslevel=$accesslevel
 
 echo "🐈  Done"

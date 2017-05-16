@@ -3,6 +3,8 @@
 
 eval(include('external/pluralize.js'));
 
+window.acl = argument.accesslevel;
+
 // Selects all classes and structs that are either based on a model or embeddable protocol
 window.models = ((types.based["Model"] || []).filter(model => (!model.annotations["skip-meow"]) && model.kind == "class") || []);
 window.modelProtocols = ((types.based["Model"] || []).filter(model => (!model.annotations["skip-meow"]) && model.kind == "protocol") || []);

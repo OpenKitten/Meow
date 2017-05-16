@@ -1,7 +1,7 @@
 // MARK: ModelResolvingFunctions.ejs
 <% serializable.allVariables.forEach(variable => {
 	if(variable.isComputed || variable.name == "_id" || variable.unwrappedTypeName != "String") { return; }%>
-	public static func by<%- capitalizeFirstLetter(variable.name) -%>(_ value: <%- variable.unwrappedTypeName %>) throws -> <%- serializable.name %>? {
+	<%- acl %> static func by<%- capitalizeFirstLetter(variable.name) -%>(_ value: <%- variable.unwrappedTypeName %>) throws -> <%- serializable.name %>? {
 		return try <%- serializable.name %>.findOne(Key.<%- variable.name %>.rawValue == value)
 	}
 <%_})%>

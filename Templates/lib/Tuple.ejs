@@ -1,6 +1,6 @@
 // MARK: Tuple.ejs
 extension Document {
-	public mutating func pack(_ tuple: <%- tupleName.unwrappedTypeName %>?, as key: String) {
+	<%- acl %> mutating func pack(_ tuple: <%- tupleName.unwrappedTypeName %>?, as key: String) {
 		guard let tuple = tuple else {
 			self[key] = nil
 			return
@@ -13,7 +13,7 @@ extension Document {
 		self[key] = document
 	}
 
-	public func unpack(_ key: String) throws -> <%- tupleName.unwrappedTypeName %> {
+	<%- acl %> func unpack(_ key: String) throws -> <%- tupleName.unwrappedTypeName %> {
 		guard let document = Document(self[key]) else {
 			throw Meow.Error.cannotDeserialize(type: Document.self, source: self[key], expectedPrimitive: Document.self)
 		}

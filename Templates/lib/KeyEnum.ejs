@@ -1,6 +1,6 @@
 // MARK: KeyEnum.ejs
 <% let keyEnumVariables = []; %>
-	public enum Key : String, ModelKey {%>
+	<%- acl %> enum Key : String, ModelKey {%>
 		<% if (serializable.based["Model"]) { %>case _id<% } %>
 		<%_ serializable.allVariables.forEach(variable => {
 			if(variable.isComputed || variable.name == "_id") { return; }
@@ -9,9 +9,9 @@
 		case <%- variable.name -%> = "<%- variable.annotations["key"] || underscoreCase(uncamel(variable.name)) %>"
 		<%_ }) %>
 
-		public var keyString: String { return self.rawValue }
+		<%- acl %> var keyString: String { return self.rawValue }
 
-		public var type: Any.Type {
+		<%- acl %> var type: Any.Type {
 			switch self {
 			<% if (serializable.based["Model"]) { %>case ._id: return ObjectId.self<% } %>
 			<%_ keyEnumVariables.forEach(variable => { -%>
@@ -20,7 +20,7 @@
 			}
 		}
 
-		public static var all: [Key] {
+		<%- acl %> static var all: [Key] {
 			return [<% if (serializable.based["Model"]) { %>._id<% if (keyEnumVariables.length > 0) {%>, <% }} -%>
 			<%_ %><%- keyEnumVariables.map(v => "." + v.name).join(", ") %>]
 		}

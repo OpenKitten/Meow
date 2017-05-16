@@ -1,13 +1,13 @@
 // MARK: VirtualInstanceEnum.ejs
-public struct VirtualInstance {
+<%- acl %> struct VirtualInstance {
 	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
-	public static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
+	<%- acl %> static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	<%- acl %> var keyPrefix: String
 
-	public init(keyPrefix: String = "") {
+	<%- acl %> init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
 	}
 }

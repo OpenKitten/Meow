@@ -37,11 +37,9 @@ Sourcery and Meow will do the rest: with the definition shown above, you can now
 
 ### Generating code
 
-You run `meow` like you run [Sourcery](https://github.com/krzysztofzablocki/Sourcery), but without the `--templates` argument.
+First, create a config file by running `meow init` and editing the `MeowConfig` file. Then just run `meow` to generate/update code.
 
-`meow --sources Sources/MyModule --output Sources/MyModule/Meow.swift`
-
-For more information about the Meow CLI, including setting it up, please look at [the CLI documentation](cli.html).
+For more information about the Meow CLI, including the config file, please look at [the CLI documentation](cli.html).
 
 ### Queries
 

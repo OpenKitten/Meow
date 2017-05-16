@@ -2,9 +2,9 @@
 	<% let inheritedProtocols = modelProtocols.filter(p => serializable.implements[p.name]); %>
 
 	/// Represents (part of) the values of a <%- serializable.name %>
-	public struct Values : ModelValues<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'Values').join("") : '' %> {
-		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+	<%- acl %> struct Values : ModelValues<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'Values').join("") : '' %> {
+		<%- acl %> init() {}
+		<%- acl %> init(restoring source: BSON.Primitive) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -14,10 +14,10 @@
 		<%_ serializable.allVariables.forEach(variable => {
 			if(variable.isComputed || variable.name == "_id") { return; }
 			-%>
-		var <%- variable.name -%>: <%- variable.unwrappedTypeName %>?
+		<%- acl %> var <%- variable.name -%>: <%- variable.unwrappedTypeName %>?
 		<%_ }) %>
 
-		public func serialize() -> Document {
+		<%- acl %> func serialize() -> Document {
 			var document: Document = [:]<% -%>
 			<% serializable.variables.forEach(variable => {
 				if (variable.isComputed || variable.isStatic) { return; } %>
@@ -27,7 +27,7 @@
 			return document
 		}
 
-		public mutating func update(with document: Document) throws {
+		<%- acl %> mutating func update(with document: Document) throws {
 			for key in document.keys {
 				switch key {
 				<%_ serializable.variables.forEach(variable => {

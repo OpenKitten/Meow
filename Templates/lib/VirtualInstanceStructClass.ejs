@@ -1,9 +1,9 @@
 // MARK: VirtualInstanceStructClass.ejs
 <% let inheritedProtocols = modelProtocols.filter(p => serializable.implements[p.name]); %>
 
-public struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'VirtualInstance').join("") : '' %> {
+<%- acl %> struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'VirtualInstance').join("") : '' %> {
 	/// Compares this model's VirtualInstance type with an actual model and generates a Query
-	public static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
+	<%- acl %> static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
 		<% if(models.includes(serializable)) { %>
 		return (lhs.keyPrefix + ".$id") == rhs?._id
 		<% } else { %>
@@ -11,10 +11,10 @@ public struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.lengt
 		<% } %>
 	}
 
-	public var keyPrefix: String
+	<%- acl %> var keyPrefix: String
 
 	<% if(models.includes(serializable)) { %>
-	public var _id: VirtualObjectId {
+	<%- acl %> var _id: VirtualObjectId {
 		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
 	}
 	<% } %>
@@ -25,17 +25,17 @@ public struct VirtualInstance : VirtualModelInstance<%- inheritedProtocols.lengt
 		 <%
 		 if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 			 if (numberTypes.includes(variable.unwrappedTypeName)) {
-				 %>public var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.<%- variable.name %>.keyString) } <%
+				 %><%- acl %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.<%- variable.name %>.keyString) } <%
 			 } else {
-				 %>public var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+				 %><%- acl %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
 			 }
 		 } else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 			 ensureSerializable(variable.type);
-			 %>public var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
 		 }
 	}) %>
 
-	public init(keyPrefix: String = "") {
+	<%- acl %> init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
 	}
 } // end VirtualInstance
