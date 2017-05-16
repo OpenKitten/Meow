@@ -69,7 +69,7 @@ will be serialized to this (in OpenKitten BSON notation):
 ]
 ```
 
-## Supported primitives
+## Supported primitives and MongoKitten types
 
 The following types are supported by BSON and will be stored as-is without conversion.
 
@@ -84,3 +84,4 @@ The following types are supported by BSON and will be stored as-is without conve
 - Binary
 - Date
 - BSON.RegularExpression
+- DBRef
