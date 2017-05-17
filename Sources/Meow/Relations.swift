@@ -16,7 +16,7 @@ public prefix func *<M : Model>(_ reference: Reference<M>) throws -> M {
 
 extension MongoKitten.Collection {
     /// Gets the model for this collection
-    var model: BaseModel.Type? {
+    public var model: BaseModel.Type? {
         return Meow.types.flatMap{ $0 as? BaseModel.Type }.first{ $0.collection.fullName == self.fullName }
     }
 }
@@ -48,8 +48,8 @@ public struct Reference<M: BaseModel> : Serializable, Hashable, Identifyable {
     }
     
     /// Compares the lhs reference to refer to rhs
-    public static func ==(lhs: Reference<M>, rhs: M) -> Bool {
-        return lhs.reference == rhs._id
+    public static func ==(lhs: Reference<M>, rhs: M?) -> Bool {
+        return lhs.reference == rhs?._id
     }
     
     /// Makes a reference hashable
@@ -65,13 +65,15 @@ public struct Reference<M: BaseModel> : Serializable, Hashable, Identifyable {
     /// Deserializes a reference
     public init(restoring source: Primitive) throws {
         let document = try Meow.Helpers.requireValue(source as? Document, keyForError: "reference to \(M.self)")
-        let ref = try Meow.Helpers.requireValue(DBRef(document, inDatabase: Meow.database), keyForError: "reference to \(M.self)")
-        self.reference = try Meow.Helpers.requireValue(ref.id as? ObjectId, keyForError: "ObjectId for reference to \(M.self)")
+        self.reference = try Meow.Helpers.requireValue(document["_id"] as? ObjectId, keyForError: "ObjectId for reference to \(M.self)")
     }
     
     /// Serializes a reference
     public func serialize() -> Primitive {
-        return DBRef(referencing: reference, inCollection: M.collection)
+        return [
+            "_id": reference,
+            "_ref": M.collection.name
+        ]
     }
     
     /// Resolves a reference

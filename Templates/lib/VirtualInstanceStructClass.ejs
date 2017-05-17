@@ -5,13 +5,23 @@
 	/// Compares this model's VirtualInstance type with an actual model and generates a Query
 	<%- acl %> static func ==(lhs: VirtualInstance, rhs: <%- serializable.name %>?) -> Query {
 		<% if(models.includes(serializable)) { %>
-		return (lhs.keyPrefix + ".$id") == rhs?._id
+		return (lhs.referencedKeyPrefix + "_id") == rhs?._id
 		<% } else { %>
-		return lhs.keyPrefix == rhs?.serialize()
+		return lhs.referencedKeyPrefix == rhs?.serialize()
 		<% } %>
 	}
 
 	<%- acl %> var keyPrefix: String
+
+	private var referencedKeyPrefix: String {
+		if isReference {
+			return keyPrefix + "."
+		} else {
+			return keyPrefix
+		}
+	}
+
+	var isReference: Bool
 
 	<% if(models.includes(serializable)) { %>
 	<%- acl %> var _id: VirtualObjectId {
@@ -25,23 +35,24 @@
 		 <%
 		 if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 			 if (numberTypes.includes(variable.unwrappedTypeName)) {
-				 %><%- acl %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.<%- variable.name %>.keyString) } <%
+				 %><%- acl %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: referencedKeyPrefix + Key.<%- variable.name %>.keyString) } <%
 			 } else {
-				 %><%- acl %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+				 %><%- acl %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: referencedKeyPrefix + Key.<%-variable.name%>.keyString) } <%
 			 }
 		 } else if ((variable.type && variable.type.kind == "enum") || (serializables.includes(variable.type) && variable.type.kind != "protocol")) {
 			 ensureSerializable(variable.type);
-			
+
 			// reference
 			if (variable.type.based["Model"]) {
-			 %><%- acl %> var <%- variable.name %>: VirtualReference<<%- variable.unwrappedTypeName %>> { return VirtualReference<<%- variable.unwrappedTypeName %>>(name: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%- variable.unwrappedTypeName %>.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString, isReference: true) } <%
 			} else {
-			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: keyPrefix + Key.<%-variable.name%>.keyString) } <%
+			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString) } <%
 			}
 		 }
 	}) %>
 
-	<%- acl %> init(keyPrefix: String = "") {
+	<%- acl %> init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
+		self.isReference = <%- models.includes(serializable) ? "isReference" : "false" %>
 	}
 } // end VirtualInstance

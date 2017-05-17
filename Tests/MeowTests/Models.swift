@@ -11,7 +11,7 @@ public enum Numbers : Int {
     case three = 3
 }
 
-public class Tiger : Model {
+public class Tiger : Model, CatLike {
     public var breed: Breed
     
     public init(breed: Breed) {

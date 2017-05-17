@@ -11,7 +11,7 @@ public protocol VirtualModelInstance {
     ///
     /// - parameter keyPrefix: The keyPrefix is prefixed to all query keys as returned from the VirtualInstance, for the
     /// purpose of being able to embed structs.
-    init(keyPrefix: String)
+    init(keyPrefix: String, isReference: Bool)
 }
 
 /// A virtual variable, as property on a VirtualModelInstance. Generates typesafe queries.
@@ -108,7 +108,7 @@ public struct VirtualReference<M : BaseModel> : VirtualVariable {
     
     /// Matches if the subject refers to an object with `_id` `id`
     public func refers(to id: ObjectId) -> Query {
-        return (self.name + ".$id") == id
+        return (self.name + "._id") == id
     }
     
     /// Matches if the subject refers to `instance`
@@ -117,8 +117,12 @@ public struct VirtualReference<M : BaseModel> : VirtualVariable {
     }
     
     /// Matches if `lhs` refers to `rhs` 
-    public static func ==(_ lhs: VirtualReference<M>, _ rhs: M) -> Query {
-        return lhs.refers(to: rhs)
+    public static func ==(_ lhs: VirtualReference<M>, _ rhs: M?) -> Query {
+        if let rhs = rhs {
+            return lhs.refers(to: rhs)
+        } else {
+            return lhs == nil
+        }
     }
 }
 

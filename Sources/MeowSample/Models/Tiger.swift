@@ -12,7 +12,7 @@ public protocol CatLike : BaseModel {
     var breed: Breed { get }
 }
 
-public class Tiger : Model {
+public class Tiger : Model, CatLike {
     public var breed: Breed
     
     public init(breed: Breed) {

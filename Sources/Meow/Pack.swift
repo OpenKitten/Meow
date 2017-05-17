@@ -4,12 +4,12 @@ import MongoKitten
 /// Unpacks a value from a primitive
 fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primitive?) throws -> S {
     if let M = S.self as? BaseModel.Type {
-        guard let document = primitive as? Document, let ref = DBRef(document, inDatabase: Meow.database) else {
+        guard let document = Document(primitive), let id = ObjectId(document["_id"]) else {
             throw Meow.Error.missingOrInvalidValue(key: key)
         }
         
-        guard let instance = try M.findOne("_id" == ref.id) else {
-            throw Meow.Error.brokenReference(in: [ref])
+        guard let instance = try M.findOne("_id" == id) else {
+            throw Meow.Error.referenceError(id: id, type: M)
         }
         
         return instance as! S
@@ -25,7 +25,10 @@ fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primit
 /// Packs a serializable into a primitive
 fileprivate func _pack(_ serializable: Serializable?) -> Primitive? {
     if let serializable = serializable as? BaseModel {
-        return DBRef(referencing: serializable._id, inCollection: type(of: serializable).collection)
+        return [
+            "_id": serializable._id,
+            "_ref": type(of: serializable).collection.name
+        ]
     } else {
         return serializable?.serialize()
     }

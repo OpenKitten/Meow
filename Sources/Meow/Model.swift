@@ -79,6 +79,11 @@ public protocol BaseModel : SerializableToDocument, Convertible, Identifyable {
     /// The database identifier. You do **NOT** need to add this yourself. It will be implemented for you using Sourcery.
     var _id: ObjectId { get set }
     
+    /// A list of all dot-notated keys that are a reference to a model and their referenced type
+    ///
+    /// The previous models chain is used to prevent infinite recursion
+    static func recursiveKeysWithReferences(chainedFrom previousModels: [BaseModel.Type]) throws -> [(String, BaseModel.Type)]
+    
     /// Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.
     func willDelete() throws
     
@@ -119,7 +124,32 @@ extension Model {
     ///
     /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
     public static func makeQuery(_ closure: QueryBuilder) rethrows -> Query {
-        return try closure(VirtualInstance(keyPrefix: ""))
+        return try closure(VirtualInstance(keyPrefix: "", isReference: false))
+    }
+    
+    /// A list of all dot-notated keys that are a reference to a model
+    public static func recursiveKeysWithReferences(chainedFrom previousModels: [BaseModel.Type]) throws -> [(String, BaseModel.Type)] {
+        let directKeys: [(String, BaseModel.Type)] = try Self.Key.all.flatMap { key in
+            guard let type = key.type as? BaseModel.Type else {
+                return nil
+            }
+            
+            for previousType in previousModels where type == previousType {
+                throw Meow.Error.infiniteRecursiveReference(from: Self.self, to: type)
+            }
+            
+            return (key.keyString, type)
+        }
+        
+        var indirectKeys = [(String, BaseModel.Type)]()
+        
+        for (prefix, type) in directKeys {
+            for (key, type) in try type.recursiveKeysWithReferences(chainedFrom: previousModels + [Self.self]) {
+                indirectKeys.append((prefix + "." + key, type))
+            }
+        }
+        
+        return directKeys + indirectKeys
     }
     
     /// Remove all instances matching the query.
@@ -133,7 +163,7 @@ extension Model {
     /// Performs a find operation using a type-safe query.
     ///
     /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
-    public static func find(sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> CollectionSlice<Self> {
+    public static func find(sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self> {
         return try find(makeQuery(query), sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
     }
     
@@ -200,11 +230,7 @@ extension BaseModel {
     /// Returns the first object matching the query
     public static func findOne(_ query: Query? = nil) throws -> Self? {
         // We don't reuse find here because that one does not have proper error reporting
-        guard let document = try collection.findOne(query) else {
-            return nil
-        }
-        
-        return try Self.instantiateIfNeeded(document)
+        return try Self.find(query, limitedTo: 1, withBatchSize: 1).next()
     }
     
     /// Saves this object to the database
@@ -260,8 +286,93 @@ extension BaseModel {
     ///
     /// - parameter query: The query to compare the database entities with
     /// - parameter sort: The order to sort the entities by
-    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> CollectionSlice<Self> {
-        return try collection.find(query, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize).flatMap { document in
+    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> Cursor<Self> {
+        var pipeline = AggregationPipeline()
+        var requirePipeline = false
+        
+        if var query = query?.makeDocument() {
+            var references = [(String, BaseModel.Type)]()
+            let referenceKeys = try Self.recursiveKeysWithReferences(chainedFrom: [])
+            
+            let referencedKeys = query.flattened().keys
+            var firstQuery = Document()
+            
+            var stages: [AggregationPipeline.Stage] = []
+            
+            func parseQuery(forKey prefix: [SubscriptExpressionType]) {
+                for (referenceKey, referenceType) in referenceKeys {
+                    var prefixTotal = ""
+                    var matches = false
+                    
+                    prefixCheck: for part in prefix {
+                        switch part.subscriptExpression {
+                        case .kittenBytes(let bytes):
+                            if let s = String(bytes: bytes.bytes, encoding: .utf8) {
+                                prefixTotal += s
+                            }
+                            
+                            if prefixTotal.hasPrefix(referenceKey + ".") && !prefixTotal.hasPrefix(referenceKey + "._id") {
+                                matches = true
+                                break prefixCheck
+                            }
+                        default:
+                            continue
+                        }
+                    }
+                    
+                    if matches {
+                        requirePipeline = true
+                        references.append((referenceKey, referenceType))
+                        stages.append(.lookup(from: referenceType.collection, localField: referenceKey + "._id", foreignField: "_id", as: referenceKey))
+                    } else {
+                        firstQuery[prefix] = query[prefix]
+                        query[prefix] = nil
+                    }
+                }
+            }
+            
+            for key in query.keys {
+                parseQuery(forKey: [key])
+            }
+            
+            if firstQuery.count > 0 {
+                pipeline.append(.match(firstQuery))
+            }
+            
+            for stage in stages {
+                pipeline.append(stage)
+            }
+            
+            if query.count > 0 {
+                pipeline.append(.match(query))
+            }
+        }
+        
+        if !requirePipeline {
+            return try collection.find(query, sortedBy: sort, skipping: skip, limitedTo: limit).flatMap { document in
+                do {
+                    return try Self.instantiateIfNeeded(document)
+                } catch {
+                    Meow.log("Initializing from document failed: \(error)")
+                    assertionFailure()
+                    return nil
+                }
+            }.cursor
+        }
+        
+        if let sort = sort {
+            pipeline.append(.sort(sort))
+        }
+        
+        if let skip = skip {
+            pipeline.append(.skip(skip))
+        }
+        
+        if let limit = limit {
+            pipeline.append(.limit(limit))
+        }
+        
+        return try collection.aggregate(pipeline).flatMap { document in
             do {
                 return try Self.instantiateIfNeeded(document)
             } catch {

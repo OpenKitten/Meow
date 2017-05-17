@@ -1,3 +1,4 @@
+
 //
 //  BaseModelTests.swift
 //  Meow
@@ -85,8 +86,8 @@ class CRUDTests : XCTestCase {
         
         let tigerBreed = try Breed.findOne()
         
-        try Tiger.remove(limitedTo: 2) {
-            $0.breed == tigerBreed
+        try Tiger.remove(limitedTo: 2) { tiger in
+            return tiger.breed == tigerBreed
         }
         
         XCTAssertEqual(try Tiger.count(), 2)
@@ -144,17 +145,30 @@ class CRUDTests : XCTestCase {
         let tiger = Tiger(breed: tigerBreed)
         try tiger.save()
         
-//        var tigerCount = try Tiger.count { tiger in
-//            return tiger.breed.name == "Normal"
-//        }
-//        
-//        XCTAssertEqual(tigerCount, 1)
-        
-        var tigerCount = try Tiger.count { tiger in
-            return tiger.breed == tigerBreed
-        }
+        var tigerCount = Array(try Tiger.find { tiger in
+            return tiger.breed.name == "Normal"
+        }).count
         
         XCTAssertEqual(tigerCount, 1)
+        
+        let catReference = CatReferencing(cat: tiger)
+        try catReference.save()
+        
+        let catReference2 = CatReferencing(cat: tiger)
+        try catReference2.save()
+        
+        let tigerBreed2 = Breed(name: "Normal")
+        try tigerBreed2.save()
+        
+        let otherTiger = Tiger(breed: tigerBreed2)
+        try otherTiger.save()
+        
+        let catReference3 = CatReferencing(cat: otherTiger)
+        try catReference.save()
+        
+        var normalCatLikeReferencingCount = try CatReferencing.count { cr in
+            return cr._id == nil
+        }
         
         var sameTiger = try Tiger.findOne()
         
@@ -169,7 +183,7 @@ class CRUDTests : XCTestCase {
         sameTiger = try Tiger.findOne("_id" == tiger._id)
         testSameTiger()
         
-        sameTiger = try Tiger.findOne("breed.$id" == tigerBreed._id)
+        sameTiger = try Tiger.findOne("breed._id" == tigerBreed._id)
         testSameTiger()
         
         sameTiger = try Tiger.findOne { $0._id == tiger._id }
@@ -197,6 +211,8 @@ class CRUDTests : XCTestCase {
         
         XCTAssertEqual(string, string.keyString)
         XCTAssertEqual(oid.keyString, oid.hexString)
+        
+        XCTAssertEqual(try Tiger.recursiveKeysWithReferences(chainedFrom: []).map { $0.0 }, [Tiger.Key.breed.keyString])
     }
 }
 
