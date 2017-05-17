@@ -81,7 +81,8 @@ public protocol BaseModel : SerializableToDocument, Convertible, Identifyable {
     
     /// A list of all dot-notated keys that are a reference to a model and their referenced type
     ///
-    /// The previous models chain is used to prevent infinite recursion
+    /// - parameter previousModels: The previous models chain is used to prevent infinite recursion. Whenever `recursiveKeysWithReferences` is queried, all types found will also be queried for their `recursiveKeysWithReferences` recursively.
+    /// - throws: When the recursion triggers a higher-level model that has been accessed earlier in the chain
     static func recursiveKeysWithReferences(chainedFrom previousModels: [BaseModel.Type]) throws -> [(String, BaseModel.Type)]
     
     /// Will be called when the Model will be deleted. Throwing from here will prevent the model from being deleted.
@@ -127,7 +128,10 @@ extension Model {
         return try closure(VirtualInstance(keyPrefix: "", isReference: false))
     }
     
-    /// A list of all dot-notated keys that are a reference to a model
+    /// A list of all dot-notated keys that are a reference to a model and their referenced type
+    ///
+    /// - parameter previousModels: The previous models chain is used to prevent infinite recursion. Whenever `recursiveKeysWithReferences` is queried, all types found will also be queried for their `recursiveKeysWithReferences` recursively.
+    /// - throws: When the recursion triggers a higher-level model that has been accessed earlier in the chain
     public static func recursiveKeysWithReferences(chainedFrom previousModels: [BaseModel.Type]) throws -> [(String, BaseModel.Type)] {
         let directKeys: [(String, BaseModel.Type)] = try Self.Key.all.flatMap { key in
             guard let type = key.type as? BaseModel.Type else {

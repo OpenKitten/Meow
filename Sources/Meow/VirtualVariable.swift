@@ -11,13 +11,21 @@ public protocol VirtualModelInstance {
     ///
     /// - parameter keyPrefix: The keyPrefix is prefixed to all query keys as returned from the VirtualInstance, for the
     /// purpose of being able to embed structs.
+    /// - parameter isReference: The isReference is true when the VirtualInstance is a referenced VirtualInstance rather than a directly queried VirtualInstance.
+    /// This is used to determine the kind and method to to create a query for data accessed from this VirtualInstance
     init(keyPrefix: String, isReference: Bool)
     
+    /// The prefix of all the queries generated from the VirtualInstance
     var keyPrefix: String { get }
+    
+    /// If this VirtualInstance is referenced from a higher-level query
     var isReference: Bool { get }
 }
 
 extension VirtualModelInstance {
+    /// Appends a dot (`"."`) to the keyPrefix if the VirtualInstance is a reference.
+    ///
+    /// This allows keys to be queried in a $match stage after a $lookup stage has been added.
     public var referencedKeyPrefix: String {
         if isReference {
             return keyPrefix + "."
