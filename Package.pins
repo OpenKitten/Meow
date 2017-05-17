@@ -5,7 +5,7 @@
       "package": "BSON",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/BSON.git",
-      "version": "5.0.3"
+      "version": "5.0.4"
     },
     {
       "package": "Cheetah",
@@ -29,7 +29,7 @@
       "package": "MongoKitten",
       "reason": null,
       "repositoryURL": "https://github.com/OpenKitten/MongoKitten.git",
-      "version": "4.0.1"
+      "version": "4.0.4"
     },
     {
       "package": "Schrodinger",
