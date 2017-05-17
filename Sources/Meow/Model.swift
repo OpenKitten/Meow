@@ -223,7 +223,7 @@ extension BaseModel {
             try self.didSave(wasUpdated: false)
             return
         }
-        
+                
         print("🐈 Saving \(self)")
         
         try Self.collection.update("_id" == self._id,

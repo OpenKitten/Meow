@@ -299,7 +299,7 @@ public enum Meow {
             objectPoolMutationQueue.sync {
                 // Only pool it if the instance is not invalidated
                 if !invalidatedObjectIds.contains(instance._id) {
-                    storage[instance._id] = (instance: Weak(instance.object), instantiation: Date(), hash: hash)
+                    storage[instance._id] = (instance: Weak(instance.object), instantiation: Date(), hash: hash ?? storage[instance._id]?.hash /* existing hash fallback */)
                 }
             }
         }
@@ -348,6 +348,7 @@ public enum Meow {
                 print("🐈 Error while saving \(type(of: instance)) \(instance._id) in deinit: \(error)")
                 assertionFailure()
             }
+            
             print("🐈 Unpooling \(instance)")
             
             objectPoolMutationQueue.sync {
