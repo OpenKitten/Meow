@@ -20,7 +20,7 @@ extension Meow {
         
         for M in Meow.types {
             guard let M = M as? BaseModel.Type else { continue }
-            print("Validating \(M)")
+            Meow.log("Validating \(M)")
             for document in try M.collection.find() {
                 do {
                     _ = try M.instantiateIfNeeded(document)

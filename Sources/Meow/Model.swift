@@ -219,12 +219,12 @@ extension BaseModel {
         let hash = document.meowHash
         
         guard force || hash != Meow.pool.existingHash(for: self) else {
-            print("🐈 Not saving \(self) because it is unchanged")
+            Meow.log("Not saving \(self) because it is unchanged")
             try self.didSave(wasUpdated: false)
             return
         }
                 
-        print("🐈 Saving \(self)")
+        Meow.log("Saving \(self)")
         
         try Self.collection.update("_id" == self._id,
                                    to: document,
@@ -265,7 +265,7 @@ extension BaseModel {
             do {
                 return try Self.instantiateIfNeeded(document)
             } catch {
-                print("🐈 Initializing from document failed: \(error)")
+                Meow.log("Initializing from document failed: \(error)")
                 assertionFailure()
                 return nil
             }

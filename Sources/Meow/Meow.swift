@@ -10,6 +10,14 @@ import Dispatch
 
 /// The main object, keeps track of the database
 public enum Meow {
+    public static var shouldLog = false
+    
+    public static func log(_ item: @autoclosure () -> (Any)) {
+        guard Meow.shouldLog else { return }
+        
+        print("🐈 ", item())
+    }
+    
     /// The database object
     public private(set) static var database: MongoKitten.Database!
     
@@ -18,7 +26,7 @@ public enum Meow {
     
     /// Initializes the static Meow database state with a MongoKitten.Database
     public static func `init`(_ db: MongoKitten.Database, _ types: [Any.Type]) {
-        print("🐈 Init")
+        Meow.log("Init")
         Meow.database = db
         Meow.types = types
         Meow.pool = ObjectPool()
@@ -103,14 +111,14 @@ public enum Meow {
     public static var minimumAutosaveAge: TimeInterval = 5
     
     private static func maintenance() {
-        print("🐈 Performing maintenance")
+        Meow.log("Performing maintenance")
         
         do {
             Meow.pool.clean()
             try Meow.pool.autoSave()
         } catch {
-            print("🐈❗ Error while performing maintenance")
-            print(error)
+            Meow.log("❗ Error while performing maintenance")
+            Meow.log(error)
             assertionFailure("\(error)")
         }
         
@@ -179,7 +187,7 @@ public enum Meow {
         
         /// Saves the database contents before exiting
         private func beforeExit() {
-            print("🐈 Performing pre-exit save")
+            Meow.log("Performing pre-exit save")
             
             for (_, object) in storage {
                 guard let instance = object as? BaseModel else {
@@ -189,13 +197,13 @@ public enum Meow {
                 do {
                     try instance.save()
                 } catch {
-                    print("🐈 Error while performing pre-exit save on \(instance)")
+                    Meow.log("Error while performing pre-exit save on \(instance)")
                     assertionFailure()
                 }
             }
             
             for id in unsavedObjectIds {
-                print("🐈 WARNING: An ObjectId \(id) was generated, but the object was not saved. This is probably because the object was not deallocated by ARC before program exit. The data has been lost, as Meow does not have access to it. To solve this, do not use models as global or top level variables. If you do use models as global or top level objects, make sure to call save() manually or add it to the object pool yourself using Meow.pool.pool(instance), for example in the initializer of the model.")
+                Meow.log("WARNING: An ObjectId \(id) was generated, but the object was not saved. This is probably because the object was not deallocated by ARC before program exit. The data has been lost, as Meow does not have access to it. To solve this, do not use models as global or top level variables. If you do use models as global or top level objects, make sure to call save() manually or add it to the object pool yourself using Meow.pool.pool(instance), for example in the initializer of the model.")
                 assertionFailure("This will crash on debug, but not on release builds.")
             }
         }
@@ -236,7 +244,7 @@ public enum Meow {
             }
             
             if let existingInstance = existingInstance {
-                print("🐈 Returning \(existingInstance) from pool")
+                Meow.log("Returning \(existingInstance) from pool")
                 return existingInstance
             }
             
@@ -256,15 +264,15 @@ public enum Meow {
             }
             
             if instantiation.thread != Thread.current {
-                print("🐈 Waiting for instance from other thread")
+                Meow.log("Waiting for instance from other thread")
                 let instance = try instantiation.await() as! M
-                print("🐈 Returning \(instance) from instantiation in other thread")
+                Meow.log("Returning \(instance) from instantiation in other thread")
                 return instance
             }
             
             return try instantiation.do {
                 let instance = try M(restoring: document)
-                print("🐈 Returning fresh instance \(instance)")
+                Meow.log("Returning fresh instance \(instance)")
                 
                 self.pool(instance, hash: document.meowHash)
                 
@@ -288,7 +296,7 @@ public enum Meow {
                 assert(current === instance.object, "two model instances with the same _id is invalid")
                 return
             } else {
-                print("🐈 Pooling \(instance)")
+                Meow.log("Pooling \(instance)")
                 objectPoolMutationQueue.sync {
                     if let index = unsavedObjectIds.index(of: instance._id) {
                         unsavedObjectIds.remove(at: index)
@@ -325,7 +333,7 @@ public enum Meow {
         public func free(_ id: ObjectId) {
             objectPoolMutationQueue.sync {
                 if let index = unsavedObjectIds.index(of: id) {
-                    print("🐈 Unregistering ObjectId \(id)")
+                    Meow.log("Unregistering ObjectId \(id)")
                     unsavedObjectIds.remove(at: index)
                 }
             }
@@ -345,11 +353,11 @@ public enum Meow {
                     try instance.save()
                 }
             } catch {
-                print("🐈 Error while saving \(type(of: instance)) \(instance._id) in deinit: \(error)")
+                Meow.log("Error while saving \(type(of: instance)) \(instance._id) in deinit: \(error)")
                 assertionFailure()
             }
             
-            print("🐈 Unpooling \(instance)")
+            Meow.log("Unpooling \(instance)")
             
             objectPoolMutationQueue.sync {
                 storage[instance._id] = nil

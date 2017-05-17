@@ -11,7 +11,7 @@ extension Meow {
         if let migrator = try Migrator("\(model.collection.name) - \(description)", on: model) {
             try migrator.execute(migration)
         } else {
-            print("🐈 Migration \"\(description)\" not needed")
+            Meow.log("Migration \"\(description)\" not needed")
         }
     }
 }
@@ -80,7 +80,7 @@ public final class Migrator<M : Model> {
     /// Executes the migration. If there are no models of the given type, the migration will be skipped.
     fileprivate func execute(_ migration: (Migrator) throws -> ()) throws {
         guard try M.collection.count() > 0 else {
-            print("🐈 Skipping migration \"\(description)\"")
+            Meow.log("Skipping migration \"\(description)\"")
             try Meow.migrationsCollection.insert([
                 "_id": description,
                 "date": Date(),
@@ -89,7 +89,7 @@ public final class Migrator<M : Model> {
             return
         }
         
-        print("🐈 Starting migration \"\(description)\"")
+        Meow.log("Starting migration \"\(description)\"")
         
         let start = Date()
         try migration(self) // generates the plan
@@ -104,7 +104,7 @@ public final class Migrator<M : Model> {
             "duration": duration
             ])
         
-        print("🐈 Migration \"\(description)\" finished in \(duration)s")
+        Meow.log("Migration \"\(description)\" finished in \(duration)s")
     }
     
     /// Runs the migration plan.
