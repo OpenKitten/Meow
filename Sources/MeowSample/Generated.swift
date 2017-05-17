@@ -188,8 +188,8 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
-	var isReference: Bool
+	public let keyPrefix: String
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -389,7 +389,7 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 	var isReference: Bool
 
 	
@@ -548,8 +548,8 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
-	var isReference: Bool
+	public let keyPrefix: String
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -701,8 +701,8 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
-	var isReference: Bool
+	public let keyPrefix: String
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -760,7 +760,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -813,7 +813,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -960,8 +960,8 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
-	var isReference: Bool
+	public let keyPrefix: String
+	public let isReference: Bool
 
 	
 

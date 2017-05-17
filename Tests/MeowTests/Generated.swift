@@ -12,7 +12,6 @@
 import Foundation
 import Meow
 import ExtendedJSON
-import MongoKitten
 
 
 // MARK: Protocols.ejs
@@ -189,17 +188,9 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
-	private var referencedKeyPrefix: String {
-		if isReference {
-			return keyPrefix + "."
-		} else {
-			return keyPrefix
-		}
-	}
-
-	var isReference: Bool
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -423,17 +414,9 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
-	private var referencedKeyPrefix: String {
-		if isReference {
-			return keyPrefix + "."
-		} else {
-			return keyPrefix
-		}
-	}
-
-	var isReference: Bool
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -595,17 +578,9 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
-	private var referencedKeyPrefix: String {
-		if isReference {
-			return keyPrefix + "."
-		} else {
-			return keyPrefix
-		}
-	}
-
-	var isReference: Bool
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -757,17 +732,9 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
-	private var referencedKeyPrefix: String {
-		if isReference {
-			return keyPrefix + "."
-		} else {
-			return keyPrefix
-		}
-	}
-
-	var isReference: Bool
+	public let isReference: Bool
 
 	
 	public var _id: VirtualObjectId {
@@ -825,7 +792,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -878,7 +845,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -1025,17 +992,9 @@ public struct VirtualInstance : VirtualModelInstance {
 		
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
-	private var referencedKeyPrefix: String {
-		if isReference {
-			return keyPrefix + "."
-		} else {
-			return keyPrefix
-		}
-	}
-
-	var isReference: Bool
+	public let isReference: Bool
 
 	
 
@@ -1144,7 +1103,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -1179,7 +1138,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -1196,7 +1155,7 @@ public struct VirtualInstance {
 // MARK: SerializableProtocol.ejs
 extension Document {
 	func unpack(_ key: String) throws -> CatLike {
-		guard let document = self[key] as? Document, let collectionName = String(document["_ref"]), let id = ObjectId(document["_id"]) else {
+		guard let document = self[key] as? Document, let collectionName = String(document["$ref"]), let id = ObjectId(document["_id"]) else {
 			throw Meow.Error.missingOrInvalidValue(key: key)
 		}
 

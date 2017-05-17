@@ -11,17 +11,9 @@
 		<% } %>
 	}
 
-	<%- acl %> var keyPrefix: String
+	<%- acl %> let keyPrefix: String
 
-	private var referencedKeyPrefix: String {
-		if isReference {
-			return keyPrefix + "."
-		} else {
-			return keyPrefix
-		}
-	}
-
-	var isReference: Bool
+	<%- acl %> let isReference: Bool
 
 	<% if(models.includes(serializable)) { %>
 	<%- acl %> var _id: VirtualObjectId {

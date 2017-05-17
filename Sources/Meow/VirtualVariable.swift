@@ -12,6 +12,19 @@ public protocol VirtualModelInstance {
     /// - parameter keyPrefix: The keyPrefix is prefixed to all query keys as returned from the VirtualInstance, for the
     /// purpose of being able to embed structs.
     init(keyPrefix: String, isReference: Bool)
+    
+    var keyPrefix: String { get }
+    var isReference: Bool { get }
+}
+
+extension VirtualModelInstance {
+    public var referencedKeyPrefix: String {
+        if isReference {
+            return keyPrefix + "."
+        } else {
+            return keyPrefix
+        }
+    }
 }
 
 /// A virtual variable, as property on a VirtualModelInstance. Generates typesafe queries.
