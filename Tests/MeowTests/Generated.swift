@@ -146,7 +146,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 
@@ -312,7 +312,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 
@@ -520,7 +520,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 
@@ -746,7 +746,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 
@@ -910,7 +910,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 
@@ -1064,7 +1064,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 
@@ -1222,7 +1222,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 	public var _id: VirtualObjectId {
-		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
 	}
 	
 

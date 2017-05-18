@@ -378,13 +378,19 @@ public enum Meow {
         }
         
         /// Removes deallocated entries from the pool
-        public func clean() {
+        @discardableResult
+        public func clean() -> Int {
             return objectPoolMutationQueue.sync {
+                var cleanedCount = 0
+                
                 for (id, val) in storage {
                     if val.instance.value == nil {
                         storage[id] = nil
+                        cleanedCount += 1
                     }
                 }
+                
+                return cleanedCount
             }
         }
         

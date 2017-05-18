@@ -170,6 +170,10 @@ class CRUDTests : XCTestCase {
             return cr._id == nil
         }
         
+        XCTAssertEqual(tiger._id, tiger.databaseIdentifier)
+        
+        XCTAssert(Meow.pool.isPooled(tiger))
+        
         var sameTiger = try Tiger.findOne()
         
         func testSameTiger() {
@@ -184,6 +188,9 @@ class CRUDTests : XCTestCase {
         testSameTiger()
         
         sameTiger = try Tiger.findOne("breed._id" == tigerBreed._id)
+        testSameTiger()
+        
+        sameTiger = try Tiger.findOne { $0.breed._id == tigerBreed._id }
         testSameTiger()
         
         sameTiger = try Tiger.findOne { $0._id == tiger._id }
