@@ -91,7 +91,7 @@ extension Beer : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .name]
 		}
 	}
@@ -253,7 +253,7 @@ extension BeerSuggestion : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .suggestor, .beer]
 		}
 	}
@@ -449,7 +449,7 @@ extension Breed : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .name, .country, .origin, .kaas, .geval]
 		}
 	}
@@ -671,7 +671,7 @@ extension Cat : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .name, .breed, .social, .bestFriend, .family, .favouriteNumber]
 		}
 	}
@@ -855,7 +855,7 @@ extension CatReferencing : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .cat]
 		}
 	}
@@ -1009,7 +1009,7 @@ extension Tiger : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .breed]
 		}
 	}
@@ -1167,7 +1167,7 @@ extension User : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [._id, .username]
 		}
 	}
@@ -1423,7 +1423,7 @@ extension Breed.Thing : SerializableToDocument {
 			}
 		}
 
-		public static var all: [Key] {
+		public static var all: Set<Key> {
 			return [.henk, .fred]
 		}
 	}
