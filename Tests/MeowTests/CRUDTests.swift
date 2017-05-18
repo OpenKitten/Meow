@@ -65,6 +65,32 @@ class CRUDTests : XCTestCase {
         }), 1)
     }
     
+    func testRelationships() throws {
+        let breed = Breed(name: "superbreed")
+        
+        try breed.save()
+        
+        let tiger = Tiger(breed: breed)
+        
+        XCTAssert(tiger.breed == breed)
+        XCTAssert(tiger.sameBreed == breed)
+        XCTAssert(tiger.sameBreed == tiger.breed)
+        
+        let resolvedSameBreed = try *tiger.sameBreed
+        
+        XCTAssertEqual(resolvedSameBreed._id, breed._id)
+        XCTAssertEqual(Reference(to: breed), tiger.sameBreed)
+        XCTAssert(breed == Reference(to: breed))
+        
+        let breed2 = try Reference<Breed>(restoring: Reference(to: breed).serialize()).resolve()
+        XCTAssert(breed == breed2)
+        XCTAssert(Reference(to: breed) == tiger.sameBreed)
+        
+        XCTAssertEqual(tiger.sameBreed.databaseIdentifier, breed._id)
+        
+        XCTAssert(Tiger.collection.model == Tiger.self)
+    }
+    
     func testEnums() throws {
         let cat = Cat(name: "MoopCat", breed: "SuperCat", bestFriend: nil, family: [])
         cat.social = SocialMedia.facebook(name: "MoopCat")

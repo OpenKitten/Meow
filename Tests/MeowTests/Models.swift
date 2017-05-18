@@ -13,9 +13,11 @@ public enum Numbers : Int {
 
 public class Tiger : Model, CatLike {
     public var breed: Breed
+    public var sameBreed: Reference<Breed>
     
     public init(breed: Breed) {
         self.breed = breed
+        self.sameBreed = Reference(to: breed)
     }
     
     // sourcery:inline:auto:Tiger.Meow
@@ -28,6 +30,7 @@ public class Tiger : Model, CatLike {
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.breed = try document.unpack(Key.breed.keyString)
+		self.sameBreed = try document.unpack(Key.sameBreed.keyString)
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
@@ -36,6 +39,7 @@ public class Tiger : Model, CatLike {
 		}
 
 		
+		self.sameBreed = (try document.unpack(Key.sameBreed.keyString)) 
 		self.breed = (try document.unpack(Key.breed.keyString)) 
 	}
 
@@ -138,10 +142,10 @@ public class Breed : Model, ExpressibleByStringLiteral {
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
-		self.country = try? document.unpack(Key.country.keyString)
-		self.origin = try? document.unpack(Key.origin.keyString)
+		self.country = try document[Key.country.keyString] == nil ? nil : document.unpack(Key.country.keyString)
+		self.origin = try document[Key.origin.keyString] == nil ? nil : document.unpack(Key.origin.keyString)
 		self.kaas = try document.unpack(Key.kaas.keyString)
-		self.geval = try? document.unpack(Key.geval.keyString)
+		self.geval = try document[Key.geval.keyString] == nil ? nil : document.unpack(Key.geval.keyString)
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
@@ -204,10 +208,10 @@ class Cat : Model, CatLike {
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
 		self.breed = try document.unpack(Key.breed.keyString)
-		self.social = try? document.unpack(Key.social.keyString)
-		self.bestFriend = try? document.unpack(Key.bestFriend.keyString)
+		self.social = try document[Key.social.keyString] == nil ? nil : document.unpack(Key.social.keyString)
+		self.bestFriend = try document[Key.bestFriend.keyString] == nil ? nil : document.unpack(Key.bestFriend.keyString)
 		self.family = try document.unpack(Key.family.keyString)
-		self.favouriteNumber = try? document.unpack(Key.favouriteNumber.keyString)
+		self.favouriteNumber = try document[Key.favouriteNumber.keyString] == nil ? nil : document.unpack(Key.favouriteNumber.keyString)
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {

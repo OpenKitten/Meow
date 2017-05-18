@@ -953,6 +953,7 @@ extension Tiger : SerializableToDocument {
 		var document: Document = [:]
 		document.pack(self._id, as: "_id")
 		document.pack(self.breed, as: Key.breed.keyString)
+		document.pack(self.sameBreed, as: Key.sameBreed.keyString)
 		return document
 	}
 
@@ -960,6 +961,9 @@ extension Tiger : SerializableToDocument {
 		let keys = document.keys
 		if keys.contains(Key.breed.keyString) {
 			_ = (try document.unpack(Key.breed.keyString)) as Breed
+		}
+		if keys.contains(Key.sameBreed.keyString) {
+			_ = (try document.unpack(Key.sameBreed.keyString)) as Reference<Breed>
 		}
 	}
 
@@ -970,6 +974,8 @@ extension Tiger : SerializableToDocument {
 			switch key {
 			case Key.breed.keyString:
 				self.breed = try document.unpack(Key.breed.keyString)
+			case Key.sameBreed.keyString:
+				self.sameBreed = try document.unpack(Key.sameBreed.keyString)
 			default: break
 			}
 		}
@@ -998,6 +1004,7 @@ extension Tiger : SerializableToDocument {
 	public enum Key : String, ModelKey {
 		case _id
 		case breed = "breed"
+		case sameBreed = "same_breed"
 
 
 		public var keyString: String { return self.rawValue }
@@ -1006,11 +1013,12 @@ extension Tiger : SerializableToDocument {
 			switch self {
 			case ._id: return ObjectId.self
 			case .breed: return Breed.self
+			case .sameBreed: return Reference<Breed>.self
 			}
 		}
 
 		public static var all: Set<Key> {
-			return [._id, .breed]
+			return [._id, .breed, .sameBreed]
 		}
 	}
 
@@ -1028,11 +1036,13 @@ extension Tiger : SerializableToDocument {
 		}
 
 		public var breed: Breed?
+		public var sameBreed: Reference<Breed>?
 
 
 		public func serialize() -> Document {
 			var document: Document = [:]			
 			document.pack(self.breed, as: Key.breed.keyString)
+			document.pack(self.sameBreed, as: Key.sameBreed.keyString)
 			return document
 		}
 
@@ -1041,6 +1051,8 @@ extension Tiger : SerializableToDocument {
 				switch key {
 				case Key.breed.keyString:
 					self.breed = try document.unpack(Key.breed.keyString)
+				case Key.sameBreed.keyString:
+					self.sameBreed = try document.unpack(Key.sameBreed.keyString)
 				default: break
 				}
 			}
@@ -1071,6 +1083,8 @@ public struct VirtualInstance : VirtualModelInstance {
 	
 		 /// breed: Breed
 		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.breed.keyString, isReference: true) } 
+		 /// sameBreed: Reference<Breed>
+		 
 
 	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix

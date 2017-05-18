@@ -64,8 +64,8 @@ public struct Reference<M: BaseModel> : Serializable, Hashable, Identifyable {
     
     /// Deserializes a reference
     public init(restoring source: Primitive) throws {
-        let document = try Meow.Helpers.requireValue(source as? Document, keyForError: "reference to \(M.self)")
-        self.reference = try Meow.Helpers.requireValue(document["_id"] as? ObjectId, keyForError: "ObjectId for reference to \(M.self)")
+        let document = try Meow.Helpers.requireValue(Document(source), keyForError: "reference to \(M.self)")
+        self.reference = try Meow.Helpers.requireValue(ObjectId(document["_id"]), keyForError: "ObjectId for reference to \(M.self)")
     }
     
     /// Serializes a reference
