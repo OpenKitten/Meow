@@ -273,7 +273,7 @@ public enum Meow {
             }
             
             return try instantiation.do {
-                let instance = try M(restoring: document)
+                let instance = try M(restoring: document, key: "")
                 Meow.log("Returning fresh instance \(instance)")
                 
                 self.pool(instance, hash: document.meowHash)

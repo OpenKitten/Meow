@@ -36,9 +36,9 @@
 
 			// reference
 			if (variable.type.based["Model"]) {
-			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%- variable.unwrappedTypeName %>.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString, isReference: true) } <%
+			 %><%- acl %> var <%- variable.name %>: <%- variableTypeString(variable, {canBeOptional: false}) %>.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString, isReference: true) } <%
 			} else {
-			 %><%- acl %> var <%- variable.name %>: <%- variable.unwrappedTypeName %>.VirtualInstance { return <%-variable.unwrappedTypeName%>.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString) } <%
+			 %><%- acl %> var <%- variable.name %>: <%- variableTypeString(variable, {canBeOptional: false}) %>.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString) } <%
 			}
 		 }
 	}) %>

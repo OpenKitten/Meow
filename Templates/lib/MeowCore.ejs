@@ -127,8 +127,39 @@ Object.assign(window, {
 	*/
 	underscoreCase(string) {
 		return string.replace(/ /g, "_").toLowerCase();
+	},
+	
+	/**
+	Returns the type string on how to refer to the variable type. Correctly handles arrays and embedded types.
+	*/
+	variableTypeString(variable, {canBeOptional} = {canBeOptional: true}) {
+		if (variable.typeName.isArray) {
+			let array = variable.typeName.array;
+			return 'Array<' + (array.descend('elementType', 'name') || array.descend('elementTypeName', 'name')) + '>'
+		}
+		
+		let name;
+		if (name = variable.descend('type', 'name')) {
+			return variable.isOptional && canBeOptional ? name + '?' : name;
+		}
+		
+		return canBeOptional ? variable.typeName.name : variable.typeName.unwrappedTypeName;
 	}
-})
+});
+
+Object.defineProperty(Object.prototype, 'descend', {
+	value: function(){
+		var keys = arguments;
+		var cur = this;
+		for(var i=0; i<keys.length; i++){
+			var key = keys[i];
+			var cur = cur[key];
+			if(typeof(cur)=='undefined')
+				return cur;
+		}
+		return cur;
+	}
+});
 
 %>
 

@@ -22,7 +22,7 @@ public class Tiger : Model, CatLike {
     
     // sourcery:inline:auto:Tiger.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -62,7 +62,7 @@ public class CatReferencing : Model {
     
     // sourcery:inline:auto:CatReferencing.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -134,7 +134,7 @@ public class Breed : Model, ExpressibleByStringLiteral {
     
     // sourcery:inline:auto:Breed.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -199,7 +199,7 @@ class Cat : Model, CatLike {
     
     // sourcery:inline:auto:Cat.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
 		}

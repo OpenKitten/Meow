@@ -4,7 +4,7 @@
 	/// Represents (part of) the values of a <%- serializable.name %>
 	<%- acl %> struct Values : ModelValues<%- inheritedProtocols.length > 0 ? inheritedProtocols.map(p => ', ' + p.name + 'Values').join("") : '' %> {
 		<%- acl %> init() {}
-		<%- acl %> init(restoring source: BSON.Primitive) throws {
+		<%- acl %> init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -14,7 +14,7 @@
 		<%_ serializable.instanceVariables.forEach(variable => {
 			if(variable.isComputed || variable.name == "_id") { return; }
 			-%>
-		<%- acl %> var <%- variable.name -%>: <%- variable.unwrappedTypeName %>?
+		<%- acl %> var <%- variable.name -%>: <%- variableTypeString(variable, {canBeOptional: false}) %>?
 		<%_ }) %>
 
 		<%- acl %> func serialize() -> Document {

@@ -102,7 +102,7 @@ extension Beer : SerializableToDocument {
 	/// Represents (part of) the values of a Beer
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: Beer.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -264,7 +264,7 @@ extension BeerSuggestion : SerializableToDocument {
 	/// Represents (part of) the values of a BeerSuggestion
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: BeerSuggestion.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -318,9 +318,9 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 		 /// suggestor: User
-		 public var suggestor: User.VirtualInstance { return User.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.suggestor.keyString, isReference: true) } 
+		 public var suggestor: User.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.suggestor.keyString, isReference: true) } 
 		 /// beer: Beer
-		 public var beer: Beer.VirtualInstance { return Beer.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.beer.keyString, isReference: true) } 
+		 public var beer: Beer.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.beer.keyString, isReference: true) } 
 
 	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
@@ -370,16 +370,16 @@ extension Breed : SerializableToDocument {
 			_ = (try document.unpack(Key.name.keyString)) as String
 		}
 		if keys.contains(Key.country.keyString) {
-			_ = (try document.unpack(Key.country.keyString)) as Country?
+			_ = (try document.unpack(Key.country.keyString)) as Breed.Country
 		}
 		if keys.contains(Key.origin.keyString) {
-			_ = (try document.unpack(Key.origin.keyString)) as Origin?
+			_ = (try document.unpack(Key.origin.keyString)) as Breed.Origin
 		}
 		if keys.contains(Key.kaas.keyString) {
 			_ = (try document.unpack(Key.kaas.keyString)) as (String,String,String)
 		}
 		if keys.contains(Key.geval.keyString) {
-			_ = (try document.unpack(Key.geval.keyString)) as Thing?
+			_ = (try document.unpack(Key.geval.keyString)) as Breed.Thing
 		}
 	}
 
@@ -442,10 +442,10 @@ extension Breed : SerializableToDocument {
 			switch self {
 			case ._id: return ObjectId.self
 			case .name: return String.self
-			case .country: return Country.self
-			case .origin: return Origin.self
+			case .country: return Breed.Country.self
+			case .origin: return Breed.Origin.self
 			case .kaas: return (String,String,String).self
-			case .geval: return Thing.self
+			case .geval: return Breed.Thing.self
 			}
 		}
 
@@ -460,7 +460,7 @@ extension Breed : SerializableToDocument {
 	/// Represents (part of) the values of a Breed
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: Breed.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -468,10 +468,10 @@ extension Breed : SerializableToDocument {
 		}
 
 		public var name: String?
-		public var country: Country?
-		public var origin: Origin?
+		public var country: Breed.Country?
+		public var origin: Breed.Origin?
 		public var kaas: (String,String,String)?
-		public var geval: Thing?
+		public var geval: Breed.Thing?
 
 
 		public func serialize() -> Document {
@@ -528,13 +528,13 @@ public struct VirtualInstance : VirtualModelInstance {
 		 /// name: String
 		 public var name: VirtualString { return VirtualString(name: referencedKeyPrefix + Key.name.keyString) } 
 		 /// country: Country?
-		 public var country: Country.VirtualInstance { return Country.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.country.keyString) } 
+		 public var country: Breed.Country.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.country.keyString) } 
 		 /// origin: Origin?
-		 public var origin: Origin.VirtualInstance { return Origin.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.origin.keyString) } 
+		 public var origin: Breed.Origin.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.origin.keyString) } 
 		 /// kaas: (String,String,String)
 		 
 		 /// geval: Thing?
-		 public var geval: Thing.VirtualInstance { return Thing.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.geval.keyString) } 
+		 public var geval: Breed.Thing.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.geval.keyString) } 
 
 	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
@@ -588,16 +588,16 @@ extension Cat : SerializableToDocument {
 			_ = (try document.unpack(Key.breed.keyString)) as Breed
 		}
 		if keys.contains(Key.social.keyString) {
-			_ = (try document.unpack(Key.social.keyString)) as SocialMedia?
+			_ = (try document.unpack(Key.social.keyString)) as SocialMedia
 		}
 		if keys.contains(Key.bestFriend.keyString) {
-			_ = (try document.unpack(Key.bestFriend.keyString)) as Reference<Cat>?
+			_ = (try document.unpack(Key.bestFriend.keyString)) as Reference<Cat>
 		}
 		if keys.contains(Key.family.keyString) {
-			_ = (try document.unpack(Key.family.keyString)) as [Cat]
+			_ = (try document.unpack(Key.family.keyString)) as Array<Cat>
 		}
 		if keys.contains(Key.favouriteNumber.keyString) {
-			_ = (try document.unpack(Key.favouriteNumber.keyString)) as Numbers?
+			_ = (try document.unpack(Key.favouriteNumber.keyString)) as Numbers
 		}
 	}
 
@@ -666,7 +666,7 @@ extension Cat : SerializableToDocument {
 			case .breed: return Breed.self
 			case .social: return SocialMedia.self
 			case .bestFriend: return Reference<Cat>.self
-			case .family: return [Cat].self
+			case .family: return Array<Cat>.self
 			case .favouriteNumber: return Numbers.self
 			}
 		}
@@ -682,7 +682,7 @@ extension Cat : SerializableToDocument {
 	/// Represents (part of) the values of a Cat
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: Cat.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -693,7 +693,7 @@ extension Cat : SerializableToDocument {
 		public var breed: Breed?
 		public var social: SocialMedia?
 		public var bestFriend: Reference<Cat>?
-		public var family: [Cat]?
+		public var family: Array<Cat>?
 		public var favouriteNumber: Numbers?
 
 
@@ -754,15 +754,15 @@ public struct VirtualInstance : VirtualModelInstance {
 		 /// name: String
 		 public var name: VirtualString { return VirtualString(name: referencedKeyPrefix + Key.name.keyString) } 
 		 /// breed: Breed
-		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.breed.keyString, isReference: true) } 
+		 public var breed: Breed.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.breed.keyString, isReference: true) } 
 		 /// social: SocialMedia?
-		 public var social: SocialMedia.VirtualInstance { return SocialMedia.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.social.keyString) } 
+		 public var social: SocialMedia.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.social.keyString) } 
 		 /// bestFriend: Reference<Cat>?
 		 
 		 /// family: [Cat]
 		 
 		 /// favouriteNumber: Numbers?
-		 public var favouriteNumber: Numbers.VirtualInstance { return Numbers.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.favouriteNumber.keyString) } 
+		 public var favouriteNumber: Numbers.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.favouriteNumber.keyString) } 
 
 	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
@@ -866,7 +866,7 @@ extension CatReferencing : SerializableToDocument {
 	/// Represents (part of) the values of a CatReferencing
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: CatReferencing.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -1028,7 +1028,7 @@ extension Tiger : SerializableToDocument {
 	/// Represents (part of) the values of a Tiger
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: Tiger.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -1082,7 +1082,7 @@ public struct VirtualInstance : VirtualModelInstance {
 
 	
 		 /// breed: Breed
-		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: referencedKeyPrefix + Key.breed.keyString, isReference: true) } 
+		 public var breed: Breed.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.breed.keyString, isReference: true) } 
 		 /// sameBreed: Reference<Breed>
 		 
 
@@ -1192,7 +1192,7 @@ extension User : SerializableToDocument {
 	/// Represents (part of) the values of a User
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: User.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -1271,7 +1271,7 @@ extension User : CustomStringConvertible {
 // MARK: Serializable.ejs
 // MARK: SerializableEnum.ejs
 extension Breed.Country : Serializable {
-	public init(restoring source: BSON.Primitive) throws {
+	public init(restoring source: BSON.Primitive, key: String) throws {
 		guard let value = String(source), let me = Breed.Country(rawValue: value) else {
 			throw Meow.Error.cannotDeserialize(type: Breed.Country.self, source: source, expectedPrimitive: String.self)
 		}
@@ -1306,7 +1306,7 @@ public struct VirtualInstance {
 // MARK: Serializable.ejs
 // MARK: SerializableEnum.ejs
 extension Breed.Origin : Serializable {
-	public init(restoring source: BSON.Primitive) throws {
+	public init(restoring source: BSON.Primitive, key: String) throws {
 		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
 			throw Meow.Error.cannotDeserialize(type: Breed.Origin.self, source: source, expectedPrimitive: String.self)
 		}
@@ -1363,7 +1363,7 @@ extension Breed.Thing : SerializableToDocument {
 	
 	
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public init(restoring source: BSON.Primitive) throws {
+	public init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -1448,7 +1448,7 @@ extension Breed.Thing : SerializableToDocument {
 	/// Represents (part of) the values of a Breed.Thing
 	public struct Values : ModelValues {
 		public init() {}
-		public init(restoring source: BSON.Primitive) throws {
+		public init(restoring source: BSON.Primitive, key: String) throws {
 			guard let document = source as? BSON.Document else {
 				throw Meow.Error.cannotDeserialize(type: Breed.Thing.Values.self, source: source, expectedPrimitive: BSON.Document.self);
 			}
@@ -1529,7 +1529,7 @@ extension Breed.Thing : CustomStringConvertible {
 // MARK: Serializable.ejs
 // MARK: SerializableEnum.ejs
 extension SocialMedia : Serializable {
-	public init(restoring source: BSON.Primitive) throws {
+	public init(restoring source: BSON.Primitive, key: String) throws {
 		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
 			throw Meow.Error.cannotDeserialize(type: SocialMedia.self, source: source, expectedPrimitive: String.self)
 		}
@@ -1617,7 +1617,7 @@ public struct VirtualInstance {
 // MARK: Serializable.ejs
 // MARK: SerializableEnum.ejs
 extension Numbers : Serializable {
-	public init(restoring source: BSON.Primitive) throws {
+	public init(restoring source: BSON.Primitive, key: String) throws {
 		guard let value = Int(source), let me = Numbers(rawValue: value) else {
 			throw Meow.Error.cannotDeserialize(type: Numbers.self, source: source, expectedPrimitive: Int.self)
 		}

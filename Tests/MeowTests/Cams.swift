@@ -9,7 +9,7 @@ class Beer : Model {
 
 // sourcery:inline:auto:Beer.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Beer.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -49,7 +49,7 @@ class BeerSuggestion : Model {
 
 // sourcery:inline:auto:BeerSuggestion.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: BeerSuggestion.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
@@ -120,7 +120,7 @@ class User : Model {
 
 // sourcery:inline:auto:User.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
-	public required init(restoring source: BSON.Primitive) throws {
+	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: User.self, source: source, expectedPrimitive: BSON.Document.self);
 		}

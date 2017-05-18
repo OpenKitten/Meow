@@ -11,7 +11,7 @@ import Foundation
 
 // MARK: - General Information
 // Supported Primitives: ObjectId, String, Int, Int32, Bool, Document, Double, Data, Binary, Date, RegularExpression
-// Sourcery Types: extension DBRef, extension DispatchTime, extension Document, extension Double, struct File, extension GridFS, enum IndexAttribute, extension Int, extension Int32, enum Meow, enum Meow.Error, enum Meow.Helpers, class Meow.ObjectPool, enum Meow.ValidationError, class Migrator, enum Migrator.Step, extension MongoKitten.Collection, extension ObjectId, struct Reference, extension String, struct VirtualArray, struct VirtualBool, struct VirtualData, struct VirtualDate, struct VirtualDocument, struct VirtualEmbeddablesArray, struct VirtualNumber, struct VirtualObjectId, struct VirtualString, struct Weak
+// Sourcery Types: extension DBRef, extension DispatchTime, extension Document, extension Double, extension GridFS.File, enum IndexAttribute, extension Int, extension Int32, enum Meow, enum Meow.Error, enum Meow.Helpers, class Meow.ObjectPool, class Meow.ObjectPool.RunningInstantiation, enum Meow.ObjectPool.RunningInstantiation.Result, enum Meow.ValidationError, class Migrator, enum Migrator.Step, extension MongoKitten.Collection, extension ObjectId, struct Reference, extension String, struct VirtualArray, struct VirtualBool, struct VirtualData, struct VirtualDate, struct VirtualDocument, struct VirtualEmbeddablesArray, struct VirtualNumber, struct VirtualObjectId, struct VirtualString, struct Weak
 
 // MARK: SupportedPrimitives.ejs
 
@@ -20,8 +20,8 @@ extension ObjectId : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(ObjectId(source), keyForError: "primitive ObjectId")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(ObjectId(source), keyForError: key)
 	}
 
     /// Serializes the ObjectId into a BSON primitive
@@ -37,8 +37,8 @@ extension String : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(String(source), keyForError: "primitive String")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(String(source), keyForError: key)
 	}
 
     /// Serializes the String into a BSON primitive
@@ -54,8 +54,8 @@ extension Int : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Int(source), keyForError: "primitive Int")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Int(source), keyForError: key)
 	}
 
     /// Serializes the Int into a BSON primitive
@@ -71,8 +71,8 @@ extension Int32 : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Int32(source), keyForError: "primitive Int32")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Int32(source), keyForError: key)
 	}
 
     /// Serializes the Int32 into a BSON primitive
@@ -88,8 +88,8 @@ extension Bool : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Bool(source), keyForError: "primitive Bool")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Bool(source), keyForError: key)
 	}
 
     /// Serializes the Bool into a BSON primitive
@@ -105,8 +105,8 @@ extension Document : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Document(source), keyForError: "primitive Document")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Document(source), keyForError: key)
 	}
 
     /// Serializes the Document into a BSON primitive
@@ -122,8 +122,8 @@ extension Double : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Double(source), keyForError: "primitive Double")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Double(source), keyForError: key)
 	}
 
     /// Serializes the Double into a BSON primitive
@@ -139,8 +139,8 @@ extension Data : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Data(source), keyForError: "primitive Data")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Data(source), keyForError: key)
 	}
 
     /// Serializes the Data into a BSON primitive
@@ -156,8 +156,8 @@ extension Binary : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Binary(source), keyForError: "primitive Binary")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Binary(source), keyForError: key)
 	}
 
     /// Serializes the Binary into a BSON primitive
@@ -173,8 +173,8 @@ extension Date : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(Date(source), keyForError: "primitive Date")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(Date(source), keyForError: key)
 	}
 
     /// Serializes the Date into a BSON primitive
@@ -190,8 +190,8 @@ extension RegularExpression : Serializable {
     ///
     /// - parameter source: The BSON primitive
     /// - throws: When the primitive is of the wrong type
-	public init(restoring source: Primitive) throws {
-		self = try Meow.Helpers.requireValue(RegularExpression(source), keyForError: "primitive RegularExpression")
+	public init(restoring source: Primitive, key: String) throws {
+		self = try Meow.Helpers.requireValue(RegularExpression(source), keyForError: key)
 	}
 
     /// Serializes the RegularExpression into a BSON primitive

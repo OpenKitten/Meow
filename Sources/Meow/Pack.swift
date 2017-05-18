@@ -18,7 +18,7 @@ fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primit
             throw Meow.Error.missingValue(key: key)
         }
         
-        return try S(restoring: primitive)
+        return try S(restoring: primitive, key: key)
     }
 }
 

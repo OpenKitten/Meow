@@ -15,7 +15,7 @@
 			switch self {
 			<% if (serializable.based["Model"]) { %>case ._id: return ObjectId.self<% } %>
 			<%_ keyEnumVariables.forEach(variable => { -%>
-			case .<%- variable.name -%>: return <%- variable.unwrappedTypeName %>.self
+			case .<%- variable.name -%>: return <%- variableTypeString(variable, {canBeOptional: false}) %>.self
 			<%_ }) -%>
 			}
 		}
