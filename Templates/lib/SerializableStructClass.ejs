@@ -17,8 +17,17 @@ extension <%- serializable.name %> : SerializableToDocument {
 			if (variable.isComputed || variable.isStatic) { return; }
 
 			ensureSerializable(variable.type || variable.typeName);
+			
+			if (variable.isOptional) {
 			%>
-		self.<%- variable.name %> = try<%- variable.isOptional ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)<%
+		self.<%- variable.name %> = try document[Key.<%- variable.name %>.keyString] == nil ? nil : document.unpack(Key.<%- variable.name %>.keyString)<%
+			} else if (variable.defaultValue) {
+			%>
+		self.<%- variable.name %> = try (document[Key.<%- variable.name %>.keyString] == nil ? self.<%- variable.name %> : document.unpack(Key.<%- variable.name %>.keyString))<%
+			} else {
+			%>
+		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)<%
+			}
 		});
 		%>
 	}
