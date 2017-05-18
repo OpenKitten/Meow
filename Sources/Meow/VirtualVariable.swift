@@ -119,34 +119,6 @@ public struct VirtualArray<V: VirtualVariable> : VirtualVariable {
     }
 }
 
-/// A queryable reference to `M`
-// sourcery: donotequate
-public struct VirtualReference<M : BaseModel> : VirtualVariable {
-    /// :nodoc:
-    public var name: String
-    /// :nodoc:
-    public init(name: String) { self.name = name }
-    
-    /// Matches if the subject refers to an object with `_id` `id`
-    public func refers(to id: ObjectId) -> Query {
-        return (self.name + "._id") == id
-    }
-    
-    /// Matches if the subject refers to `instance`
-    public func refers(to instance: M) -> Query {
-        return self.refers(to: instance._id)
-    }
-    
-    /// Matches if `lhs` refers to `rhs` 
-    public static func ==(_ lhs: VirtualReference<M>, _ rhs: M?) -> Query {
-        if let rhs = rhs {
-            return lhs.refers(to: rhs)
-        } else {
-            return lhs == nil
-        }
-    }
-}
-
 // sourcery: donotequate
 public struct VirtualEmbeddablesArray<V: Serializable> : VirtualVariable {
     public var name: String
