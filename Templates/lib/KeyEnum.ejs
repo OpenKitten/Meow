@@ -20,7 +20,7 @@
 			}
 		}
 
-		<%- acl %> static var all: [Key] {
+		<%- acl %> static var all: Set<Key> {
 			return [<% if (serializable.based["Model"]) { %>._id<% if (keyEnumVariables.length > 0) {%>, <% }} -%>
 			<%_ %><%- keyEnumVariables.map(v => "." + v.name).join(", ") %>]
 		}

@@ -17,8 +17,8 @@ public protocol ModelKey : KeyRepresentable {
     /// The type of the variable that this key represents in the model
     var type: Any.Type { get }
     
-    /// An array containing all keys belonging to the model
-    static var all: [Self] { get }
+    /// All keys belonging to the model
+    static var all: Set<Self> { get }
     
 }
 
