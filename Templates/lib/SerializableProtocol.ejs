@@ -1,14 +1,18 @@
 // MARK: SerializableProtocol.ejs
 extension Document {
 	func unpack(_ key: String) throws -> <%- serializable.name %> {
-		guard let document = self[key] as? Document, let ref = DBRef(document, inDatabase: Meow.database) else {
+		guard let document = self[key] as? Document, let collectionName = String(document["$ref"]), let id = ObjectId(document["_id"]) else {
 			throw Meow.Error.missingOrInvalidValue(key: key)
 		}
-		
-		guard let instance = try ref.resolveModel() as? <%- serializable.name %> else {
+
+		guard let modelType = Meow.database[collectionName].model else {
 			throw Meow.Error.missingOrInvalidValue(key: key)
 		}
-		
+
+		guard let instance = try modelType.findOne("_id" == id) as? <%- serializable.name %> else {
+			throw Meow.Error.missingOrInvalidValue(key: key)
+		}
+
 		return instance
 	}
 }

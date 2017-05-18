@@ -2,13 +2,13 @@
 Object.assign(window, {
 	serializableGenerators: [],
 	modelGenerators: [],
-	
+
 	imports: {
 		"Foundation": true,
 		"Meow": true,
 		"ExtendedJSON": true
 	},
-	
+
 	execute(closures, argument) {
 		var code = "";
 		closures.forEach(closure => {
@@ -17,7 +17,7 @@ Object.assign(window, {
 
 		return code
 	},
-	
+
 	importPluginDependencies() {
 		var imports = "";
 
@@ -29,11 +29,11 @@ Object.assign(window, {
 
 		return imports;
 	},
-	
+
 	forEachSerializable(func) {
 		serializableGenerators.push(func);
 	},
-	
+
 	swiftImport() {
 		for (let i = 0; i < arguments.length; i++) {
 			imports[arguments[i]] = true

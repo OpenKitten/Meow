@@ -53,6 +53,8 @@ public enum Meow {
     
     /// Generic errors thrown by the generator
     public enum Error : Swift.Error {
+        case infiniteRecursiveReference(from: BaseModel.Type, to: BaseModel.Type)
+        
         /// The value for the given key is missing, or invalid
         case missingOrInvalidValue(key: String)
         

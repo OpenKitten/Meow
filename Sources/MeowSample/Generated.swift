@@ -44,16 +44,16 @@ extension Breed : SerializableToDocument {
 			_ = (try document.unpack(Key.name.keyString)) as String
 		}
 		if keys.contains(Key.country.keyString) {
-			_ = (try? document.unpack(Key.country.keyString)) as Country?
+			_ = (try document.unpack(Key.country.keyString)) as Country?
 		}
 		if keys.contains(Key.origin.keyString) {
-			_ = (try? document.unpack(Key.origin.keyString)) as Origin?
+			_ = (try document.unpack(Key.origin.keyString)) as Origin?
 		}
 		if keys.contains(Key.kaas.keyString) {
 			_ = (try document.unpack(Key.kaas.keyString)) as (String,String,String)
 		}
 		if keys.contains(Key.geval.keyString) {
-			_ = (try? document.unpack(Key.geval.keyString)) as Thing?
+			_ = (try document.unpack(Key.geval.keyString)) as Thing?
 		}
 	}
 
@@ -78,9 +78,19 @@ extension Breed : SerializableToDocument {
 	}
 
 	
+	
 	public static let collection: MongoKitten.Collection = Meow.database["breeds"]
+	
 
 	// MARK: ModelResolvingFunctions.ejs
+
+	
+	public static func byId(_ value: ObjectId) throws -> Breed? {
+		return try Breed.findOne("_id" == value)
+	}
+	
+
+
 
 	public static func byName(_ value: String) throws -> Breed? {
 		return try Breed.findOne(Key.name.rawValue == value)
@@ -131,11 +141,11 @@ extension Breed : SerializableToDocument {
 			try self.update(with: document)
 		}
 
-		var name: String?
-		var country: Country?
-		var origin: Origin?
-		var kaas: (String,String,String)?
-		var geval: Thing?
+		public var name: String?
+		public var country: Country?
+		public var origin: Origin?
+		public var kaas: (String,String,String)?
+		public var geval: Thing?
 
 
 		public func serialize() -> Document {
@@ -171,7 +181,21 @@ extension Breed : SerializableToDocument {
 
 
 public struct VirtualInstance : VirtualModelInstance {
-	public var keyPrefix: String
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: Breed?) -> Query {
+		
+		return (lhs.keyPrefix + ".$id") == rhs?._id
+		
+	}
+
+	public let keyPrefix: String
+	public let isReference: Bool
+
+	
+	public var _id: VirtualObjectId {
+		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+	}
+	
 
 	
 		 /// name: String
@@ -185,18 +209,25 @@ public struct VirtualInstance : VirtualModelInstance {
 		 /// geval: Thing?
 		 public var geval: Thing.VirtualInstance { return Thing.VirtualInstance(keyPrefix: keyPrefix + Key.geval.keyString) } 
 
-	public init(keyPrefix: String = "") {
+	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
+		self.isReference = isReference
 	}
 } // end VirtualInstance
 
 }
 
+// CustomStringConvertible.ejs
+
+
 extension Breed : CustomStringConvertible {
 	public var description: String {
-		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	
+		return "Breed<\(ObjectIdentifier(self).hashValue),\((self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString())>"
+	
 	}
 }
+
 
 
 
@@ -228,7 +259,7 @@ extension Cat : SerializableToDocument {
 			_ = (try document.unpack(Key.breed.keyString)) as Breed
 		}
 		if keys.contains(Key.bestFriend.keyString) {
-			_ = (try? document.unpack(Key.bestFriend.keyString)) as Reference<Cat>?
+			_ = (try document.unpack(Key.bestFriend.keyString)) as Reference<Cat>?
 		}
 		if keys.contains(Key.family.keyString) {
 			_ = (try document.unpack(Key.family.keyString)) as [Cat]
@@ -254,9 +285,19 @@ extension Cat : SerializableToDocument {
 	}
 
 	
+	
 	public static let collection: MongoKitten.Collection = Meow.database["cats"]
+	
 
 	// MARK: ModelResolvingFunctions.ejs
+
+	
+	public static func byId(_ value: ObjectId) throws -> Cat? {
+		return try Cat.findOne("_id" == value)
+	}
+	
+
+
 
 	public static func byName(_ value: String) throws -> Cat? {
 		return try Cat.findOne(Key.name.rawValue == value)
@@ -305,10 +346,10 @@ extension Cat : SerializableToDocument {
 			try self.update(with: document)
 		}
 
-		var name: String?
-		var breed: Breed?
-		var bestFriend: Reference<Cat>?
-		var family: [Cat]?
+		public var name: String?
+		public var breed: Breed?
+		public var bestFriend: Reference<Cat>?
+		public var family: [Cat]?
 
 
 		public func serialize() -> Document {
@@ -341,30 +382,51 @@ extension Cat : SerializableToDocument {
 
 
 public struct VirtualInstance : VirtualModelInstance {
-	public var keyPrefix: String
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: Cat?) -> Query {
+		
+		return (lhs.keyPrefix + ".$id") == rhs?._id
+		
+	}
+
+	public let keyPrefix: String
+	var isReference: Bool
+
+	
+	public var _id: VirtualObjectId {
+		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+	}
+	
 
 	
 		 /// name: String
 		 public var name: VirtualString { return VirtualString(name: keyPrefix + Key.name.keyString) } 
 		 /// breed: Breed
-		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString, isReference: true) }
 		 /// bestFriend: Reference<Cat>?
 		 
 		 /// family: [Cat]
 		 
 
-	public init(keyPrefix: String = "") {
+	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
+		self.isReference = isReference
 	}
 } // end VirtualInstance
 
 }
 
+// CustomStringConvertible.ejs
+
+
 extension Cat : CustomStringConvertible {
 	public var description: String {
-		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	
+		return "Cat<\(ObjectIdentifier(self).hashValue),\((self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString())>"
+	
 	}
 }
+
 
 
 
@@ -404,9 +466,19 @@ extension CatReferencing : SerializableToDocument {
 	}
 
 	
+	
 	public static let collection: MongoKitten.Collection = Meow.database["cat_referencings"]
+	
 
 	// MARK: ModelResolvingFunctions.ejs
+
+	
+	public static func byId(_ value: ObjectId) throws -> CatReferencing? {
+		return try CatReferencing.findOne("_id" == value)
+	}
+	
+
+
 
 
 	
@@ -445,7 +517,7 @@ extension CatReferencing : SerializableToDocument {
 			try self.update(with: document)
 		}
 
-		var cat: CatLike?
+		public var cat: CatLike?
 
 
 		public func serialize() -> Document {
@@ -469,24 +541,45 @@ extension CatReferencing : SerializableToDocument {
 
 
 public struct VirtualInstance : VirtualModelInstance {
-	public var keyPrefix: String
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: CatReferencing?) -> Query {
+		
+		return (lhs.keyPrefix + ".$id") == rhs?._id
+		
+	}
+
+	public let keyPrefix: String
+	public let isReference: Bool
+
+	
+	public var _id: VirtualObjectId {
+		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+	}
+	
 
 	
 		 /// cat: CatLike
 		 
 
-	public init(keyPrefix: String = "") {
+	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
+		self.isReference = isReference
 	}
 } // end VirtualInstance
 
 }
 
+// CustomStringConvertible.ejs
+
+
 extension CatReferencing : CustomStringConvertible {
 	public var description: String {
-		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	
+		return "CatReferencing<\(ObjectIdentifier(self).hashValue),\((self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString())>"
+	
 	}
 }
+
 
 
 
@@ -526,9 +619,19 @@ extension Tiger : SerializableToDocument {
 	}
 
 	
+	
 	public static let collection: MongoKitten.Collection = Meow.database["tigers"]
+	
 
 	// MARK: ModelResolvingFunctions.ejs
+
+	
+	public static func byId(_ value: ObjectId) throws -> Tiger? {
+		return try Tiger.findOne("_id" == value)
+	}
+	
+
+
 
 
 	
@@ -567,7 +670,7 @@ extension Tiger : SerializableToDocument {
 			try self.update(with: document)
 		}
 
-		var breed: Breed?
+		public var breed: Breed?
 
 
 		public func serialize() -> Document {
@@ -591,24 +694,45 @@ extension Tiger : SerializableToDocument {
 
 
 public struct VirtualInstance : VirtualModelInstance {
-	public var keyPrefix: String
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: Tiger?) -> Query {
+		
+		return (lhs.keyPrefix + ".$id") == rhs?._id
+		
+	}
+
+	public let keyPrefix: String
+	public let isReference: Bool
+
+	
+	public var _id: VirtualObjectId {
+		return VirtualObjectId(name: keyPrefix + Key._id.keyString)
+	}
+	
 
 	
 		 /// breed: Breed
-		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString) } 
+		 public var breed: Breed.VirtualInstance { return Breed.VirtualInstance(keyPrefix: keyPrefix + Key.breed.keyString, isReference: true) }
 
-	public init(keyPrefix: String = "") {
+	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
+		self.isReference = isReference
 	}
 } // end VirtualInstance
 
 }
 
+// CustomStringConvertible.ejs
+
+
 extension Tiger : CustomStringConvertible {
 	public var description: String {
-		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	
+		return "Tiger<\(ObjectIdentifier(self).hashValue),\((self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString())>"
+	
 	}
 }
+
 
 
 
@@ -618,28 +742,15 @@ extension Tiger : CustomStringConvertible {
 // MARK: SerializableEnum.ejs
 extension Breed.Country : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
-		guard let rawValue = String(source) else {
-				throw Meow.Error.cannotDeserialize(type: Breed.Country.self, source: source, expectedPrimitive: String.self)
+		guard let value = String(source), let me = Breed.Country(rawValue: value) else {
+			throw Meow.Error.cannotDeserialize(type: Breed.Country.self, source: source, expectedPrimitive: String.self)
 		}
 
-		switch rawValue {
-			 case "ethopia": self = .ethopia
-			 case "greece": self = .greece
-			 case "unitedStates": self = .unitedStates
-			 case "brazil": self = .brazil
-			
-			default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Country", name: rawValue)
-		}
+		self = me
 	}
 
-	public func serialize() -> BSON.Primitive {
-		switch self {
-					case .ethopia: return "ethopia"
-					case .greece: return "greece"
-					case .unitedStates: return "unitedStates"
-					case .brazil: return "brazil"
-			
-		}
+	public func serialize() -> Primitive {
+		return self.rawValue
 	}
 
 	// MARK: VirtualInstanceEnum.ejs
@@ -649,7 +760,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -666,29 +777,32 @@ public struct VirtualInstance {
 // MARK: SerializableEnum.ejs
 extension Breed.Origin : Serializable {
 	public init(restoring source: BSON.Primitive) throws {
-		guard let rawValue = String(source) else {
-				throw Meow.Error.cannotDeserialize(type: Breed.Origin.self, source: source, expectedPrimitive: String.self)
+		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+			throw Meow.Error.cannotDeserialize(type: Breed.Origin.self, source: source, expectedPrimitive: String.self)
 		}
 
 		switch rawValue {
-			 case "natural": self = .natural
-			 case "mutation": self = .mutation
-			 case "crossbreed": self = .crossbreed
-			 case "hybrid": self = .hybrid
-			 case "hybridCrossbreed": self = .hybridCrossbreed
-			
-			default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Origin", name: rawValue)
+			case "natural":
+							self = .natural
+						case "mutation":
+							self = .mutation
+						case "crossbreed":
+							self = .crossbreed
+						case "hybrid":
+							self = .hybrid
+						case "hybridCrossbreed":
+							self = .hybridCrossbreed
+					default: throw Meow.Error.enumCaseNotFound(enum: "Breed.Origin", name: rawValue)
 		}
 	}
 
 	public func serialize() -> BSON.Primitive {
 		switch self {
-					case .natural: return "natural"
-					case .mutation: return "mutation"
-					case .crossbreed: return "crossbreed"
-					case .hybrid: return "hybrid"
-					case .hybridCrossbreed: return "hybridCrossbreed"
-			
+		case .natural: return "natural"
+		case .mutation: return "mutation"
+		case .crossbreed: return "crossbreed"
+		case .hybrid: return "hybrid"
+		case .hybridCrossbreed: return "hybridCrossbreed"
 		}
 	}
 
@@ -699,7 +813,7 @@ public struct VirtualInstance {
 		return lhs.keyPrefix == rhs?.serialize()
 	}
 
-	public var keyPrefix: String
+	public let keyPrefix: String
 
 	public init(keyPrefix: String = "") {
 		self.keyPrefix = keyPrefix
@@ -811,8 +925,8 @@ extension Breed.Thing : SerializableToDocument {
 			try self.update(with: document)
 		}
 
-		var henk: String?
-		var fred: Int?
+		public var henk: String?
+		public var fred: Int?
 
 
 		public func serialize() -> Document {
@@ -839,7 +953,17 @@ extension Breed.Thing : SerializableToDocument {
 
 
 public struct VirtualInstance : VirtualModelInstance {
-	public var keyPrefix: String
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: Breed.Thing?) -> Query {
+		
+		return lhs.keyPrefix == rhs?.serialize()
+		
+	}
+
+	public let keyPrefix: String
+	public let isReference: Bool
+
+	
 
 	
 		 /// henk: String
@@ -847,18 +971,25 @@ public struct VirtualInstance : VirtualModelInstance {
 		 /// fred: Int
 		 public var fred: VirtualNumber { return VirtualNumber(name: keyPrefix + Key.fred.keyString) } 
 
-	public init(keyPrefix: String = "") {
+	public init(keyPrefix: String = "", isReference: Bool = false) {
 		self.keyPrefix = keyPrefix
+		self.isReference = false
 	}
 } // end VirtualInstance
 
 }
 
+// CustomStringConvertible.ejs
+
+
 extension Breed.Thing : CustomStringConvertible {
 	public var description: String {
-		return (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString()
+	
+		return "Breed.Thing<" + (self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString() + ">"
+	
 	}
 }
+
 
 
 
@@ -889,7 +1020,7 @@ extension Document {
 			self[key] = nil
 			return
 		}
-
+		
 		var document: Document = [:]		
 		document.pack(tuple.0, as: "0")		
 		document.pack(tuple.1, as: "1")		

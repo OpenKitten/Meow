@@ -190,6 +190,6 @@ public final class Migrator<M : Model> {
             
             document[property] = DBRef(referencing: objectId, inCollection: target.collection)
             return document
-            }]))
+        }]))
     }
 }
