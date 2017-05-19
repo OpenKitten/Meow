@@ -163,12 +163,11 @@ extension Model {
         try self.remove(makeQuery(query), limitedTo: limit)
     }
     
-    
     /// Performs a find operation using a type-safe query.
     ///
     /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
-    public static func find(sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self> {
-        return try find(makeQuery(query), sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
+    public static func find(sortedBy sort: [Key : SortOrder]? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self> {
+        return try find(makeQuery(query), sortedBy: sort?.makeSort(), skipping: skip, limitedTo: limit, withBatchSize: batchSize)
     }
     
     /// Performs a findOne operation using a type-safe query.
@@ -183,6 +182,18 @@ extension Model {
     /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
     public static func count(_ query: QueryBuilder) throws -> Int {
         return try count(makeQuery(query))
+    }
+}
+
+extension Dictionary where Key : KeyRepresentable, Value == SortOrder {
+    public func makeSort() -> Sort {
+        var sort = Sort()
+        
+        for (key, order) in self {
+            sort[key.keyString] = order
+        }
+        
+        return sort
     }
 }
 

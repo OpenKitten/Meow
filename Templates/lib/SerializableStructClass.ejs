@@ -17,7 +17,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 			if (variable.isComputed || variable.isStatic) { return; }
 
 			ensureSerializable(variable.type || variable.typeName);
-			
+
 			if (variable.isOptional) {
 			%>
 		self.<%- variable.name %> = try document[Key.<%- variable.name %>.keyString] == nil ? nil : document.unpack(Key.<%- variable.name %>.keyString)<%
@@ -36,7 +36,6 @@ extension <%- serializable.name %> : SerializableToDocument {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-
 		<%
 		serializable.variables.sort((a, b) => (a.defaultValue && !b.defaultValue ? 1 : -1)).forEach(variable => {
 			if (variable.isComputed || variable.isStatic) { return; }
@@ -47,15 +46,14 @@ extension <%- serializable.name %> : SerializableToDocument {
 		});
 		%>
 	}
-
-	<% if (serializable.kind == "class") { %>
-	<% if (serializable.based["Model"]) { %>
+	<%_ if (serializable.kind == "class") { -%>
+	<%_ if (serializable.based["Model"]) { -%>
 	<%- acl %> var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
-	<% } %>
+	<% } -%>
 		// sourcery:end
 	<% } %>
 

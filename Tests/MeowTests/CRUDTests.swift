@@ -23,6 +23,33 @@ class CRUDTests : XCTestCase {
         try! Meow.database.drop()
     }
     
+    func testSort() throws {
+        let sort: [Tiger.Key : SortOrder] = [
+            .breed: .ascending
+        ]
+        
+        XCTAssertEqual(sort.makeSort().makeDocument(), ["breed": Int32(1)])
+        
+        _ = Breed(name: "A")
+        _ = Breed(name: "B")
+        _ = Breed(name: "C")
+        _ = Breed(name: "D")
+        _ = Breed(name: "E")
+        _ = Breed(name: "F")
+        
+        var baseOrder = ["A", "B", "C", "D", "E", "F"]
+        
+        for (offset, breed) in try Breed.find(sortedBy: [.name: .ascending], { _ in Query() }).enumerated() {
+            XCTAssertEqual(breed.name, baseOrder[offset])
+        }
+        
+        baseOrder = baseOrder.reversed()
+        
+        for (offset, breed) in try Breed.find(sortedBy: [.name: .descending], { _ in Query() }).enumerated() {
+            XCTAssertEqual(breed.name, baseOrder[offset])
+        }
+    }
+    
     func testSave() throws {
         let tigerBreed = Breed(name: "Normal")
         try tigerBreed.save()
@@ -82,7 +109,7 @@ class CRUDTests : XCTestCase {
         XCTAssertEqual(Reference(to: breed), tiger.sameBreed)
         XCTAssert(breed == Reference(to: breed))
         
-        let breed2 = try Reference<Breed>(restoring: Reference(to: breed).serialize()).resolve()
+        let breed2 = try Reference<Breed>(restoring: Reference(to: breed).serialize(), key: "").resolve()
         XCTAssert(breed == breed2)
         XCTAssert(Reference(to: breed) == tiger.sameBreed)
         

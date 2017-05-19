@@ -19,8 +19,8 @@ public class Tiger : Model, CatLike {
         self.breed = breed
         self.sameBreed = Reference(to: breed)
     }
-    
-    // sourcery:inline:auto:Tiger.Meow
+
+// sourcery:inline:auto:Tiger.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
@@ -37,20 +37,16 @@ public class Tiger : Model, CatLike {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-
 		
 		self.sameBreed = (try document.unpack(Key.sameBreed.keyString)) 
 		self.breed = (try document.unpack(Key.breed.keyString)) 
 	}
-
-	
-	
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
-    // sourcery:end
+// sourcery:end
 }
 
 public class CatReferencing : Model {
@@ -59,8 +55,8 @@ public class CatReferencing : Model {
     public init(cat: CatLike) {
         self.cat = cat
     }
-    
-    // sourcery:inline:auto:CatReferencing.Meow
+
+// sourcery:inline:auto:CatReferencing.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
@@ -76,19 +72,15 @@ public class CatReferencing : Model {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-
 		
 		self.cat = (try document.unpack(Key.cat.keyString)) 
 	}
-
-	
-	
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
-    // sourcery:end
+// sourcery:end
 }
 
 public class Breed : Model, ExpressibleByStringLiteral {
@@ -131,8 +123,8 @@ public class Breed : Model, ExpressibleByStringLiteral {
     public func purr() {
         print("Purr.")
     }
-    
-    // sourcery:inline:auto:Breed.Meow
+
+// sourcery:inline:auto:Breed.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
@@ -152,7 +144,6 @@ public class Breed : Model, ExpressibleByStringLiteral {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-
 		
 		self.geval = (try? document.unpack(Key.geval.keyString)) 
 		self.kaas = (try document.unpack(Key.kaas.keyString)) 
@@ -160,15 +151,12 @@ public class Breed : Model, ExpressibleByStringLiteral {
 		self.country = (try? document.unpack(Key.country.keyString)) 
 		self.name = (try document.unpack(Key.name.keyString)) 
 	}
-
-	
-	
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
-    // sourcery:end
+// sourcery:end
 }
 
 enum SocialMedia {
@@ -196,8 +184,8 @@ class Cat : Model, CatLike {
         
         self.family = family
     }
-    
-    // sourcery:inline:auto:Cat.Meow
+
+// sourcery:inline:auto:Cat.Meow
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
@@ -218,7 +206,6 @@ class Cat : Model, CatLike {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
-
 		
 		self.favouriteNumber = (try? document.unpack(Key.favouriteNumber.keyString)) 
 		self.family = (try document.unpack(Key.family.keyString)) 
@@ -227,13 +214,10 @@ class Cat : Model, CatLike {
 		self.breed = (try document.unpack(Key.breed.keyString)) 
 		self.name = (try document.unpack(Key.name.keyString)) 
 	}
-
-	
-	
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
 		Meow.pool.handleDeinit(self)
 	}
-    // sourcery:end
+// sourcery:end
 }
