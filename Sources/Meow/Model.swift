@@ -291,6 +291,35 @@ extension BaseModel {
     /// - parameter query: The query to compare the database entities with
     /// - parameter sort: The order to sort the entities by
     public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> Cursor<Self> {
+        let prepared = try prepareQuery(query, sortedBy: sort, skipping: skip, limitedTo: limit)
+        let result = try runPreparedQuery(prepared, batchSize: batchSize)
+        
+        return try result.flatMap { document in
+            do {
+                return try Self.instantiateIfNeeded(document)
+            } catch {
+                Meow.log("Initializing from document failed: \(error)")
+                assertionFailure()
+                return nil
+            }
+        }
+    }
+    
+    /// Intantiates this instance if needed, or pulls the existing entity from memory when able
+    public static func instantiateIfNeeded(_ document: Document) throws -> Self {
+        return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
+    }
+    
+    fileprivate static func runPreparedQuery(_ query: PreparedQuery, batchSize: Int = 100) throws -> Cursor<Document> {
+        switch query {
+        case .aggregate(let pipeline):
+            return try collection.aggregate(pipeline, options: [.cursorOptions(["batchSize": batchSize])])
+        case .find(let query, let sort, let skip, let limit, let project):
+            return try collection.find(query, sortedBy: sort, projecting: project, skipping: skip, limitedTo: limit, withBatchSize: batchSize).cursor
+        }
+    }
+    
+    fileprivate static func prepareQuery(_ query: Query? = nil, sortedBy sort: Sort? = nil, projecting projection: Projection? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil) throws -> PreparedQuery {
         var pipeline = AggregationPipeline()
         var requirePipeline = false
         
@@ -353,15 +382,7 @@ extension BaseModel {
         }
         
         if !requirePipeline {
-            return try collection.find(query, sortedBy: sort, skipping: skip, limitedTo: limit).flatMap { document in
-                do {
-                    return try Self.instantiateIfNeeded(document)
-                } catch {
-                    Meow.log("Initializing from document failed: \(error)")
-                    assertionFailure()
-                    return nil
-                }
-            }.cursor
+            return .find(query: query, sort: sort, skip: skip, limit: limit, project: projection)
         }
         
         if let sort = sort {
@@ -376,19 +397,45 @@ extension BaseModel {
             pipeline.append(.limit(limit))
         }
         
-        return try collection.aggregate(pipeline).flatMap { document in
+        return .aggregate(pipeline)
+    }
+}
+
+extension Model {
+    /// Performs a projected find
+    ///
+    /// - parameter query: The MongoKitten query to perform
+    /// - parameter including: The set of keys to include in the returned values. The rest (except _id) will be nil.
+    /// - parameter sort: MongoKitten sort
+    /// - parameter limit: The maximum number of results to return
+    /// - parameter batchSize: The amount of documents to fetch from MongoDB at once
+    public static func findPartial(_ query: Query? = nil, including: Set<Self.Key>, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> Cursor<Self.Values> {
+        let projection = Document(dictionaryElements: including.map { ($0.keyString, Int32(1)) })
+        
+        let prepared = try prepareQuery(query, sortedBy: sort, projecting: Projection(projection), skipping: skip, limitedTo: limit)
+        let result = try runPreparedQuery(prepared, batchSize: batchSize)
+        
+        return try result.flatMap { document in
             do {
-                return try Self.instantiateIfNeeded(document)
+                return try Self.Values(restoring: document, key: "")
             } catch {
-                Meow.log("Initializing from document failed: \(error)")
+                Meow.log("Initializing values from document failed: \(error)")
                 assertionFailure()
                 return nil
             }
         }
+
     }
     
-    /// Intantiates this instance if needed, or pulls the existing entity from memory when able
-    public static func instantiateIfNeeded(_ document: Document) throws -> Self {
-        return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
+    /// Performs a find operation using a type-safe query.
+    ///
+    /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
+    public static func findPartial(including: Set<Self.Key>, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self.Values> {
+        return try findPartial(makeQuery(query), including: including, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
     }
+}
+
+fileprivate enum PreparedQuery {
+    case find(query: Query?, sort: Sort?, skip: Int?, limit: Int?, project: Projection?)
+    case aggregate(AggregationPipeline)
 }
