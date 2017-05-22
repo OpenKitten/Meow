@@ -628,6 +628,8 @@ extension Tiger : SerializableToDocument {
 		document.pack(self._id, as: "_id")
 		document.pack(self.breed, as: Key.breed.keyString)
 		document.pack(self.sameBreed, as: Key.sameBreed.keyString)
+		document.pack(self.singleBreeds, as: Key.singleBreeds.keyString)
+		document.pack(self.sameSingleBreeds, as: Key.sameSingleBreeds.keyString)
 		return document
 	}
 
@@ -638,6 +640,12 @@ extension Tiger : SerializableToDocument {
 		}
 		if keys.contains(Key.sameBreed.keyString) {
 			_ = (try document.unpack(Key.sameBreed.keyString)) as Reference<Breed>
+		}
+		if keys.contains(Key.singleBreeds.keyString) {
+			_ = (try document.unpack(Key.singleBreeds.keyString)) as Array<Breed>
+		}
+		if keys.contains(Key.sameSingleBreeds.keyString) {
+			_ = (try document.unpack(Key.sameSingleBreeds.keyString)) as Array<Reference<Breed>>
 		}
 	}
 
@@ -650,6 +658,10 @@ extension Tiger : SerializableToDocument {
 				self.breed = try document.unpack(Key.breed.keyString)
 			case Key.sameBreed.keyString:
 				self.sameBreed = try document.unpack(Key.sameBreed.keyString)
+			case Key.singleBreeds.keyString:
+				self.singleBreeds = try document.unpack(Key.singleBreeds.keyString)
+			case Key.sameSingleBreeds.keyString:
+				self.sameSingleBreeds = try document.unpack(Key.sameSingleBreeds.keyString)
 			default: break
 			}
 		}
@@ -679,6 +691,8 @@ extension Tiger : SerializableToDocument {
 		case _id
 		case breed = "breed"
 		case sameBreed = "same_breed"
+		case singleBreeds = "single_breeds"
+		case sameSingleBreeds = "same_single_breeds"
 
 
 		public var keyString: String { return self.rawValue }
@@ -688,11 +702,13 @@ extension Tiger : SerializableToDocument {
 			case ._id: return ObjectId.self
 			case .breed: return Breed.self
 			case .sameBreed: return Reference<Breed>.self
+			case .singleBreeds: return Array<Breed>.self
+			case .sameSingleBreeds: return Array<Reference<Breed>>.self
 			}
 		}
 
 		public static var all: Set<Key> {
-			return [._id, .breed, .sameBreed]
+			return [._id, .breed, .sameBreed, .singleBreeds, .sameSingleBreeds]
 		}
 	}
 
@@ -711,12 +727,16 @@ extension Tiger : SerializableToDocument {
 
 		public var breed: Breed?
 		public var sameBreed: Reference<Breed>?
+		public var singleBreeds: Array<Breed>?
+		public var sameSingleBreeds: Array<Reference<Breed>>?
 
 
 		public func serialize() -> Document {
 			var document: Document = [:]			
 			document.pack(self.breed, as: Key.breed.keyString)
 			document.pack(self.sameBreed, as: Key.sameBreed.keyString)
+			document.pack(self.singleBreeds, as: Key.singleBreeds.keyString)
+			document.pack(self.sameSingleBreeds, as: Key.sameSingleBreeds.keyString)
 			return document
 		}
 
@@ -727,6 +747,10 @@ extension Tiger : SerializableToDocument {
 					self.breed = try document.unpack(Key.breed.keyString)
 				case Key.sameBreed.keyString:
 					self.sameBreed = try document.unpack(Key.sameBreed.keyString)
+				case Key.singleBreeds.keyString:
+					self.singleBreeds = try document.unpack(Key.singleBreeds.keyString)
+				case Key.sameSingleBreeds.keyString:
+					self.sameSingleBreeds = try document.unpack(Key.sameSingleBreeds.keyString)
 				default: break
 				}
 			}
@@ -758,6 +782,10 @@ public struct VirtualInstance : VirtualModelInstance {
 		 /// breed: Breed
 		 public var breed: Breed.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.breed.keyString, isReference: true) } 
 		 /// sameBreed: Reference<Breed>
+		 
+		 /// singleBreeds: [Breed]
+		 
+		 /// sameSingleBreeds: [Reference<Breed>]
 		 
 
 	public init(keyPrefix: String = "", isReference: Bool = false) {

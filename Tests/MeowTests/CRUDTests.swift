@@ -232,10 +232,6 @@ class CRUDTests : XCTestCase {
         let catReference3 = CatReferencing(cat: otherTiger)
         try catReference.save()
         
-        var normalCatLikeReferencingCount = try CatReferencing.count { cr in
-            return cr._id == nil
-        }
-        
         XCTAssertEqual(tiger._id, tiger.databaseIdentifier)
         
         XCTAssert(Meow.pool.isPooled(tiger))
@@ -253,7 +249,7 @@ class CRUDTests : XCTestCase {
         sameTiger = try Tiger.findOne("_id" == tiger._id)
         testSameTiger()
         
-        sameTiger = try Tiger.findOne("breed._id" == tigerBreed._id)
+        sameTiger = try Tiger.findOne("breed" == tigerBreed._id)
         testSameTiger()
         
         sameTiger = try Tiger.findOne { $0.breed._id == tigerBreed._id }
@@ -261,6 +257,18 @@ class CRUDTests : XCTestCase {
         
         sameTiger = try Tiger.findOne { $0._id == tiger._id }
         testSameTiger()
+        
+//        sameTiger = try Tiger.findOne { $0.singleBreeds.contains(tigerBreed) }
+//        testSameTiger()
+//        
+//        sameTiger = try Tiger.findOne { $0.sameSingleBreeds.contains(Reference(to: tigerBreed)) }
+//        testSameTiger()
+//        
+//        _ = CatReferencing(cat: tiger)
+//        
+//        let referenceCount = try CatReferencing.count { $0.cat.breed.name == "Normal" }
+//        
+//        XCTAssertEqual(referenceCount, 1)
         
         let otherBreed = Breed(name: "Special")
         

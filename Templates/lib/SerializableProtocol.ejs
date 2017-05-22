@@ -1,7 +1,7 @@
 // MARK: SerializableProtocol.ejs
 extension Document {
 	func unpack(_ key: String) throws -> <%- serializable.name %> {
-		guard let document = self[key] as? Document, let collectionName = String(document["$ref"]), let id = ObjectId(document["_id"]) else {
+		guard let document = self[key] as? Document, let collectionName = String(document["_ref"]), let id = ObjectId(document["_id"]) else {
 			throw Meow.Error.missingOrInvalidValue(key: key)
 		}
 

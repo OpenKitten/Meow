@@ -54,7 +54,7 @@ public class BaseModelHelper<M: BaseModel> {
                             prefixTotal += s
                         }
                         
-                        if prefixTotal.hasPrefix(referenceKey + ".") && !prefixTotal.hasPrefix(referenceKey + "._id") {
+                        if prefixTotal.hasPrefix(referenceKey + ".") {
                             matches = true
                             break prefixCheck
                         }
@@ -66,7 +66,7 @@ public class BaseModelHelper<M: BaseModel> {
                 if matches {
                     requirePipeline = true
                     references.append((referenceKey, referenceType))
-                    stages.append(.lookup(from: referenceType.collection, localField: referenceKey + "._id", foreignField: "_id", as: referenceKey))
+                    stages.append(.lookup(from: referenceType.collection, localField: referenceKey, foreignField: "_id", as: referenceKey))
                 } else {
                     firstQuery[prefix] = query[prefix]
                     query[prefix] = nil

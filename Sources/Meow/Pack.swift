@@ -4,7 +4,7 @@ import MongoKitten
 /// Unpacks a value from a primitive
 fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primitive?) throws -> S {
     if let M = S.self as? BaseModel.Type {
-        guard let document = Document(primitive), let id = ObjectId(document["_id"]) else {
+        guard let id = ObjectId(primitive) ?? ObjectId(primitive["_id"]) ?? ObjectId(primitive[0]["_id"]) else {
             throw Meow.Error.missingOrInvalidValue(key: key)
         }
         
@@ -25,10 +25,7 @@ fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primit
 /// Packs a serializable into a primitive
 fileprivate func _pack(_ serializable: Serializable?) -> Primitive? {
     if let serializable = serializable as? BaseModel {
-        return [
-            "_id": serializable._id,
-            "_ref": type(of: serializable).collection.name
-        ]
+        return serializable._id
     } else {
         return serializable?.serialize()
     }

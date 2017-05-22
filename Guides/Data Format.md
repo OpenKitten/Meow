@@ -41,16 +41,17 @@ class User : Model {
     enum Gender {
         case male, female
     }
-    
+
     struct Details {
         var gender: Gender
         var firstName: String
         var lastName: String
     }
-    
+
+    var parents: (mother: User, father: User)
     var username: String
     var details: Details
-    
+
     init(...) { ... }
 }
 ```
@@ -61,8 +62,12 @@ will be serialized to this (in OpenKitten BSON notation):
 [
 	"_id": ObjectId(),
 	"username": "Bob26",
+  "parents": [
+    "mother": ObjectId(),
+    "father": ObjectId()
+  ],
 	"details": [
-		"gender": "malae",
+		"gender": "male",
 		"first_name": "Bob",
 		"last_name": "Something"
 	]

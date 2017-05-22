@@ -14,10 +14,14 @@ public enum Numbers : Int {
 public class Tiger : Model, CatLike {
     public var breed: Breed
     public var sameBreed: Reference<Breed>
+    public var singleBreeds: [Breed]
+    public var sameSingleBreeds: [Reference<Breed>]
     
     public init(breed: Breed) {
         self.breed = breed
         self.sameBreed = Reference(to: breed)
+        self.singleBreeds = [breed]
+        self.sameSingleBreeds = [Reference(to: breed)]
     }
 
 // sourcery:inline:auto:Tiger.Meow
@@ -31,6 +35,8 @@ public class Tiger : Model, CatLike {
 		self._id = try document.unpack("_id")
 		self.breed = try document.unpack(Key.breed.keyString)
 		self.sameBreed = try document.unpack(Key.sameBreed.keyString)
+		self.singleBreeds = try document.unpack(Key.singleBreeds.keyString)
+		self.sameSingleBreeds = try document.unpack(Key.sameSingleBreeds.keyString)
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
@@ -38,6 +44,8 @@ public class Tiger : Model, CatLike {
 			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
 		}
 		
+		self.sameSingleBreeds = (try document.unpack(Key.sameSingleBreeds.keyString)) 
+		self.singleBreeds = (try document.unpack(Key.singleBreeds.keyString)) 
 		self.sameBreed = (try document.unpack(Key.sameBreed.keyString)) 
 		self.breed = (try document.unpack(Key.breed.keyString)) 
 	}
