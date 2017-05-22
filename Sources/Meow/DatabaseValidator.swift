@@ -23,7 +23,8 @@ extension Meow {
             Meow.log("Validating \(M)")
             for document in try M.collection.find() {
                 do {
-                    _ = try M.instantiateIfNeeded(document)
+                    let instance = try M.instantiateIfNeeded(document)
+                    Meow.pool.ghost(instance)
                 } catch {
                     problems.append((M, document["_id"], error))
                 }

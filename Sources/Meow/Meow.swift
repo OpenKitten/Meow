@@ -222,6 +222,9 @@ public enum Meow {
         /// A set of entity's ObjectIds that are currently being instantiated
         private var currentlyInstantiating = [ObjectId: RunningInstantiation]()
         
+        /// Ghosted instances
+        private var ghosts = Set<ObjectIdentifier>()
+        
         /// Generated a new ObjectId
         public func newObjectId() -> ObjectId {
             let id = ObjectId()
@@ -231,6 +234,15 @@ public enum Meow {
             }
             
             return id
+        }
+        
+        /// Turns the `instance` into a ghost. It will not be saved again.
+        public func ghost(_ instance: BaseModel) {
+            ghosts.insert(ObjectIdentifier(instance))
+        }
+        
+        public func isGhost(_ instance: BaseModel) -> Bool {
+            return ghosts.contains(ObjectIdentifier(instance))
         }
         
         /// Instantiates a model from a Document unless the model is alraedy in-memory
@@ -350,6 +362,8 @@ public enum Meow {
         
         /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
+            ghosts.remove(ObjectIdentifier(instance))
+            
             do {
                 if !invalidatedObjectIds.contains(instance._id) {
                     try instance.save()

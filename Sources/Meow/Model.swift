@@ -63,7 +63,7 @@ public protocol Identifyable {
 /// making the function generic.
 ///
 /// When possible, model methods are added to the `BaseModel` protocol, and not the `Model` protocol. 
-public protocol BaseModel : SerializableToDocument, Convertible, Identifyable {
+public protocol BaseModel : class, SerializableToDocument, Convertible, Identifyable {
     /// The collection this entity resides in
     static var collection: MongoKitten.Collection { get }
     
@@ -252,6 +252,10 @@ extension BaseModel {
     ///
     /// - parameter force: Defaults to `false`. If set to true, the object is saved even if it has not been changed.
     public func save(force: Bool = false) throws {
+        guard force || !Meow.pool.isGhost(self) else {
+            return
+        }
+        
         try self.willSave()
         
         let document = self.serialize()
