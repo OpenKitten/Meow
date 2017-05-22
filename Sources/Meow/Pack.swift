@@ -5,7 +5,7 @@ import MongoKitten
 fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primitive?) throws -> S {
     if let M = S.self as? BaseModel.Type {
         guard let id = ObjectId(primitive) ?? ObjectId(primitive["_id"]) ?? ObjectId(primitive[0]["_id"]) else {
-            throw Meow.Error.missingOrInvalidValue(key: key)
+            throw Meow.Error.missingOrInvalidValue(key: key, expected: ObjectId.self, got: primitive)
         }
         
         guard let instance = try M.findOne("_id" == id) else {
@@ -49,7 +49,7 @@ extension Document {
     /// - parameter key: The key in this Document to unpack
     public func unpack<S : Serializable>(_ key: String) throws -> [S] {
         guard let array = self[key] as? Document, array.validatesAsArray() else {
-            throw Meow.Error.missingOrInvalidValue(key: key)
+            throw Meow.Error.missingOrInvalidValue(key: key, expected: Document.self, got: self[key])
         }
         
         return try array.arrayValue.map { try _unpack(key, from: $0) }
@@ -108,7 +108,7 @@ extension Document {
         let values = try doc.unpack("values") as [V]
         
         guard keys.count == values.count else {
-            throw Meow.Error.missingOrInvalidValue(key: key)
+            throw Meow.Error.invalidValue(key: key, reason: "The amount of keys is not equal to the amount of values for this [\(K.self): \(V.self)]")
         }
         
         for i in 0..<keys.count {

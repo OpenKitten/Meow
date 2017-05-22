@@ -34,7 +34,7 @@ extension Meow {
 extension GridFS.File : Restorable {
     public static func restore(_ source: Primitive, key: String) throws -> GridFS.File {
         guard let id = ObjectId(source) else {
-            throw Meow.Error.missingOrInvalidValue(key: key)
+            throw Meow.Error.missingOrInvalidValue(key: key, expected: ObjectId.self, got: source)
         }
         
         guard let file = try Meow.fs.findOne(byID: id) else {

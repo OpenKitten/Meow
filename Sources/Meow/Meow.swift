@@ -43,11 +43,11 @@ public enum Meow {
     public enum Helpers {
         /// Throws when the value is nil
         public static func requireValue<T>(_ val: T?, keyForError key: String) throws -> T {
-            guard let val = val else {
-                throw Error.missingOrInvalidValue(key: key)
+            guard let theVal = val else {
+                throw Error.missingOrInvalidValue(key: key, expected: T.self, got: val)
             }
             
-            return val
+            return theVal
         }
     }
     
@@ -56,10 +56,13 @@ public enum Meow {
         case infiniteRecursiveReference(from: BaseModel.Type, to: BaseModel.Type)
         
         /// The value for the given key is missing, or invalid
-        case missingOrInvalidValue(key: String)
+        case missingOrInvalidValue(key: String, expected: Any.Type, got: Any?)
         
         /// The value for the given key is missing
         case missingValue(key: String)
+        
+        /// The value is invalid
+        case invalidValue(key: String, reason: String)
         
         /// A reference to `type` with id `id` cannot be resolved
         case referenceError(id: ObjectId, type: BaseModel.Type)
@@ -248,7 +251,7 @@ public enum Meow {
         /// Instantiates a model from a Document unless the model is alraedy in-memory
         public func instantiateIfNeeded<M : BaseModel>(type: M.Type, document: Document) throws -> M {
             guard let id = ObjectId(document["_id"]) else {
-                throw Error.missingOrInvalidValue(key: "_id")
+                throw Error.missingOrInvalidValue(key: "_id", expected: ObjectId.self, got: document["_id"])
             }
             
             var existingInstance: M?
