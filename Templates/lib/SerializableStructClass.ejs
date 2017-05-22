@@ -7,7 +7,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	<%- acl %> <% if (serializable.kind == "class") { %>required <% }%>init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 
 		<% if (serializable.based["Model"]) { %>Meow.pool.free(self._id)
@@ -34,7 +34,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 	<%- acl %> <% if (serializable.kind == "class") { %>required <% }%>init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 		<%
 		serializable.variables.sort((a, b) => (a.defaultValue && !b.defaultValue ? 1 : -1)).forEach(variable => {
