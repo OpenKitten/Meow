@@ -121,7 +121,7 @@
     },
     {
       "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 114,
+      "line": 112,
       "symbol": "VirtualEmbeddablesArray.contains(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"

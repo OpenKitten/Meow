@@ -1,159 +1,264 @@
 {
   "warnings": [
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/Serializable.swift",
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/File.swift",
+      "line": 35,
+      "symbol": "GridFS.restore(_:key:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Generated.swift",
+      "line": 209,
+      "symbol": "Migrator.rename(property:to:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Generated.swift",
+      "line": 213,
+      "symbol": "Migrator.map(property:transform:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Generated.swift",
+      "line": 217,
+      "symbol": "Migrator.remove(property:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Generated.swift",
+      "line": 221,
+      "symbol": "Migrator.mapObjectIdToReference(property:target:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Helpers.swift",
+      "line": 29,
+      "symbol": "ModelKey.makeProjection()",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Meow.swift",
+      "line": 13,
+      "symbol": "Meow.shouldLog",
+      "symbol_kind": "source.lang.swift.decl.var.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Meow.swift",
       "line": 15,
+      "symbol": "Meow.log(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Meow.swift",
+      "line": 56,
+      "symbol": "Meow.Error.infiniteRecursiveReference",
+      "symbol_kind": "source.lang.swift.decl.enumelement",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Meow.swift",
+      "line": 244,
+      "symbol": "Meow.ObjectPool.isGhost(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Model.swift",
+      "line": 53,
+      "symbol": "Identifyable.databaseIdentifier",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Model.swift",
+      "line": 105,
+      "symbol": "BaseModel.databaseIdentifier",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Model.swift",
+      "line": 189,
+      "symbol": "Dictionary.makeSort()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Relations.swift",
+      "line": 88,
+      "symbol": "Reference.databaseIdentifier",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Serializable.swift",
+      "line": 17,
+      "symbol": "Restorable.restore(_:key:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.static",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/Serializable.swift",
+      "line": 28,
       "symbol": "SerializableToDocument.serialize()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 37,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 52,
       "symbol": "VirtualDocument.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 46,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 61,
       "symbol": "VirtualString",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 48,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 63,
       "symbol": "VirtualString.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 70,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 85,
       "symbol": "VirtualObjectId",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 72,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 87,
       "symbol": "VirtualObjectId.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 76,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 91,
       "symbol": "VirtualNumber",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 78,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 93,
       "symbol": "VirtualNumber.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 82,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 97,
       "symbol": "VirtualDate",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 84,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 99,
       "symbol": "VirtualDate.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 88,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 103,
       "symbol": "VirtualBool",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 90,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 105,
       "symbol": "VirtualBool.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 94,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 109,
       "symbol": "VirtualArray",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 96,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 111,
       "symbol": "VirtualArray.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 100,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 115,
       "symbol": "VirtualArray.contains(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 108,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 123,
       "symbol": "VirtualEmbeddablesArray",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 110,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 125,
       "symbol": "VirtualEmbeddablesArray.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 112,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 127,
       "symbol": "VirtualEmbeddablesArray.contains(_:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 122,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 137,
       "symbol": "VirtualData",
       "symbol_kind": "source.lang.swift.decl.struct",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 124,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 139,
       "symbol": "VirtualData.init(name:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 127,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 142,
       "symbol": "!(_:)",
       "symbol_kind": "source.lang.swift.decl.function.free",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
-      "line": 139,
+      "file": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow/Sources/Meow/VirtualVariable.swift",
+      "line": 154,
       "symbol": "MeowNumber",
       "symbol_kind": "source.lang.swift.decl.protocol",
       "warning": "undocumented"
     }
   ],
-  "source_directory": "/Users/robbert/Workingcopies/tikcit/Tikcit/Packages/Meow"
+  "source_directory": "/Users/robbert/Workingcopies/Tikcit/Tikcit/Packages/Meow"
 }

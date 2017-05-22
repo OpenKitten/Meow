@@ -85,3 +85,16 @@ The following types are supported by BSON and will be stored as-is without conve
 - Date
 - BSON.RegularExpression
 - DBRef
+
+## References
+
+References are stored in a custom format. For example, a reference to a `User` with the id "afafafafafafafafafafafaf" looks like this in BSON:
+
+```swift
+[
+	"_id": ObjectId("afafafafafafafafafafafaf"),
+	"_ref": "users"
+]
+```
+
+We do not use DBRefs for relations. DBRefs include a `$` in their key names which complicates querying.

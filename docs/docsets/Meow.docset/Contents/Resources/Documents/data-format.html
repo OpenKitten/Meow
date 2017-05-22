@@ -13,7 +13,7 @@
     <a title="Data Format  Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="index.html">Meow Docs</a> (89% documented)</p>
+        <p><a href="index.html">Meow Docs</a> (85% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -77,6 +77,12 @@
             <a href="Other Classes.html">Other Classes</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Classes/BaseModelHelper.html">BaseModelHelper</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Other Classes.html#/s:C4Meow6Helper">Helper</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Classes/Migrator.html">Migrator</a>
               </li>
             </ul>
@@ -86,6 +92,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="Enums/IndexAttribute.html">IndexAttribute</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Enums/PreparedQuery.html">PreparedQuery</a>
               </li>
             </ul>
           </li>
@@ -108,6 +117,9 @@
                 <a href="Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
+                <a href="Extensions/Dictionary.html">Dictionary</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Extensions/Document.html">Document</a>
               </li>
               <li class="nav-group-task">
@@ -121,6 +133,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/MongoKitten.html">MongoKitten</a>
               </li>
               <li class="nav-group-task">
                 <a href="Extensions/ObjectId.html">ObjectId</a>
@@ -157,6 +172,9 @@
             <a href="Other Protocols.html">Other Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Protocols/Identifyable.html">Identifyable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Protocols/KeyRepresentable.html">KeyRepresentable</a>
               </li>
               <li class="nav-group-task">
@@ -167,6 +185,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/Restorable.html">Restorable</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/Serializable.html">Serializable</a>
@@ -185,9 +206,6 @@
           <li class="nav-group-name">
             <a href="Other Structs.html">Other Structs</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a href="Structs/File.html">File</a>
-              </li>
               <li class="nav-group-task">
                 <a href="Structs/Reference.html">Reference</a>
               </li>
@@ -267,6 +285,69 @@
 <p>Meow will store all property names in an enum named <code>Key</code> in every model. You can use this enum if you ever need to acccess the raw (database) name of a property.</p>
 
 <p>To access the key name of a property <code>MyProperty</code> on <code>MyModel</code>:  <code>MyModel.Key.myProperty.keyString</code></p>
+<h2 id='structs-and-classes' class='heading'>Structs and classes</h2>
+
+<p>Meow stores structs and classes as BSON documents. The key enum (see above) is used to define the keys in these documents.</p>
+
+<p>For example, the following model:</p>
+<pre class="highlight swift"><code><span class="kd">class</span> <span class="kt">User</span> <span class="p">:</span> <span class="kt">Model</span> <span class="p">{</span>
+    <span class="kd">enum</span> <span class="kt">Gender</span> <span class="p">{</span>
+        <span class="k">case</span> <span class="n">male</span><span class="p">,</span> <span class="n">female</span>
+    <span class="p">}</span>
+
+    <span class="kd">struct</span> <span class="kt">Details</span> <span class="p">{</span>
+        <span class="k">var</span> <span class="nv">gender</span><span class="p">:</span> <span class="kt">Gender</span>
+        <span class="k">var</span> <span class="nv">firstName</span><span class="p">:</span> <span class="kt">String</span>
+        <span class="k">var</span> <span class="nv">lastName</span><span class="p">:</span> <span class="kt">String</span>
+    <span class="p">}</span>
+
+    <span class="k">var</span> <span class="nv">username</span><span class="p">:</span> <span class="kt">String</span>
+    <span class="k">var</span> <span class="nv">details</span><span class="p">:</span> <span class="kt">Details</span>
+
+    <span class="nf">init</span><span class="p">(</span><span class="o">...</span><span class="p">)</span> <span class="p">{</span> <span class="o">...</span> <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+
+<p>will be serialized to this (in OpenKitten BSON notation):</p>
+<pre class="highlight swift"><code><span class="p">[</span>
+    <span class="s">"_id"</span><span class="p">:</span> <span class="kt">ObjectId</span><span class="p">(),</span>
+    <span class="s">"username"</span><span class="p">:</span> <span class="s">"Bob26"</span><span class="p">,</span>
+    <span class="s">"details"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s">"gender"</span><span class="p">:</span> <span class="s">"malae"</span><span class="p">,</span>
+        <span class="s">"first_name"</span><span class="p">:</span> <span class="s">"Bob"</span><span class="p">,</span>
+        <span class="s">"last_name"</span><span class="p">:</span> <span class="s">"Something"</span>
+    <span class="p">]</span>
+<span class="p">]</span>
+</code></pre>
+<h2 id='supported-primitives-and-mongokitten-types' class='heading'>Supported primitives and MongoKitten types</h2>
+
+<p>The following types are supported by BSON and will be stored as-is without conversion.</p>
+<li>ObjectId</li>
+<li>String</li>
+<li>Int</li>
+<li>Int32</li>
+<li>Bool</li>
+<li>Document</li>
+<li>Double</li>
+<li>Data</li>
+<li>Binary</li>
+<div class="aside aside-date">
+    <p class="aside-title">Date</p>
+    Date
+
+</div>
+<li>BSON.RegularExpression</li>
+<li>DBRef</li>
+<h2 id='references' class='heading'>References</h2>
+
+<p>References are stored in a custom format. For example, a reference to a <code>User</code> with the id <q>afafafafafafafafafafafaf</q> looks like this in BSON:</p>
+<pre class="highlight swift"><code><span class="p">[</span>
+    <span class="s">"_id"</span><span class="p">:</span> <span class="kt">ObjectId</span><span class="p">(</span><span class="s">"afafafafafafafafafafafaf"</span><span class="p">),</span>
+    <span class="s">"_ref"</span><span class="p">:</span> <span class="s">"users"</span>
+<span class="p">]</span>
+</code></pre>
+
+<p>We do not use DBRefs for relations. DBRefs include a <code>$</code> in their key names which complicates querying.</p>
 
           </section>
         </section>

@@ -14,7 +14,7 @@
     <a title="Model Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Meow Docs</a> (89% documented)</p>
+        <p><a href="../index.html">Meow Docs</a> (85% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -78,6 +78,12 @@
             <a href="../Other Classes.html">Other Classes</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Classes/BaseModelHelper.html">BaseModelHelper</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Classes.html#/s:C4Meow6Helper">Helper</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Classes/Migrator.html">Migrator</a>
               </li>
             </ul>
@@ -87,6 +93,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="../Enums/IndexAttribute.html">IndexAttribute</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PreparedQuery.html">PreparedQuery</a>
               </li>
             </ul>
           </li>
@@ -109,6 +118,9 @@
                 <a href="../Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Extensions/Dictionary.html">Dictionary</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Extensions/Document.html">Document</a>
               </li>
               <li class="nav-group-task">
@@ -122,6 +134,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/MongoKitten.html">MongoKitten</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Extensions/ObjectId.html">ObjectId</a>
@@ -158,6 +173,9 @@
             <a href="../Other Protocols.html">Other Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Protocols/Identifyable.html">Identifyable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a>
               </li>
               <li class="nav-group-task">
@@ -168,6 +186,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Restorable.html">Restorable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/Serializable.html">Serializable</a>
@@ -186,9 +207,6 @@
           <li class="nav-group-name">
             <a href="../Other Structs.html">Other Structs</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a href="../Structs/File.html">File</a>
-              </li>
               <li class="nav-group-task">
                 <a href="../Structs/Reference.html">Reference</a>
               </li>
@@ -467,6 +485,60 @@
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/s:ZFE4MeowPS_5Model27recursiveKeysWithReferencesFzT11chainedFromGSaPMPS_9BaseModel___GSaTSSPMPS1____"></a>
+                    <a name="//apple_ref/swift/Method/recursiveKeysWithReferences(chainedFrom:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model27recursiveKeysWithReferencesFzT11chainedFromGSaPMPS_9BaseModel___GSaTSSPMPS1____">recursiveKeysWithReferences(chainedFrom:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A list of all dot-notated keys that are a reference to a model and their referenced type</p>
+<div class="aside aside-throws">
+    <p class="aside-title">Throws</p>
+    When the recursion triggers a higher-level model that has been accessed earlier in the chain
+
+</div>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">recursiveKeysWithReferences</span><span class="p">(</span><span class="n">chainedFrom</span> <span class="nv">previousModels</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span><span class="p">])</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="p">[(</span><span class="kt">String</span><span class="p">,</span> <span class="kt"><a href="../Protocols/BaseModel.html">BaseModel</a></span><span class="o">.</span><span class="k">Type</span><span class="p">)]</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>previousModels</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The previous models chain is used to prevent infinite recursion. Whenever <code>recursiveKeysWithReferences</code> is queried, all types found will also be queried for their <code>recursiveKeysWithReferences</code> recursively.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/s:ZFE4MeowPS_5Model6removeFzT9limitedToGSqSi_Fzwx15VirtualInstanceV11MongoKitten5Query_T_"></a>
                     <a name="//apple_ref/swift/Method/remove(limitedTo:_:)" class="dashAnchor"></a>
                     <a class="token" href="#/s:ZFE4MeowPS_5Model6removeFzT9limitedToGSqSi_Fzwx15VirtualInstanceV11MongoKitten5Query_T_">remove(limitedTo:_:)</a>
@@ -499,9 +571,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:ZFE4MeowPS_5Model4findFzT8sortedByGSqV11MongoKitten4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS1_5Query_GCS1_15CollectionSlicex_"></a>
+                    <a name="/s:ZFE4MeowPS_5Model4findFzT8sortedByGSqGVs10Dictionarywx3KeyO11MongoKitten9SortOrder__8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS3_5Query_GCS3_6Cursorx_"></a>
                     <a name="//apple_ref/swift/Method/find(sortedBy:skipping:limitedTo:withBatchSize:_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZFE4MeowPS_5Model4findFzT8sortedByGSqV11MongoKitten4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS1_5Query_GCS1_15CollectionSlicex_">find(sortedBy:skipping:limitedTo:withBatchSize:_:)</a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model4findFzT8sortedByGSqGVs10Dictionarywx3KeyO11MongoKitten9SortOrder__8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS3_5Query_GCS3_6Cursorx_">find(sortedBy:skipping:limitedTo:withBatchSize:_:)</a>
                     </code>
                       <span class="declaration-note">
                         Extension method
@@ -521,7 +593,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">find</span><span class="p">(</span><span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">withBatchSize</span> <span class="nv">batchSize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">CollectionSlice</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">&gt;</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">find</span><span class="p">(</span><span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="p">[</span><span class="kt">Key</span> <span class="p">:</span> <span class="kt">SortOrder</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">withBatchSize</span> <span class="nv">batchSize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Cursor</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">&gt;</span></code></pre>
 
                         </div>
                       </div>
@@ -560,6 +632,38 @@
                     </section>
                   </div>
                 </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model5countFzFzwx15VirtualInstanceV11MongoKitten5QuerySi"></a>
+                    <a name="//apple_ref/swift/Method/count(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model5countFzFzwx15VirtualInstanceV11MongoKitten5QuerySi">count(_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs a findOne operation using a type-safe query.</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">count</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
               </ul>
             </div>
             <div class="task-group">
@@ -567,9 +671,142 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:ZFE4MeowPS_5Model13paginatedFindFzTGSqV11MongoKitten5Query_8sortedByGSqVS1_4Sort_4pageSi7perPageSi_T5totalSi7perPageSi11currentPageSi8lastPageSi4fromSi2toSi4dataGCS1_15CollectionSlicex__"></a>
+                    <a name="/s:ZFE4MeowPS_5Model11findPartialFzTGSqV11MongoKitten5Query_9includingGVs3Setwx3Key_8sortedByGSqVS1_4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSi_GCS1_6Cursorwx6Values_"></a>
+                    <a name="//apple_ref/swift/Method/findPartial(_:including:sortedBy:skipping:limitedTo:withBatchSize:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model11findPartialFzTGSqV11MongoKitten5Query_9includingGVs3Setwx3Key_8sortedByGSqVS1_4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSi_GCS1_6Cursorwx6Values_">findPartial(_:including:sortedBy:skipping:limitedTo:withBatchSize:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs a projected find</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">findPartial</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">including</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">.</span><span class="kt">Key</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">withBatchSize</span> <span class="nv">batchSize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Cursor</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">.</span><span class="kt">Values</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>query</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The MongoKitten query to perform</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>including</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The set of keys to include in the returned values. The rest (except _id) will be nil.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>sort</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>MongoKitten sort</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>limit</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The maximum number of results to return</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>batchSize</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The amount of documents to fetch from MongoDB at once</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model11findPartialFzT9includingGVs3Setwx3Key_8sortedByGSqV11MongoKitten4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS3_5Query_GCS3_6Cursorwx6Values_"></a>
+                    <a name="//apple_ref/swift/Method/findPartial(including:sortedBy:skipping:limitedTo:withBatchSize:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model11findPartialFzT9includingGVs3Setwx3Key_8sortedByGSqV11MongoKitten4Sort_8skippingGSqSi_9limitedToGSqSi_13withBatchSizeSiFzwx15VirtualInstanceVS3_5Query_GCS3_6Cursorwx6Values_">findPartial(including:sortedBy:skipping:limitedTo:withBatchSize:_:)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Performs a find operation using a type-safe query.</p>
+
+<p>For more information about type safe queries, see the guide and the documentation on the types whose name start with <code>Virtual</code>.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">findPartial</span><span class="p">(</span><span class="nv">including</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">.</span><span class="kt">Key</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">skipping</span> <span class="nv">skip</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">limitedTo</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">withBatchSize</span> <span class="nv">batchSize</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">QueryBuilder</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt">Cursor</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">.</span><span class="kt">Values</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_5Model13paginatedFindFzTGSqV11MongoKitten5Query_8sortedByGSqGVs10Dictionarywx3KeyOS1_9SortOrder__4pageGSqSi_7perPageGSqSi__T5totalSi7perPageSi11currentPageSi8lastPageSi4fromSi2toSi4dataGVs11AnySequencex__"></a>
                     <a name="//apple_ref/swift/Method/paginatedFind(_:sortedBy:page:perPage:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZFE4MeowPS_5Model13paginatedFindFzTGSqV11MongoKitten5Query_8sortedByGSqVS1_4Sort_4pageSi7perPageSi_T5totalSi7perPageSi11currentPageSi8lastPageSi4fromSi2toSi4dataGCS1_15CollectionSlicex__">paginatedFind(_:sortedBy:page:perPage:)</a>
+                    <a class="token" href="#/s:ZFE4MeowPS_5Model13paginatedFindFzTGSqV11MongoKitten5Query_8sortedByGSqGVs10Dictionarywx3KeyOS1_9SortOrder__4pageGSqSi_7perPageGSqSi__T5totalSi7perPageSi11currentPageSi8lastPageSi4fromSi2toSi4dataGVs11AnySequencex__">paginatedFind(_:sortedBy:page:perPage:)</a>
                     </code>
                       <span class="declaration-note">
                         Extension method
@@ -587,7 +824,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">paginatedFind</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">MongoKitten</span><span class="o">.</span><span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="kt">Sort</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">page</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">perPage</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a></span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="nf">paginatedFind</span><span class="p">(</span><span class="n">_</span> <span class="nv">query</span><span class="p">:</span> <span class="kt">MongoKitten</span><span class="o">.</span><span class="kt">Query</span><span class="p">?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="n">sortedBy</span> <span class="nv">sort</span><span class="p">:</span> <span class="p">[</span><span class="kt">Key</span> <span class="p">:</span> <span class="kt">SortOrder</span><span class="p">]?</span> <span class="o">=</span> <span class="kc">nil</span><span class="p">,</span> <span class="nv">page</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?,</span> <span class="nv">perPage</span><span class="p">:</span> <span class="kt">Int</span><span class="p">?</span> <span class="o">=</span> <span class="mi">25</span><span class="p">)</span> <span class="k">throws</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Other Typealiases.html#/s:E4MeowPS_5Model19PaginatedFindResult">PaginatedFindResult</a></span></code></pre>
 
                         </div>
                       </div>

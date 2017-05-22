@@ -14,7 +14,7 @@
     <a title="ModelKey Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">Meow Docs</a> (89% documented)</p>
+        <p><a href="../index.html">Meow Docs</a> (85% documented)</p>
         <p class="header-right"><a href="https://github.com/OpenKitten/Meow"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -78,6 +78,12 @@
             <a href="../Other Classes.html">Other Classes</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Classes/BaseModelHelper.html">BaseModelHelper</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Other Classes.html#/s:C4Meow6Helper">Helper</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Classes/Migrator.html">Migrator</a>
               </li>
             </ul>
@@ -87,6 +93,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="../Enums/IndexAttribute.html">IndexAttribute</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Enums/PreparedQuery.html">PreparedQuery</a>
               </li>
             </ul>
           </li>
@@ -109,6 +118,9 @@
                 <a href="../Extensions/Date.html">Date</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Extensions/Dictionary.html">Dictionary</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Extensions/Document.html">Document</a>
               </li>
               <li class="nav-group-task">
@@ -122,6 +134,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Extensions/Int32.html">Int32</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/MongoKitten.html">MongoKitten</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Extensions/ObjectId.html">ObjectId</a>
@@ -158,6 +173,9 @@
             <a href="../Other Protocols.html">Other Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Protocols/Identifyable.html">Identifyable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a>
               </li>
               <li class="nav-group-task">
@@ -168,6 +186,9 @@
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/ModelValues.html">ModelValues</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/Restorable.html">Restorable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/Serializable.html">Serializable</a>
@@ -186,9 +207,6 @@
           <li class="nav-group-name">
             <a href="../Other Structs.html">Other Structs</a>
             <ul class="nav-group-tasks">
-              <li class="nav-group-task">
-                <a href="../Structs/File.html">File</a>
-              </li>
               <li class="nav-group-task">
                 <a href="../Structs/Reference.html">Reference</a>
               </li>
@@ -283,9 +301,9 @@ You normally do not need to implement this protocol yourself.</p>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:ZvP4Meow8ModelKey3allGSax_"></a>
+                    <a name="/s:ZvP4Meow8ModelKey3allGVs3Setx_"></a>
                     <a name="//apple_ref/swift/Variable/all" class="dashAnchor"></a>
-                    <a class="token" href="#/s:ZvP4Meow8ModelKey3allGSax_">all</a>
+                    <a class="token" href="#/s:ZvP4Meow8ModelKey3allGVs3Setx_">all</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -293,14 +311,48 @@ You normally do not need to implement this protocol yourself.</p>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>An array containing all keys belonging to the model</p>
+                        <p>All keys belonging to the model</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">static</span> <span class="k">var</span> <span class="nv">all</span><span class="p">:</span> <span class="p">[</span><span class="k">Self</span><span class="p">]</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">static</span> <span class="k">var</span> <span class="nv">all</span><span class="p">:</span> <span class="kt">Set</span><span class="o">&lt;</span><span class="k">Self</span><span class="o">&gt;</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:ZFE4MeowPS_8ModelKey14makeProjectionFT_V11MongoKitten10Projection"></a>
+                    <a name="//apple_ref/swift/Method/makeProjection()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:ZFE4MeowPS_8ModelKey14makeProjectionFT_V11MongoKitten10Projection">makeProjection()</a>
+                    </code>
+                      <span class="declaration-note">
+                        Extension method
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">ModelKey</span> <span class="p">:</span> <span class="kt"><a href="../Protocols/KeyRepresentable.html">KeyRepresentable</a></span></code></pre>
 
                         </div>
                       </div>
