@@ -330,66 +330,75 @@ extension BaseModel {
         }
     }
     
-    fileprivate static func prepareQuery(_ query: Query? = nil, sortedBy sort: Sort? = nil, projecting projection: Projection? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil) throws -> PreparedQuery {
+    internal static func makeQueryPipeline(for query: Query) throws -> (pipeline: AggregationPipeline, required: Bool) {
+        var query = query.makeDocument()
+        var pipeline = AggregationPipeline()
+        var requirePipeline = false
+        var references = [(String, BaseModel.Type)]()
+        let referenceKeys = try Self.recursiveKeysWithReferences(chainedFrom: [])
+        
+        let referencedKeys = query.flattened().keys
+        var firstQuery = Document()
+        
+        var stages: [AggregationPipeline.Stage] = []
+        
+        func parseQuery(forKey prefix: [SubscriptExpressionType]) {
+            for (referenceKey, referenceType) in referenceKeys {
+                var prefixTotal = ""
+                var matches = false
+                
+                prefixCheck: for part in prefix {
+                    switch part.subscriptExpression {
+                    case .kittenBytes(let bytes):
+                        if let s = String(bytes: bytes.bytes, encoding: .utf8) {
+                            prefixTotal += s
+                        }
+                        
+                        if prefixTotal.hasPrefix(referenceKey + ".") && !prefixTotal.hasPrefix(referenceKey + "._id") {
+                            matches = true
+                            break prefixCheck
+                        }
+                    default:
+                        continue
+                    }
+                }
+                
+                if matches {
+                    requirePipeline = true
+                    references.append((referenceKey, referenceType))
+                    stages.append(.lookup(from: referenceType.collection, localField: referenceKey + "._id", foreignField: "_id", as: referenceKey))
+                } else {
+                    firstQuery[prefix] = query[prefix]
+                    query[prefix] = nil
+                }
+            }
+        }
+        
+        for key in query.keys {
+            parseQuery(forKey: [key])
+        }
+        
+        if firstQuery.count > 0 {
+            pipeline.append(.match(firstQuery))
+        }
+        
+        for stage in stages {
+            pipeline.append(stage)
+        }
+        
+        if query.count > 0 {
+            pipeline.append(.match(query))
+        }
+        
+        return (pipeline, requirePipeline)
+    }
+    
+    internal static func prepareQuery(_ query: Query? = nil, sortedBy sort: Sort? = nil, projecting projection: Projection? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil) throws -> PreparedQuery {
         var pipeline = AggregationPipeline()
         var requirePipeline = false
         
-        if var query = query?.makeDocument() {
-            var references = [(String, BaseModel.Type)]()
-            let referenceKeys = try Self.recursiveKeysWithReferences(chainedFrom: [])
-            
-            let referencedKeys = query.flattened().keys
-            var firstQuery = Document()
-            
-            var stages: [AggregationPipeline.Stage] = []
-            
-            func parseQuery(forKey prefix: [SubscriptExpressionType]) {
-                for (referenceKey, referenceType) in referenceKeys {
-                    var prefixTotal = ""
-                    var matches = false
-                    
-                    prefixCheck: for part in prefix {
-                        switch part.subscriptExpression {
-                        case .kittenBytes(let bytes):
-                            if let s = String(bytes: bytes.bytes, encoding: .utf8) {
-                                prefixTotal += s
-                            }
-                            
-                            if prefixTotal.hasPrefix(referenceKey + ".") && !prefixTotal.hasPrefix(referenceKey + "._id") {
-                                matches = true
-                                break prefixCheck
-                            }
-                        default:
-                            continue
-                        }
-                    }
-                    
-                    if matches {
-                        requirePipeline = true
-                        references.append((referenceKey, referenceType))
-                        stages.append(.lookup(from: referenceType.collection, localField: referenceKey + "._id", foreignField: "_id", as: referenceKey))
-                    } else {
-                        firstQuery[prefix] = query[prefix]
-                        query[prefix] = nil
-                    }
-                }
-            }
-            
-            for key in query.keys {
-                parseQuery(forKey: [key])
-            }
-            
-            if firstQuery.count > 0 {
-                pipeline.append(.match(firstQuery))
-            }
-            
-            for stage in stages {
-                pipeline.append(stage)
-            }
-            
-            if query.count > 0 {
-                pipeline.append(.match(query))
-            }
+        if let query = query {
+            (pipeline, requirePipeline) = try makeQueryPipeline(for: query)
         }
         
         if !requirePipeline {
@@ -446,7 +455,7 @@ extension Model {
     }
 }
 
-fileprivate enum PreparedQuery {
+internal enum PreparedQuery {
     case find(query: Query?, sort: Sort?, skip: Int?, limit: Int?, project: Projection?)
     case aggregate(AggregationPipeline)
 }

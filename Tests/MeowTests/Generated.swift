@@ -8,7 +8,7 @@
 
 // MARK: - General Information
 // Supported Primitives: ObjectId, String, Int, Int32, Bool, Document, Double, Data, Binary, Date, RegularExpression
-// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class CRUDTests, class Cat, class CatReferencing, enum Numbers, enum SocialMedia, class Tiger
+// Sourcery Types: class Breed, enum Breed.Country, enum Breed.Origin, struct Breed.Thing, class CRUDTests, class Cat, class CatReferencing, enum Numbers, enum SocialMedia, class Tiger, class User, enum User.Login
 import Foundation
 import Meow
 import ExtendedJSON
@@ -783,6 +783,206 @@ extension Tiger : CustomStringConvertible {
 
 
 
+// MARK: - 🐈 for User
+// MARK: Serializable.ejs
+// MARK: SerializableStructClass.ejs
+
+extension User : SerializableToDocument {
+
+	
+
+	public func serialize() -> Document {
+		var document: Document = [:]
+		document.pack(self._id, as: "_id")
+		document.pack(self.name, as: Key.name.keyString)
+		document.pack(self.username, as: Key.username.keyString)
+		document.pack(self.login, as: Key.login.keyString)
+		document.pack(self.friends, as: Key.friends.keyString)
+		return document
+	}
+
+	public static func validateUpdate(with document: Document) throws {
+		let keys = document.keys
+		if keys.contains(Key.name.keyString) {
+			_ = (try document.unpack(Key.name.keyString)) as (first: String, last: String)
+		}
+		if keys.contains(Key.username.keyString) {
+			_ = (try document.unpack(Key.username.keyString)) as String
+		}
+		if keys.contains(Key.login.keyString) {
+			_ = (try document.unpack(Key.login.keyString)) as User.Login
+		}
+		if keys.contains(Key.friends.keyString) {
+			_ = (try document.unpack(Key.friends.keyString)) as Array<Reference<User>>
+		}
+	}
+
+	public func update(with document: Document) throws {
+		try User.validateUpdate(with: document)
+
+		for key in document.keys {
+			switch key {
+			case Key.name.keyString:
+				self.name = try document.unpack(Key.name.keyString)
+			case Key.username.keyString:
+				self.username = try document.unpack(Key.username.keyString)
+			case Key.login.keyString:
+				self.login = try document.unpack(Key.login.keyString)
+			case Key.friends.keyString:
+				self.friends = try document.unpack(Key.friends.keyString)
+			default: break
+			}
+		}
+	}
+
+	
+	
+	public static let collection: MongoKitten.Collection = Meow.database["users"]
+	
+
+	// MARK: ModelResolvingFunctions.ejs
+
+	
+	public static func byId(_ value: ObjectId) throws -> User? {
+		return try User.findOne("_id" == value)
+	}
+	
+
+
+
+	public static func byUsername(_ value: String) throws -> User? {
+		return try User.findOne(Key.username.rawValue == value)
+	}
+
+
+	
+
+	// MARK: KeyEnum.ejs
+
+	public enum Key : String, ModelKey {
+		case _id
+		case name = "name"
+		case username = "username"
+		case login = "login"
+		case friends = "friends"
+
+
+		public var keyString: String { return self.rawValue }
+
+		public var type: Any.Type {
+			switch self {
+			case ._id: return ObjectId.self
+			case .name: return (first: String, last: String).self
+			case .username: return String.self
+			case .login: return User.Login.self
+			case .friends: return Array<Reference<User>>.self
+			}
+		}
+
+		public static var all: Set<Key> {
+			return [._id, .name, .username, .login, .friends]
+		}
+	}
+
+	// MARK: Values.ejs
+	
+
+	/// Represents (part of) the values of a User
+	public struct Values : ModelValues {
+		public init() {}
+		public init(restoring source: BSON.Primitive, key: String) throws {
+			guard let document = source as? BSON.Document else {
+				throw Meow.Error.cannotDeserialize(type: User.Values.self, source: source, expectedPrimitive: BSON.Document.self);
+			}
+			try self.update(with: document)
+		}
+
+		public var name: (first: String, last: String)?
+		public var username: String?
+		public var login: User.Login?
+		public var friends: Array<Reference<User>>?
+
+
+		public func serialize() -> Document {
+			var document: Document = [:]			
+			document.pack(self.name, as: Key.name.keyString)
+			document.pack(self.username, as: Key.username.keyString)
+			document.pack(self.login, as: Key.login.keyString)
+			document.pack(self.friends, as: Key.friends.keyString)
+			return document
+		}
+
+		public mutating func update(with document: Document) throws {
+			for key in document.keys {
+				switch key {
+				case Key.name.keyString:
+					self.name = try document.unpack(Key.name.keyString)
+				case Key.username.keyString:
+					self.username = try document.unpack(Key.username.keyString)
+				case Key.login.keyString:
+					self.login = try document.unpack(Key.login.keyString)
+				case Key.friends.keyString:
+					self.friends = try document.unpack(Key.friends.keyString)
+				default: break
+				}
+			}
+		}
+	}
+
+	// MARK: VirtualInstanceStructClass.ejs
+
+
+public struct VirtualInstance : VirtualModelInstance {
+	/// Compares this model's VirtualInstance type with an actual model and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: User?) -> Query {
+		
+		return (lhs.referencedKeyPrefix + "_id") == rhs?._id
+		
+	}
+
+	public let keyPrefix: String
+
+	public let isReference: Bool
+
+	
+	public var _id: VirtualObjectId {
+		return VirtualObjectId(name: referencedKeyPrefix + Key._id.keyString)
+	}
+	
+
+	
+		 /// name: (first: String, last: String)
+		 
+		 /// username: String
+		 public var username: VirtualString { return VirtualString(name: referencedKeyPrefix + Key.username.keyString) } 
+		 /// login: Login?
+		 public var login: User.Login.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.login.keyString) } 
+		 /// friends: [Reference<User>]
+		 
+
+	public init(keyPrefix: String = "", isReference: Bool = false) {
+		self.keyPrefix = keyPrefix
+		self.isReference = isReference
+	}
+} // end VirtualInstance
+
+}
+
+// CustomStringConvertible.ejs
+
+
+extension User : CustomStringConvertible {
+	public var description: String {
+	
+		return "User<\(ObjectIdentifier(self).hashValue),\((self.serialize() as Document).makeExtendedJSON(typeSafe: false).serializedString())>"
+	
+	}
+}
+
+
+
+
+
 // MARK: - 🐈 for Breed.Country
 // MARK: Serializable.ejs
 // MARK: SerializableEnum.ejs
@@ -1186,6 +1386,59 @@ extension Document {
 
 
 
+// MARK: - 🐈 for User.Login
+// MARK: Serializable.ejs
+// MARK: SerializableEnum.ejs
+extension User.Login : Serializable {
+	public init(restoring source: BSON.Primitive, key: String) throws {
+		guard let rawValue = String(source) ?? String(Document(source)?[0]) else {
+			throw Meow.Error.cannotDeserialize(type: User.Login.self, source: source, expectedPrimitive: String.self)
+		}
+
+		switch rawValue {
+			case "password":
+						guard let document = Document(source) else {
+				throw Meow.Error.cannotDeserialize(type: User.Login.self, source: source, expectedPrimitive: String.self)
+			}
+				let value0: String = try document.unpack("1")
+
+
+				self = .password(value0)
+		default: throw Meow.Error.enumCaseNotFound(enum: "User.Login", name: rawValue)
+		}
+	}
+
+	public func serialize() -> BSON.Primitive {
+		switch self {
+		case .password(let value0):
+			var document: Document = []
+
+			document.append("password")
+			document.pack(value0, as: "1")
+
+			return document
+		}
+	}
+
+	// MARK: VirtualInstanceEnum.ejs
+public struct VirtualInstance {
+	/// Compares this enum's VirtualInstance type with an actual enum case and generates a Query
+	public static func ==(lhs: VirtualInstance, rhs: User.Login?) -> Query {
+		return lhs.keyPrefix == rhs?.serialize()
+	}
+
+	public var keyPrefix: String
+
+	public init(keyPrefix: String = "") {
+		self.keyPrefix = keyPrefix
+	}
+}
+
+}
+
+
+
+
 // MARK: Tuple.ejs
 extension Document {
 	public mutating func pack(_ tuple: (String,String,String)?, as key: String) {
@@ -1215,8 +1468,35 @@ extension Document {
 }
 
 		
+// MARK: Tuple.ejs
+extension Document {
+	public mutating func pack(_ tuple: (first: String, last: String)?, as key: String) {
+		guard let tuple = tuple else {
+			self[key] = nil
+			return
+		}
+		
+		var document: Document = [:]		
+		document.pack(tuple.first, as: "first")		
+		document.pack(tuple.last, as: "last")		
+		self[key] = document
+	}
 
-fileprivate let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, SocialMedia.self, Numbers.self, CatLike.self]
+	public func unpack(_ key: String) throws -> (first: String, last: String) {
+		guard let document = Document(self[key]) else {
+			throw Meow.Error.cannotDeserialize(type: Document.self, source: self[key], expectedPrimitive: Document.self)
+		}
+
+		return try (			
+				 				 				 first:  				document.unpack("first") 				, 			
+				 				 				 last:  				document.unpack("last") 				 			
+		)
+	}
+}
+
+		
+
+fileprivate let meows: [Any.Type] = [Breed.self, Cat.self, CatReferencing.self, Tiger.self, User.self, Breed.Country.self, Breed.Origin.self, Breed.Thing.self, SocialMedia.self, Numbers.self, CatLike.self, User.Login.self]
 
 extension Meow {
 	static func `init`(_ connectionString: String) throws {
@@ -1229,10 +1509,10 @@ extension Meow {
 }
 
 // 🐈 Statistics
-// Models: 4
-//   Breed, Cat, CatReferencing, Tiger
-// Serializables: 10
-//   Breed, Cat, CatReferencing, Tiger, Breed.Country, Breed.Origin, Breed.Thing, SocialMedia, Numbers, CatLike
+// Models: 5
+//   Breed, Cat, CatReferencing, Tiger, User
+// Serializables: 12
+//   Breed, Cat, CatReferencing, Tiger, User, Breed.Country, Breed.Origin, Breed.Thing, SocialMedia, Numbers, CatLike, User.Login
 // Model protocols: 0
 //   
-// Tuples: 1
+// Tuples: 2

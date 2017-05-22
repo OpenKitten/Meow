@@ -24,3 +24,15 @@ extension DispatchTime {
         self.init(uptimeNanoseconds: uptime)
     }
 }
+
+extension ModelKey {
+    public static func makeProjection() -> Projection {
+        var doc = Document()
+        
+        for key in Self.all {
+            doc[key.keyString] = true
+        }
+        
+        return Projection(doc)
+    }
+}
