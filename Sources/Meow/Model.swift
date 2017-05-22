@@ -306,8 +306,8 @@ extension BaseModel {
     /// - parameter query: The query to compare the database entities with
     /// - parameter sort: The order to sort the entities by
     public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> Cursor<Self> {
-        let prepared = try prepareQuery(query, sortedBy: sort, skipping: skip, limitedTo: limit)
-        let result = try runPreparedQuery(prepared, batchSize: batchSize)
+        let prepared = try BaseModelHelper<Self>.prepareQuery(query, sortedBy: sort, skipping: skip, limitedTo: limit)
+        let result = try BaseModelHelper<Self>.runPreparedQuery(prepared, batchSize: batchSize)
         
         return try result.flatMap { document in
             do {
@@ -324,105 +324,6 @@ extension BaseModel {
     public static func instantiateIfNeeded(_ document: Document) throws -> Self {
         return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
     }
-    
-    fileprivate static func runPreparedQuery(_ query: PreparedQuery, batchSize: Int = 100) throws -> Cursor<Document> {
-        switch query {
-        case .aggregate(let pipeline):
-            return try collection.aggregate(pipeline, options: [.cursorOptions(["batchSize": batchSize])])
-        case .find(let query, let sort, let skip, let limit, let project):
-            return try collection.find(query, sortedBy: sort, projecting: project, skipping: skip, limitedTo: limit, withBatchSize: batchSize).cursor
-        }
-    }
-    
-    internal static func makeQueryPipeline(for query: Query) throws -> (pipeline: AggregationPipeline, required: Bool) {
-        var query = query.makeDocument()
-        var pipeline = AggregationPipeline()
-        var requirePipeline = false
-        var references = [(String, BaseModel.Type)]()
-        let referenceKeys = try Self.recursiveKeysWithReferences(chainedFrom: [])
-        
-        let referencedKeys = query.flattened().keys
-        var firstQuery = Document()
-        
-        var stages: [AggregationPipeline.Stage] = []
-        
-        func parseQuery(forKey prefix: [SubscriptExpressionType]) {
-            for (referenceKey, referenceType) in referenceKeys {
-                var prefixTotal = ""
-                var matches = false
-                
-                prefixCheck: for part in prefix {
-                    switch part.subscriptExpression {
-                    case .kittenBytes(let bytes):
-                        if let s = String(bytes: bytes.bytes, encoding: .utf8) {
-                            prefixTotal += s
-                        }
-                        
-                        if prefixTotal.hasPrefix(referenceKey + ".") && !prefixTotal.hasPrefix(referenceKey + "._id") {
-                            matches = true
-                            break prefixCheck
-                        }
-                    default:
-                        continue
-                    }
-                }
-                
-                if matches {
-                    requirePipeline = true
-                    references.append((referenceKey, referenceType))
-                    stages.append(.lookup(from: referenceType.collection, localField: referenceKey + "._id", foreignField: "_id", as: referenceKey))
-                } else {
-                    firstQuery[prefix] = query[prefix]
-                    query[prefix] = nil
-                }
-            }
-        }
-        
-        for key in query.keys {
-            parseQuery(forKey: [key])
-        }
-        
-        if firstQuery.count > 0 {
-            pipeline.append(.match(firstQuery))
-        }
-        
-        for stage in stages {
-            pipeline.append(stage)
-        }
-        
-        if query.count > 0 {
-            pipeline.append(.match(query))
-        }
-        
-        return (pipeline, requirePipeline)
-    }
-    
-    internal static func prepareQuery(_ query: Query? = nil, sortedBy sort: Sort? = nil, projecting projection: Projection? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil) throws -> PreparedQuery {
-        var pipeline = AggregationPipeline()
-        var requirePipeline = false
-        
-        if let query = query {
-            (pipeline, requirePipeline) = try makeQueryPipeline(for: query)
-        }
-        
-        if !requirePipeline {
-            return .find(query: query, sort: sort, skip: skip, limit: limit, project: projection)
-        }
-        
-        if let sort = sort {
-            pipeline.append(.sort(sort))
-        }
-        
-        if let skip = skip {
-            pipeline.append(.skip(skip))
-        }
-        
-        if let limit = limit {
-            pipeline.append(.limit(limit))
-        }
-        
-        return .aggregate(pipeline)
-    }
 }
 
 extension Model {
@@ -436,8 +337,8 @@ extension Model {
     public static func findPartial(_ query: Query? = nil, including: Set<Self.Key>, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> Cursor<Self.Values> {
         let projection = Document(dictionaryElements: including.map { ($0.keyString, Int32(1)) })
         
-        let prepared = try prepareQuery(query, sortedBy: sort, projecting: Projection(projection), skipping: skip, limitedTo: limit)
-        let result = try runPreparedQuery(prepared, batchSize: batchSize)
+        let prepared = try Helper<Self>.prepareQuery(query, sortedBy: sort, projecting: Projection(projection), skipping: skip, limitedTo: limit)
+        let result = try Helper<Self>.runPreparedQuery(prepared, batchSize: batchSize)
         
         return try result.flatMap { document in
             do {
@@ -457,9 +358,4 @@ extension Model {
     public static func findPartial(including: Set<Self.Key>, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self.Values> {
         return try findPartial(makeQuery(query), including: including, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
     }
-}
-
-internal enum PreparedQuery {
-    case find(query: Query?, sort: Sort?, skip: Int?, limit: Int?, project: Projection?)
-    case aggregate(AggregationPipeline)
 }
