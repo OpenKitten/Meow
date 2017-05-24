@@ -173,7 +173,7 @@ extension Model {
     /// Performs a find operation using a type-safe query.
     ///
     /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
-    public static func find(sortedBy sort: [Key : SortOrder]? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self> {
+    public static func find(sortedBy sort: [Key : SortOrder]? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> AnySequence<Self> {
         return try find(makeQuery(query), sortedBy: sort?.makeSort(), skipping: skip, limitedTo: limit, withBatchSize: batchSize)
     }
     
@@ -252,7 +252,7 @@ extension BaseModel {
     /// Returns the first object matching the query
     public static func findOne(_ query: Query? = nil) throws -> Self? {
         // We don't reuse find here because that one does not have proper error reporting
-        return try Self.find(query, limitedTo: 1, withBatchSize: 1).next()
+        return try Self.find(query, limitedTo: 1, withBatchSize: 1).makeIterator().next()
     }
     
     /// Saves this object to the database
@@ -312,11 +312,27 @@ extension BaseModel {
     ///
     /// - parameter query: The query to compare the database entities with
     /// - parameter sort: The order to sort the entities by
-    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100) throws -> Cursor<Self> {
+    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, allowOptimizing: Bool = true) throws -> AnySequence<Self> {
+        
+        // Query optimisations
+        if allowOptimizing && sort == nil && skip == nil, let aqt = query?.aqt {
+            if case .valEquals("_id", let val) = aqt {
+                // Meow only supports ObjectId as _id, so if it isn't an ObjectId we can safely return an empty result
+                guard let val = val as? ObjectId else {
+                    return AnySequence([])
+                }
+                
+                // we have this id in memory, so return that
+                if let instance: Self = Meow.pool.getPooledInstance(withIdentifier: val) {
+                    return AnySequence([instance])
+                }
+            }
+        }
+        
         let prepared = try BaseModelHelper<Self>.prepareQuery(query, sortedBy: sort, skipping: skip, limitedTo: limit)
         let result = try BaseModelHelper<Self>.runPreparedQuery(prepared, batchSize: batchSize)
-        
-        return try result.flatMap { document in
+                
+        return AnySequence(try result.flatMap { document in
             do {
                 return try Self.instantiateIfNeeded(document)
             } catch {
@@ -324,7 +340,7 @@ extension BaseModel {
                 assertionFailure()
                 return nil
             }
-        }
+        })
     }
     
     /// Intantiates this instance if needed, or pulls the existing entity from memory when able

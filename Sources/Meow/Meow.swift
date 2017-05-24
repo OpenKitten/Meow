@@ -298,6 +298,12 @@ public enum Meow {
             }
         }
         
+        public func getPooledInstance<M: BaseModel>(withIdentifier id: ObjectId) -> M? {
+            return objectPoolMutationQueue.sync {
+                return storage[id]?.instance.value as? M
+            }
+        }
+        
         /// Stored an entity in the pool
         public func pool<M: BaseModel>(_ instance: M, hash: Int? = nil) {
             var current: AnyObject?
