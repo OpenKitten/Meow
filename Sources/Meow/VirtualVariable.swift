@@ -139,18 +139,6 @@ public struct VirtualData : VirtualVariable {
     public init(name: String) { self.name = name }
 }
 
-public prefix func !(rhs: Query) -> Query {
-    var query = Document()
-    
-    for (key, value) in rhs.makeDocument() {
-        query[key] = [
-            "$not": value
-            ] as Document
-    }
-    
-    return Query(query)
-}
-
 public protocol MeowNumber : Primitive {}
 extension Int : MeowNumber {}
 extension Int32 : MeowNumber {}
