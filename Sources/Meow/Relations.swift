@@ -25,7 +25,7 @@ extension DBRef {
     /// Resolves the model referenced in this DBRef
     public func resolveModel() throws -> BaseModel {
         guard let M = collection.model, let instance = try M.findOne("_id" == id) else {
-            throw Meow.Error.brokenReference(in: [self])
+            throw Meow.Error.brokenReference(in: self)
         }
         
         return instance

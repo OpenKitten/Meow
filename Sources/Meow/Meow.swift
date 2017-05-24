@@ -77,7 +77,7 @@ public enum Meow {
         case cannotDeserialize(type: Serializable.Type, source: BSON.Primitive?, expectedPrimitive: BSON.Primitive.Type)
         
         /// The given DBRef is not valid
-        case brokenReference(in: [DBRef])
+        case brokenReference(in: DBRef)
         
         /// One or more errors occurred while mass-deleting objects. The `errors` array contains the specific object identifier and error pairs.
         case deletingMultiple(errors: [(ObjectId, Swift.Error)])
