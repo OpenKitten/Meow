@@ -909,7 +909,7 @@ extension Breed.Thing : SerializableToDocument {
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 
 		
@@ -919,7 +919,7 @@ extension Breed.Thing : SerializableToDocument {
 
 	public init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 		
 		self.fred = (try document.unpack(Key.fred.keyString)) 
@@ -1195,7 +1195,7 @@ public struct VirtualInstance {
 // MARK: SerializableProtocol.ejs
 extension Document {
 	func unpack(_ key: String) throws -> CatLike {
-		guard let document = self[key] as? Document, let collectionName = String(document["$ref"]), let id = ObjectId(document["_id"]) else {
+		guard let document = self[key] as? Document, let collectionName = String(document["_ref"]), let id = ObjectId(document["_id"]) else {
 			throw Meow.Error.missingOrInvalidValue(key: key)
 		}
 

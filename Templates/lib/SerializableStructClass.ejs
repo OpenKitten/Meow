@@ -20,10 +20,10 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 			if (variable.isOptional) {
 			%>
-		self.<%- variable.name %> = try document[Key.<%- variable.name %>.keyString] == nil ? nil : document.unpack(Key.<%- variable.name %>.keyString)<%
+		self.<%- variable.name %> = try document.meowHasValue(Key.<%- variable.name %>) ? document.unpack(Key.<%- variable.name %>.keyString) : nil<%
 			} else if (variable.defaultValue) {
 			%>
-		self.<%- variable.name %> = try (document[Key.<%- variable.name %>.keyString] == nil ? self.<%- variable.name %> : document.unpack(Key.<%- variable.name %>.keyString))<%
+		self.<%- variable.name %> = try document.meowHasValue(Key.<%- variable.name %>) ? document.unpack(Key.<%- variable.name %>.keyString) : self.<%- variable.name %><%
 			} else {
 			%>
 		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)<%

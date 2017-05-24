@@ -28,7 +28,7 @@ public class Tiger : Model, CatLike {
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 
 		Meow.pool.free(self._id)
@@ -41,7 +41,7 @@ public class Tiger : Model, CatLike {
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Tiger.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 		
 		self.sameSingleBreeds = (try document.unpack(Key.sameSingleBreeds.keyString)) 
@@ -68,7 +68,7 @@ public class CatReferencing : Model {
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 
 		Meow.pool.free(self._id)
@@ -78,7 +78,7 @@ public class CatReferencing : Model {
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: CatReferencing.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 		
 		self.cat = (try document.unpack(Key.cat.keyString)) 
@@ -136,21 +136,21 @@ public class Breed : Model, ExpressibleByStringLiteral {
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
-		self.country = try document[Key.country.keyString] == nil ? nil : document.unpack(Key.country.keyString)
-		self.origin = try document[Key.origin.keyString] == nil ? nil : document.unpack(Key.origin.keyString)
+		self.country = try document.meowHasValue(Key.country) ? document.unpack(Key.country.keyString) : nil
+		self.origin = try document.meowHasValue(Key.origin) ? document.unpack(Key.origin.keyString) : nil
 		self.kaas = try document.unpack(Key.kaas.keyString)
-		self.geval = try document[Key.geval.keyString] == nil ? nil : document.unpack(Key.geval.keyString)
+		self.geval = try document.meowHasValue(Key.geval) ? document.unpack(Key.geval.keyString) : nil
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Breed.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 		
 		self.geval = (try? document.unpack(Key.geval.keyString)) 
@@ -197,22 +197,22 @@ class Cat : Model, CatLike {
 	@available(*, unavailable, message: "This API is internal to Meow. You can create a new instance using your own inits or using init(newFrom:).")
 	public required init(restoring source: BSON.Primitive, key: String) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 
 		Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
 		self.breed = try document.unpack(Key.breed.keyString)
-		self.social = try document[Key.social.keyString] == nil ? nil : document.unpack(Key.social.keyString)
-		self.bestFriend = try document[Key.bestFriend.keyString] == nil ? nil : document.unpack(Key.bestFriend.keyString)
+		self.social = try document.meowHasValue(Key.social) ? document.unpack(Key.social.keyString) : nil
+		self.bestFriend = try document.meowHasValue(Key.bestFriend) ? document.unpack(Key.bestFriend.keyString) : nil
 		self.family = try document.unpack(Key.family.keyString)
-		self.favouriteNumber = try document[Key.favouriteNumber.keyString] == nil ? nil : document.unpack(Key.favouriteNumber.keyString)
+		self.favouriteNumber = try document.meowHasValue(Key.favouriteNumber) ? document.unpack(Key.favouriteNumber.keyString) : nil
 	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self);
+			throw Meow.Error.cannotDeserialize(type: Cat.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
 		
 		self.favouriteNumber = (try? document.unpack(Key.favouriteNumber.keyString)) 
