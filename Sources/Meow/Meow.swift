@@ -58,9 +58,6 @@ public enum Meow {
         /// The value for the given key is missing, or invalid
         case missingOrInvalidValue(key: String, expected: Any.Type, got: Any?)
         
-        /// The value for the given key is missing
-        case missingValue(key: String)
-        
         /// The value is invalid
         case invalidValue(key: String, reason: String)
         

@@ -15,7 +15,7 @@ fileprivate func _unpack<S : Serializable>(_ key: String, from primitive: Primit
         return instance as! S
     } else {
         guard let primitive = primitive else {
-            throw Meow.Error.missingValue(key: key)
+            throw Meow.Error.missingOrInvalidValue(key: key, expected: S.self, got: nil)
         }
         
         return try S(restoring: primitive, key: key)
