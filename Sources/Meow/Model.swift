@@ -99,6 +99,9 @@ public protocol BaseModel : class, SerializableToDocument, Convertible, Identify
     
     /// Updates a model with a Document, overriding its own properties with those from the document
     func update(with document: Document) throws
+    
+    /// All keys present in this model. Implemented in a protocol extension
+    static var allRawKeys: [(String, Any.Type)] { get }
 }
 
 extension BaseModel {
@@ -116,6 +119,10 @@ public protocol Model : class, BaseModel, Hashable {
 }
 
 extension Model {
+    public static var allRawKeys: [(String, Any.Type)] {
+        return Key.all.map { return ($0.keyString, $0.type) }
+    }
+    
     /// Makes the model hashable, thus unique, thus usable in a Dictionary
     public var hashValue: Int {
         return _id.hashValue
@@ -358,4 +365,33 @@ extension Model {
     public static func findPartial(including: Set<Self.Key>, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, _ query: QueryBuilder) throws -> Cursor<Self.Values> {
         return try findPartial(makeQuery(query), including: including, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
     }
+}
+
+extension Model {
+    
+    /// Looks up all models that refer to this model, and returns it as a set of collection-key combinations
+    /// Currently only works for top-level references (references inside structs are not supported currently)
+    public static func referencingProperties() -> [(collection: MongoKitten.Collection, key: String)] {
+        var properties: [(MongoKitten.Collection, String)] = []
+        for model in Meow.types.flatMap({ $0 as? BaseModel.Type }) {
+            print(model.allRawKeys)
+            
+            for (key, keyType) in model.allRawKeys where keyType == Self.self || keyType == Array<Self>.self || keyType == Set<Self>.self {
+                properties.append((model.collection, key))
+            }
+        }
+        return properties
+    }
+    
+    /// Counts the number of properties that reference this instance. Supports propeties listed by referencingProperties.
+    /// Note that this may execute a large amount of queries on your database and may be a costly operation, especially
+    /// if the references are not indexed.
+    public func referenceCount() throws -> Int {
+        var count = 0
+        for (collection, key) in Self.referencingProperties() {
+            count += try collection.count(key == self._id)
+        }
+        return count
+    }
+    
 }
