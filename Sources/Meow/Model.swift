@@ -374,8 +374,6 @@ extension Model {
     public static func referencingProperties() -> [(collection: MongoKitten.Collection, key: String)] {
         var properties: [(MongoKitten.Collection, String)] = []
         for model in Meow.types.flatMap({ $0 as? BaseModel.Type }) {
-            print(model.allRawKeys)
-            
             for (key, keyType) in model.allRawKeys where keyType == Self.self || keyType == Array<Self>.self || keyType == Set<Self>.self {
                 properties.append((model.collection, key))
             }
