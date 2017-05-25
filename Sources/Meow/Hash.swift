@@ -11,7 +11,7 @@ import BSON
 
 extension Document {
     /// Hashes a Document for internal comparison
-    internal var meowHash: Int {
+    public var meowHash: Int {
         let bytes = self.bytes
         
         guard bytes.count > 0 else {
