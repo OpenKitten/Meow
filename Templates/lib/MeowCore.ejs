@@ -128,7 +128,7 @@ Object.assign(window, {
 	underscoreCase(string) {
 		return string.replace(/ /g, "_").toLowerCase();
 	},
-	
+
 	/**
 	Returns the type string on how to refer to the variable type. Correctly handles arrays and embedded types.
 	*/
@@ -137,12 +137,12 @@ Object.assign(window, {
 			let array = variable.typeName.array;
 			return 'Array<' + (array.descend('elementType', 'name') || array.descend('elementTypeName', 'name')) + '>'
 		}
-		
+
 		let name;
 		if (name = variable.descend('type', 'name')) {
 			return variable.isOptional && canBeOptional ? name + '?' : name;
 		}
-		
+
 		return canBeOptional ? variable.typeName.name : variable.typeName.unwrappedTypeName;
 	}
 });

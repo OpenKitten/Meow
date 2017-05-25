@@ -35,7 +35,7 @@
 			 ensureSerializable(variable.type);
 
 			// reference
-			if (variable.type.based["Model"]) {
+			if (models.includes(variable.type)) {
 			 %><%- acl %> var <%- variable.name %>: <%- variableTypeString(variable, {canBeOptional: false}) %>.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString, isReference: true) } <%
 			} else {
 			 %><%- acl %> var <%- variable.name %>: <%- variableTypeString(variable, {canBeOptional: false}) %>.VirtualInstance { return .init(keyPrefix: referencedKeyPrefix + Key.<%-variable.name%>.keyString) } <%

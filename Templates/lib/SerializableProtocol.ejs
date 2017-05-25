@@ -2,17 +2,19 @@
 extension Document {
 	func unpack(_ key: String) throws -> <%- serializable.name %> {
 		guard let document = self[key] as? Document, let collectionName = String(document["_ref"]), let id = ObjectId(document["_id"]) else {
-			throw Meow.Error.missingOrInvalidValue(key: key)
+			throw Meow.Error.missingOrInvalidValue(key: key, expected: <%-serializable.name%>.self, got: self["key"])
 		}
 
 		guard let modelType = Meow.database[collectionName].model else {
-			throw Meow.Error.missingOrInvalidValue(key: key)
+			throw Meow.Error.missingOrInvalidValue(key: key, expected: <%-serializable.name%>.self, got: self["key"])
 		}
 
-		guard let instance = try modelType.findOne("_id" == id) as? <%- serializable.name %> else {
-			throw Meow.Error.missingOrInvalidValue(key: key)
+        let instance = try modelType.findOne("_id" == id)
+
+		guard let protocolConformingInstance = instance as? <%- serializable.name %> else {
+			throw Meow.Error.missingOrInvalidValue(key: key, expected: <%-serializable.name%>.self, got: instance)
 		}
 
-		return instance
+		return protocolConformingInstance
 	}
 }

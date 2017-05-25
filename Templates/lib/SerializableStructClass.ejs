@@ -1,5 +1,5 @@
 // MARK: SerializableStructClass.ejs
-<% serializable.isModel = !!serializable.based["Model"]; %>
+<% serializable.isModel = models.includes(serializable); %>
 extension <%- serializable.name %> : SerializableToDocument {
 	<%# Classes need their designated initializers to be in the definition of the body, so we use automatic inline code generation. %>
 	<% if (serializable.kind == "class") { %>// sourcery:inline:auto:<%- serializable.name %>.Meow<% } %>
@@ -9,8 +9,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: <%- serializable.name %>.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
-
-		<% if (serializable.based["Model"]) { %>Meow.pool.free(self._id)
+        <% if (models.includes(serializable)) { %>Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")<% }
 
 		serializable.variables.forEach(variable => {
@@ -29,7 +28,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)<%
 			}
 		});
-		%>
+		-%>
 	}
 
 	<%- acl %> <% if (serializable.kind == "class") { %>required <% }%>init(newFrom source: BSON.Primitive) throws {
@@ -47,7 +46,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		%>
 	}
 	<%_ if (serializable.kind == "class") { -%>
-	<%_ if (serializable.based["Model"]) { -%>
+	<%_ if (models.includes(serializable)) { -%>
 	<%- acl %> var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
 	deinit {
@@ -59,7 +58,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 	<%- acl %> func serialize() -> Document {
 		var document: Document = [:]
-		<% if (serializable.based["Model"]) { %>document.pack(self._id, as: "_id")<% }
+		<% if (models.includes(serializable)) { %>document.pack(self._id, as: "_id")<% }
 
 		serializable.variables.forEach(variable => {
 			if (variable.isComputed || variable.isStatic) { return; }
@@ -100,7 +99,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		}
 	}
 
-	<% if (serializable.based["Model"]) { %>
+	<% if (models.includes(serializable)) { %>
 	<%   if (!serializable.staticVariables.find(v => v.name == "collection")) { %>
 	<%- acl %> static let collection: MongoKitten.Collection = Meow.database["<%- underscoreCase(uncamel(pluralize(serializable.name))) %>"]
 	<%   } %>

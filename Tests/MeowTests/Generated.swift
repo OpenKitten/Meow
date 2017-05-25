@@ -84,11 +84,11 @@ extension Breed : SerializableToDocument {
 
 	// MARK: ModelResolvingFunctions.ejs
 
-	
+
 	public static func byId(_ value: ObjectId) throws -> Breed? {
 		return try Breed.findOne("_id" == value)
 	}
-	
+
 
 
 
@@ -304,11 +304,11 @@ extension Cat : SerializableToDocument {
 
 	// MARK: ModelResolvingFunctions.ejs
 
-	
+
 	public static func byId(_ value: ObjectId) throws -> Cat? {
 		return try Cat.findOne("_id" == value)
 	}
-	
+
 
 
 
@@ -502,11 +502,11 @@ extension CatReferencing : SerializableToDocument {
 
 	// MARK: ModelResolvingFunctions.ejs
 
-	
+
 	public static func byId(_ value: ObjectId) throws -> CatReferencing? {
 		return try CatReferencing.findOne("_id" == value)
 	}
-	
+
 
 
 
@@ -674,11 +674,11 @@ extension Tiger : SerializableToDocument {
 
 	// MARK: ModelResolvingFunctions.ejs
 
-	
+
 	public static func byId(_ value: ObjectId) throws -> Tiger? {
 		return try Tiger.findOne("_id" == value)
 	}
-	
+
 
 
 
@@ -911,11 +911,9 @@ extension Breed.Thing : SerializableToDocument {
 		guard let document = source as? BSON.Document else {
 			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self)
 		}
-
-		
+        
 		self.henk = try document.unpack(Key.henk.keyString)
-		self.fred = try document.unpack(Key.fred.keyString)
-	}
+		self.fred = try document.unpack(Key.fred.keyString)	}
 
 	public init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
@@ -1196,18 +1194,20 @@ public struct VirtualInstance {
 extension Document {
 	func unpack(_ key: String) throws -> CatLike {
 		guard let document = self[key] as? Document, let collectionName = String(document["_ref"]), let id = ObjectId(document["_id"]) else {
-			throw Meow.Error.missingOrInvalidValue(key: key)
+			throw Meow.Error.missingOrInvalidValue(key: key, expected: CatLike.self, got: self["key"])
 		}
 
 		guard let modelType = Meow.database[collectionName].model else {
-			throw Meow.Error.missingOrInvalidValue(key: key)
+			throw Meow.Error.missingOrInvalidValue(key: key, expected: CatLike.self, got: self["key"])
 		}
 
-		guard let instance = try modelType.findOne("_id" == id) as? CatLike else {
-			throw Meow.Error.missingOrInvalidValue(key: key)
+        let instance = try modelType.findOne("_id" == id)
+
+		guard let protocolConformingInstance = instance as? CatLike else {
+			throw Meow.Error.missingOrInvalidValue(key: key, expected: CatLike.self, got: instance)
 		}
 
-		return instance
+		return protocolConformingInstance
 	}
 }
 

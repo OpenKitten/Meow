@@ -1,10 +1,10 @@
 // MARK: ModelResolvingFunctions.ejs
-<% if (serializable.based["Model"]) { %>
-	
+<% if (models.includes(serializable)) { %>
+
 	<%- acl  %> static func byId(_ value: ObjectId) throws -> <%- serializable.name %>? {
 		return try <%- serializable.name %>.findOne("_id" == value)
 	}
-	
+
 <% } %>
 
 <% serializable.allVariables.forEach(variable => {
