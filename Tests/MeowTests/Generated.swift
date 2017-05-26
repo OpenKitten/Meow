@@ -35,6 +35,7 @@ extension Breed : SerializableToDocument {
 		document.pack(self.origin, as: Key.origin.keyString)
 		document.pack(self.kaas, as: Key.kaas.keyString)
 		document.pack(self.geval, as: Key.geval.keyString)
+        
 		return document
 	}
 
@@ -250,6 +251,7 @@ extension Cat : SerializableToDocument {
 		document.pack(self.bestFriend, as: Key.bestFriend.keyString)
 		document.pack(self.family, as: Key.family.keyString)
 		document.pack(self.favouriteNumber, as: Key.favouriteNumber.keyString)
+        
 		return document
 	}
 
@@ -473,6 +475,7 @@ extension CatReferencing : SerializableToDocument {
 		var document: Document = [:]
 		document.pack(self._id, as: "_id")
 		document.pack(self.cat, as: Key.cat.keyString)
+        
 		return document
 	}
 
@@ -630,6 +633,7 @@ extension Tiger : SerializableToDocument {
 		document.pack(self.sameBreed, as: Key.sameBreed.keyString)
 		document.pack(self.singleBreeds, as: Key.singleBreeds.keyString)
 		document.pack(self.sameSingleBreeds, as: Key.sameSingleBreeds.keyString)
+        
 		return document
 	}
 
@@ -913,7 +917,8 @@ extension Breed.Thing : SerializableToDocument {
 		}
         
 		self.henk = try document.unpack(Key.henk.keyString)
-		self.fred = try document.unpack(Key.fred.keyString)	}
+		self.fred = try document.unpack(Key.fred.keyString)
+        	}
 
 	public init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
@@ -930,6 +935,7 @@ extension Breed.Thing : SerializableToDocument {
 		
 		document.pack(self.henk, as: Key.henk.keyString)
 		document.pack(self.fred, as: Key.fred.keyString)
+        
 		return document
 	}
 

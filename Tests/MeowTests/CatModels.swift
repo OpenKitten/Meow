@@ -35,7 +35,8 @@ public class Tiger : Model, CatLike {
 		self.breed = try document.unpack(Key.breed.keyString)
 		self.sameBreed = try document.unpack(Key.sameBreed.keyString)
 		self.singleBreeds = try document.unpack(Key.singleBreeds.keyString)
-		self.sameSingleBreeds = try document.unpack(Key.sameSingleBreeds.keyString)	}
+		self.sameSingleBreeds = try document.unpack(Key.sameSingleBreeds.keyString)
+        	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
@@ -70,7 +71,8 @@ public class CatReferencing : Model {
 		}
         Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
-		self.cat = try document.unpack(Key.cat.keyString)	}
+		self.cat = try document.unpack(Key.cat.keyString)
+        	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
@@ -140,7 +142,8 @@ public class Breed : Model, ExpressibleByStringLiteral {
 		self.country = try document.meowHasValue(Key.country) ? document.unpack(Key.country.keyString) : nil
 		self.origin = try document.meowHasValue(Key.origin) ? document.unpack(Key.origin.keyString) : nil
 		self.kaas = try document.unpack(Key.kaas.keyString)
-		self.geval = try document.meowHasValue(Key.geval) ? document.unpack(Key.geval.keyString) : nil	}
+		self.geval = try document.meowHasValue(Key.geval) ? document.unpack(Key.geval.keyString) : nil
+        	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {
@@ -200,7 +203,8 @@ class Cat : Model, CatLike {
 		self.social = try document.meowHasValue(Key.social) ? document.unpack(Key.social.keyString) : nil
 		self.bestFriend = try document.meowHasValue(Key.bestFriend) ? document.unpack(Key.bestFriend.keyString) : nil
 		self.family = try document.unpack(Key.family.keyString)
-		self.favouriteNumber = try document.meowHasValue(Key.favouriteNumber) ? document.unpack(Key.favouriteNumber.keyString) : nil	}
+		self.favouriteNumber = try document.meowHasValue(Key.favouriteNumber) ? document.unpack(Key.favouriteNumber.keyString) : nil
+        	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
 		guard let document = source as? BSON.Document else {

@@ -2,6 +2,8 @@
 Object.assign(window, {
 	serializableGenerators: [],
 	modelGenerators: [],
+    serializationGenerators: [],
+    deserializationGenerators: [],
 
 	imports: {
 		"Foundation": true,
@@ -33,6 +35,12 @@ Object.assign(window, {
 	forEachSerializable(func) {
 		serializableGenerators.push(func);
 	},
+    forEachSerialization(func) {
+        serializationGenerators.push(func);
+    },
+    forEachDeserialization(func) {
+        deserializationGenerators.push(func);
+    },
 
 	swiftImport() {
 		for (let i = 0; i < arguments.length; i++) {

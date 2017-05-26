@@ -28,7 +28,8 @@ extension <%- serializable.name %> : SerializableToDocument {
 		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)<%
 			}
 		});
-		-%>
+		%>
+        <%- window.execute(window.deserializationGenerators, serializable) -%>
 	}
 
 	<%- acl %> <% if (serializable.kind == "class") { %>required <% }%>init(newFrom source: BSON.Primitive) throws {
@@ -70,6 +71,7 @@ extension <%- serializable.name %> : SerializableToDocument {
 		document.pack(self.<%- variable.name %>, as: Key.<%- variable.name %>.keyString)<%
 		});
 		%>
+        <%- window.execute(window.serializationGenerators, serializable) %>
 		return document
 	}
 
