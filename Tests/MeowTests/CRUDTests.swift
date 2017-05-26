@@ -147,6 +147,19 @@ class CRUDTests : XCTestCase {
         XCTAssertEqual(Numbers.two.serialize() as? Int, 2)
     }
     
+    func testCount() throws {
+        let tigerBreed = Breed(name: "kaas")
+        try tigerBreed.save()
+        
+        _ = Tiger(breed: tigerBreed)
+        _ = Tiger(breed: tigerBreed)
+        _ = Tiger(breed: tigerBreed)
+        _ = Tiger(breed: Breed(name: "meep"))
+        
+        XCTAssertEqual(try Tiger.count { $0.breed.name == "kaas" }, 3)
+        XCTAssertEqual(try Tiger.count { $0.breed.name == "meep" }, 1)
+    }
+    
     func testDeleteBulk() throws {
         try testFindBulk()
         

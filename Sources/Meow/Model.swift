@@ -235,7 +235,19 @@ extension BaseModel {
     
     /// Counts the amount of objects matching the query
     public static func count(_ filter: Query? = nil, limitedTo limit: Int? = nil, skipping skip: Int? = nil) throws -> Int {
-        return try collection.count(filter, limitedTo: limit, skipping: skip)
+        let prepared = try BaseModelHelper<Self>.prepareQuery(filter, skipping: skip, limitedTo: limit)
+        
+        switch prepared {
+        case .aggregate(var pipeline):
+            pipeline.append(.count(insertedAtKey: "_meowCount"))
+            guard let count = Int(try Self.collection.aggregate(pipeline, options: [.cursorOptions(["batchSize": 1])]).next()?["_meowCount"]) else {
+                throw MongoError.internalInconsistency
+            }
+            
+            return count
+        case .find(let query, _, let skip, let limit, _):
+            return try collection.count(query, limitedTo: limit, skipping: skip)
+        }
     }
     
     /// Removes this object from the database
