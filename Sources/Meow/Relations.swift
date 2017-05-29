@@ -64,16 +64,12 @@ public struct Reference<M: BaseModel> : Serializable, Hashable, Identifyable {
     
     /// Deserializes a reference
     public init(restoring source: Primitive, key: String) throws {
-        let document = try Meow.Helpers.requireValue(Document(source), keyForError: key)
-        self.reference = try Meow.Helpers.requireValue(ObjectId(document["_id"]), keyForError: key)
+        self.reference = try Meow.Helpers.requireValue(ObjectId(source), keyForError: key)
     }
     
     /// Serializes a reference
     public func serialize() -> Primitive {
-        return [
-            "_id": reference,
-            "_ref": M.collection.name
-        ]
+        return reference
     }
     
     /// Resolves a reference
