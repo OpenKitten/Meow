@@ -11,14 +11,16 @@ extension Meow {
     }
     
     /// Validates the integrity of the database and returns an array all problems
-    public static func validateDatabaseIntegrity() throws -> [DatabaseProblem] {
+    public static func validateDatabaseIntegrity(limit: Int = Int.max, types typesToValidate: [BaseModel.Type]? = nil) throws -> [DatabaseProblem] {
         guard Meow.pool.count == 0 else {
             throw ValidationError.cannotValidateBecauseOfAliveObjects(objects: Meow.pool.storage.map { $0.1 })
         }
         
+        let types = typesToValidate ?? Meow.types!
+        
         var problems = [DatabaseProblem]()
         
-        for M in Meow.types {
+        upperLoop: for M in types {
             guard let M = M as? BaseModel.Type else { continue }
             Meow.log("Validating \(M)")
             for document in try M.collection.find() {
@@ -27,6 +29,10 @@ extension Meow {
                     Meow.pool.ghost(instance)
                 } catch {
                     problems.append((M, document["_id"], error))
+                    
+                    guard problems.count < limit else {
+                        break upperLoop
+                    }
                 }
             }
         }
