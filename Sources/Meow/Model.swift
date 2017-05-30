@@ -359,6 +359,11 @@ extension BaseModel {
     public static func instantiateIfNeeded(_ document: Document) throws -> Self {
         return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
     }
+    
+    /// Performs a type-erased find operation, so you can perform a `find` when you dynamically receive a BaseModel.Type.
+    public static func genericFind(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, allowOptimizing: Bool = true) throws -> AnySequence<BaseModel> {
+        return AnySequence(try self.find(query, sortedBy: sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize, allowOptimizing: allowOptimizing).lazy.map { $0 as BaseModel })
+    }
 }
 
 extension Model {
@@ -399,25 +404,54 @@ extension Model {
     
     /// Looks up all models that refer to this model, and returns it as a set of collection-key combinations
     /// Currently only works for top-level references (references inside structs are not supported currently)
-    public static func referencingProperties() -> [(collection: MongoKitten.Collection, key: String)] {
-        var properties: [(MongoKitten.Collection, String)] = []
+    public static func referencingProperties() -> [(type: BaseModel.Type, keys: [String])] {
+        var properties: [(BaseModel.Type, [String])] = []
+        
+        // First, we'll get all BaseModel types, and then find every Key that refers to Self
         for model in Meow.types.flatMap({ $0 as? BaseModel.Type }) {
             for (key, keyType) in model.allRawKeys where keyType == Self.self || keyType == Array<Self>.self || keyType == Set<Self>.self {
-                properties.append((model.collection, key))
+                properties.append((model, [key]))
             }
         }
-        return properties
+        
+        // Now, reduce these so the result only contains one entry per type
+        return properties.reduce([]) { result, entry in
+            if let existingIndex = result.index(where: { $0.0 == entry.0 }) {
+                var result = result
+                result[existingIndex].keys += entry.1
+                return result
+            } else {
+                return result + [entry]
+            }
+        }
     }
     
     /// Counts the number of properties that reference this instance. Supports propeties listed by referencingProperties.
     /// Note that this may execute a large amount of queries on your database and may be a costly operation, especially
     /// if the references are not indexed.
+    ///
+    /// Note that if one model contains multiple references (in separate properties) to this model, it is still counted as one.
+    ///
+    /// - returns: The amount of models that refer to this model
     public func referenceCount() throws -> Int {
         var count = 0
-        for (collection, key) in Self.referencingProperties() {
-            count += try collection.count(key == self._id)
+        for (model, keys) in Self.referencingProperties() {
+            count += try model.count(keys.map{ $0 == self._id }.reduce(Query(), ||))
         }
         return count
+    }
+    
+    /// Returns all model instances that refer to this instance. Supports propeties listed by referencingProperties.
+    /// Note that this may execute a large amount of queries on your database and may be a costly operation, especially
+    /// if the references are not indexed.
+    public func referencingModels() throws -> AnySequence<BaseModel> {
+        var sequences = [AnySequence<BaseModel>]()
+        
+        for (model, keys) in Self.referencingProperties() {
+            sequences.append(try model.genericFind(keys.map{ $0 == self._id }.reduce(Query(), ||)))
+        }
+        
+        return AnySequence(sequences.joined())
     }
     
 }
