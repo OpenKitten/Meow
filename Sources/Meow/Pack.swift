@@ -38,22 +38,8 @@ extension Document {
     }
     
     /// Packs a value into this document
-    public mutating func pack<S : Serializable>(_ serializable: S?, as key: String) {
+    public mutating func pack(_ serializable: Serializable?, as key: String) {
         self[key] = _pack(serializable)
-    }
-}
-
-extension Document {
-    public mutating func pack(_ primitive: BSON.Primitive?, as key: String) {
-        self[key] = primitive
-    }
-    
-    public func unpack(_ key: String) throws -> BSON.Primitive {
-        guard let primitive = self[key] else {
-            throw Meow.Error.missingOrInvalidValue(key: key, expected: BSON.Primitive.self, got: nil)
-        }
-        
-        return primitive
     }
 }
 

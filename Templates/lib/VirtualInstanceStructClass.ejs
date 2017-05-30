@@ -28,8 +28,6 @@
 		 if (supportedPrimitives.includes(variable.unwrappedTypeName)) {
 			 if (numberTypes.includes(variable.unwrappedTypeName)) {
 				 %><%- acl %> var <%- variable.name %>: VirtualNumber { return VirtualNumber(name: referencedKeyPrefix + Key.<%- variable.name %>.keyString) } <%
-			 } else if (variable.unwrappedTypeName.endsWith("Primitive")) {
-				 %><%- acl %> var <%- variable.name %>: String { return referencedKeyPrefix + Key.<%- variable.name %>.keyString } <%
 			 } else {
 				 %><%- acl %> var <%- variable.name %>: Virtual<%- variable.unwrappedTypeName %> { return Virtual<%-variable.unwrappedTypeName%>(name: referencedKeyPrefix + Key.<%-variable.name%>.keyString) } <%
 			 }
