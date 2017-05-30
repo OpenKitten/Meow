@@ -268,6 +268,9 @@ class CRUDTests : XCTestCase {
         sameTiger = try Tiger.findOne { $0.breed._id == tigerBreed._id }
         testSameTiger()
         
+        sameTiger = try Tiger.findOne { $0.breed == tigerBreed }
+        testSameTiger()
+        
         sameTiger = try Tiger.findOne { $0._id == tiger._id }
         testSameTiger()
         

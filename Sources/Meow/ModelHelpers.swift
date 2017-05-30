@@ -25,74 +25,6 @@ public class BaseModelHelper<M: BaseModel> {
         }
     }
     
-    /// Creates a pipeline according to query specification. If necessary, performs $lookup or left-joins on other collections and queries those entities, too.
-    ///
-    /// - parameter query: The query to generate an aggregation pipeline for
-    /// - throws: When recursively referring to the same model, potentially creating an infinite join loop
-    /// - returns: A tuple containing the pipeline and a boolean. The boolean will be true if left-joins have been applied and the pipeline is thus requires for properly executing this query.
-    public static func makeQueryPipeline(for query: Query) throws -> (pipeline: AggregationPipeline, required: Bool) {
-        var query = query.makeDocument()
-        var pipeline = AggregationPipeline()
-        var requirePipeline = false
-        var references = [(String, BaseModel.Type)]()
-        let referenceKeys = try M.recursiveKeysWithReferences(chainedFrom: [])
-        
-        let referencedKeys = query.flattened().keys
-        var firstQuery = Document()
-        
-        var stages: [AggregationPipeline.Stage] = []
-        
-        func parseQuery(forKey prefix: [SubscriptExpressionType]) {
-            for (referenceKey, referenceType) in referenceKeys {
-                var prefixTotal = ""
-                var matches = false
-                
-                prefixCheck: for part in prefix {
-                    switch part.subscriptExpression {
-                    case .kittenBytes(let bytes):
-                        if let s = String(bytes: bytes.bytes, encoding: .utf8) {
-                            prefixTotal += s
-                        }
-                        
-                        if prefixTotal.hasPrefix(referenceKey + ".") {
-                            matches = true
-                            break prefixCheck
-                        }
-                    default:
-                        continue
-                    }
-                }
-                
-                if matches {
-                    requirePipeline = true
-                    references.append((referenceKey, referenceType))
-                    stages.append(.lookup(from: referenceType.collection, localField: referenceKey, foreignField: "_id", as: referenceKey))
-                } else {
-                    firstQuery[prefix] = query[prefix]
-                    query[prefix] = nil
-                }
-            }
-        }
-        
-        for key in query.keys {
-            parseQuery(forKey: [key])
-        }
-        
-        if firstQuery.count > 0 {
-            pipeline.append(.match(firstQuery))
-        }
-        
-        for stage in stages {
-            pipeline.append(stage)
-        }
-        
-        if query.count > 0 {
-            pipeline.append(.match(query))
-        }
-        
-        return (pipeline, requirePipeline)
-    }
-    
     /// Prepares a query given a set of parameters. This query can be either a find operation or aggregation pipeline
     ///
     /// - parameter query: The query that is being executed which allows references to be queries, too
@@ -105,13 +37,89 @@ public class BaseModelHelper<M: BaseModel> {
     public static func prepareQuery(_ query: Query? = nil, sortedBy sort: Sort? = nil, projecting projection: Projection? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil) throws -> PreparedQuery {
         var pipeline = AggregationPipeline()
         var requirePipeline = false
+        var query = query?.makeDocument()
         
-        if let query = query {
-            (pipeline, requirePipeline) = try makeQueryPipeline(for: query)
+        if var queryDocument = query {
+            var references = [(String, BaseModel.Type)]()
+            let referenceKeys = try M.recursiveKeysWithReferences(chainedFrom: [])
+            
+            let referencedKeys = queryDocument.flattened().keys
+            var firstQuery = Document()
+            
+            var stages: [AggregationPipeline.Stage] = []
+            
+            func parseQuery(forKey prefix: [SubscriptExpressionType]) {
+                for (referenceKey, referenceType) in referenceKeys {
+                    var prefixTotal = ""
+                    var matches = false
+                    var modifyKey: [SubscriptExpressionType]? = nil
+                    
+                    prefixCheck: for part in prefix {
+                        switch part.subscriptExpression {
+                        case .kittenBytes(let bytes):
+                            if let s = String(bytes: bytes.bytes, encoding: .utf8) {
+                                prefixTotal += s
+                            }
+                            
+                            if prefixTotal.hasPrefix(referenceKey + ".") {
+                                if prefixTotal == referenceKey + "._id" {
+                                    modifyKey = prefix
+                                    modifyKey?.removeLast()
+                                    modifyKey?.append(referenceKey)
+                                } else {
+                                    matches = true
+                                }
+                                
+                                break prefixCheck
+                            }
+                        default:
+                            continue
+                        }
+                    }
+                    
+                    if matches {
+                        requirePipeline = true
+                        references.append((referenceKey, referenceType))
+                        stages.append(.lookup(from: referenceType.collection, localField: referenceKey, foreignField: "_id", as: referenceKey))
+                    } else if let modifyKey = modifyKey {
+                        var newPrefix = prefix
+                        newPrefix.removeLast()
+                        
+                        firstQuery[modifyKey] = queryDocument[prefix]
+                        queryDocument[prefix] = nil
+                        
+                        query?[modifyKey] = query?[prefix]
+                        query?[prefix] = nil
+                    } else {
+                        firstQuery[prefix] = queryDocument[prefix]
+                        queryDocument[prefix] = nil
+                    }
+                }
+            }
+            
+            for key in queryDocument.keys {
+                parseQuery(forKey: [key])
+            }
+            
+            if firstQuery.count > 0 {
+                pipeline.append(.match(firstQuery))
+            }
+            
+            for stage in stages {
+                pipeline.append(stage)
+            }
+            
+            if queryDocument.count > 0 {
+                pipeline.append(.match(queryDocument))
+            }
         }
         
         if !requirePipeline {
-            return .find(query: query, sort: sort, skip: skip, limit: limit, project: projection)
+            if let query = query {
+                return .find(query: Query(query), sort: sort, skip: skip, limit: limit, project: projection)
+            } else {
+                return .find(query: nil, sort: sort, skip: skip, limit: limit, project: projection)
+            }
         }
         
         if let sort = sort {
