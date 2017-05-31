@@ -179,6 +179,11 @@ public enum Meow {
             }
         }
         
+        /// The amount of objects to keep strong references to
+        public var strongReferenceAmount = 0
+        
+        private var strongReferences = [BaseModel]()
+        
         /// The queue used to prevent crashes in mutations
         private let objectPoolMutationQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
         
@@ -310,6 +315,21 @@ public enum Meow {
             
             objectPoolMutationQueue.sync {
                 current = storage[instance._id]?.instance.value
+                
+                // remove old strong reference
+                if let current = current, let index = self.strongReferences.index(where: { $0 === current }) {
+                    self.strongReferences.remove(at: index)
+                }
+                
+                // keep a strong reference
+                if self.strongReferenceAmount > 0 {
+                    self.strongReferences.insert(instance, at: 0)
+                }
+                
+                // clean up strong references
+                if self.strongReferences.count > self.strongReferenceAmount {
+                    self.strongReferences.removeLast(self.strongReferences.count - self.strongReferenceAmount)
+                }
             }
             
             if let current = current {
