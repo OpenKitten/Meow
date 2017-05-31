@@ -1,11 +1,3 @@
-//
-//  Document+Meow.swift
-//  Tikcit
-//
-//  Created by Robbert Brandsma on 24-05-17.
-//
-//
-
 import BSON
 import Foundation
 

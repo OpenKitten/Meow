@@ -1,11 +1,3 @@
-//
-//  Hash.swift
-//  Tikcit
-//
-//  Created by Robbert Brandsma on 11-05-17.
-//
-//
-
 import Foundation
 import BSON
 

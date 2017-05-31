@@ -1,11 +1,3 @@
-//
-//  DBRef.swift
-//  Tikcit
-//
-//  Created by Robbert Brandsma on 16-05-17.
-//
-//
-
 import MongoKitten
 
 extension DBRef : Serializable {
