@@ -349,7 +349,7 @@ extension BaseModel {
                 return try Self.instantiateIfNeeded(document)
             } catch {
                 Meow.log("Initializing from document failed: \(error)")
-                assertionFailure()
+                assertionFailure("Could not initialize \(Self.self) from document\n_id: \(ObjectId(document["_id"])?.hexString ?? document["_id"] ?? "unknown")\nError: \(error)\n")
                 return nil
             }
         })
