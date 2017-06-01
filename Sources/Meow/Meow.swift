@@ -103,7 +103,7 @@ public enum Meow {
     /// The Object Pool instance. For more information, look at the `ObjectPool` documentation.
     public static let pool = ObjectPool()
     
-    internal static let maintenanceQueue = DispatchQueue(label: "org.openkitten.meow.maintenance", qos: .background)
+    fileprivate static let maintenanceQueue = DispatchQueue(label: "org.openkitten.meow.maintenance", qos: .background, attributes: .concurrent)
     
     /// The time interval, in seconds, at which the maintenance loop runs. Defaults to 5.
     public static var maintenanceInterval: TimeInterval = 5
@@ -114,21 +114,15 @@ public enum Meow {
     private static func maintenance() {
         Meow.log("Performing maintenance")
         
-        do {
-            Meow.pool.clean()
-            try Meow.pool.autoSave()
-        } catch {
-            Meow.log("❗ Error while performing maintenance")
-            Meow.log(error)
-            assertionFailure("\(error)")
-        }
+        Meow.pool.clean()
+        Meow.pool.maintenance()
         
         // Schedule next maintenance
         scheduleMaintenance()
     }
     
     private static func scheduleMaintenance() {
-        maintenanceQueue.asyncAfter(deadline: DispatchTime(secondsFromNow: maintenanceInterval), execute: Meow.maintenance)
+        maintenanceQueue.asyncAfter(deadline: DispatchTime(secondsFromNow: maintenanceInterval), flags: .barrier, execute: Meow.maintenance)
     }
     
     /// The ObjectPool is used to hold references to models to link them in-memory
@@ -179,13 +173,8 @@ public enum Meow {
             }
         }
         
-        /// The amount of objects to keep strong references to
-        public var strongReferenceAmount = 0
-        
-        private var strongReferences = [BaseModel]()
-        
-        /// The queue used to prevent crashes in mutations
-        private let objectPoolMutationQueue = DispatchQueue(label: "org.openkitten.meow.objectPool", qos: .userInteractive)
+        /// The lock used to prevent crashes in mutations
+        private var objectPoolMutationLock = NSRecursiveLock()
         
         fileprivate init() {
             // Save the database contents before exiting
@@ -234,26 +223,30 @@ public enum Meow {
         
         /// Generated a new ObjectId
         public func newObjectId() -> ObjectId {
-            let id = ObjectId()
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
             
-            objectPoolMutationQueue.sync {
-                _ = unsavedObjectIds.insert(id)
-            }
+            let id = ObjectId()
+            unsavedObjectIds.insert(id)
             
             return id
         }
         
         /// Turns the `instance` into a ghost. It will not be saved again.
         public func ghost(_ instance: BaseModel) {
-            objectPoolMutationQueue.async {
-                self.ghosts.insert(ObjectIdentifier(instance))
-            }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            let id = ObjectIdentifier(instance)
+            self.ghosts.insert(id)
         }
         
         public func isGhost(_ instance: BaseModel) -> Bool {
-            return objectPoolMutationQueue.sync {
-                return ghosts.contains(ObjectIdentifier(instance))
-            }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            let id = ObjectIdentifier(instance)
+            return ghosts.contains(id)
         }
         
         /// Instantiates a model from a Document unless the model is alraedy in-memory
@@ -262,18 +255,19 @@ public enum Meow {
                 throw Error.missingOrInvalidValue(key: "_id", expected: ObjectId.self, got: document["_id"])
             }
             
-            var existingInstance: M?
-            
-            objectPoolMutationQueue.sync {
-                existingInstance = storage[id]?.instance.value as? M
-            }
+            objectPoolMutationLock.lock()
+            let existingInstance: M? = storage[id]?.instance.value as? M
+            objectPoolMutationLock.unlock()
             
             if let existingInstance = existingInstance {
                 Meow.log("Returning \(existingInstance) from pool")
                 return existingInstance
             }
             
-            let instantiation: RunningInstantiation = try objectPoolMutationQueue.sync {
+            let instantiation: RunningInstantiation = try {
+                objectPoolMutationLock.lock()
+                defer { objectPoolMutationLock.unlock() }
+                
                 let instantiation = currentlyInstantiating[id]
                 guard instantiation == nil || instantiation!.thread != Thread.current else {
                     throw Meow.Error.infiniteReferenceLoop(type: M.self, id: id)
@@ -286,7 +280,7 @@ public enum Meow {
                     currentlyInstantiating[id] = instantiation
                     return instantiation
                 }
-            }
+            }()
             
             if instantiation.thread != Thread.current {
                 Meow.log("Waiting for instance from other thread")
@@ -301,110 +295,98 @@ public enum Meow {
                 
                 self.pool(instance, hash: document.meowHash)
                 
-                objectPoolMutationQueue.sync {
-                    currentlyInstantiating[id] = nil
-                }
+                objectPoolMutationLock.lock()
+                currentlyInstantiating[id] = nil
+                objectPoolMutationLock.unlock()
                 
                 return instance
             }
         }
         
         public func getPooledInstance<M: BaseModel>(withIdentifier id: ObjectId) -> M? {
-            return objectPoolMutationQueue.sync {
-                return storage[id]?.instance.value as? M
-            }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            return storage[id]?.instance.value as? M
         }
         
         /// Stored an entity in the pool
         public func pool<M: BaseModel>(_ instance: M, hash: Int? = nil) {
-            var current: AnyObject?
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
             
-            objectPoolMutationQueue.sync {
-                current = storage[instance._id]?.instance.value
-                
-                // remove old strong reference
-                if let current = current, let index = self.strongReferences.index(where: { $0 === current }) {
-                    self.strongReferences.remove(at: index)
-                }
-                
-                // keep a strong reference
-                if self.strongReferenceAmount > 0 {
-                    self.strongReferences.insert(instance, at: 0)
-                }
-                
-                // clean up strong references
-                if self.strongReferences.count > self.strongReferenceAmount {
-                    self.strongReferences.removeLast(self.strongReferences.count - self.strongReferenceAmount)
-                }
-            }
+            let current = storage[instance._id]?.instance.value
             
             if let current = current {
                 assert(current === instance.object, "two model instances with the same _id is invalid")
                 return
             } else {
                 Meow.log("Pooling \(instance)")
-                objectPoolMutationQueue.sync {
-                    if let index = unsavedObjectIds.index(of: instance._id) {
-                        unsavedObjectIds.remove(at: index)
-                    }
+                
+                if let index = unsavedObjectIds.index(of: instance._id) {
+                    unsavedObjectIds.remove(at: index)
                 }
+                
             }
             
-            objectPoolMutationQueue.sync {
-                // Only pool it if the instance is not invalidated
-                if !invalidatedObjectIds.contains(instance._id) {
-                    storage[instance._id] = (instance: Weak(instance.object), instantiation: Date(), hash: hash ?? storage[instance._id]?.hash /* existing hash fallback */)
-                }
+            
+            // Only pool it if the instance is not invalidated
+            if !invalidatedObjectIds.contains(instance._id) {
+                storage[instance._id] = (instance: Weak(instance.object), instantiation: Date(), hash: hash ?? storage[instance._id]?.hash /* existing hash fallback */)
             }
+            
         }
         
         internal func existingHash(for instance: BaseModel) -> Int? {
-            return objectPoolMutationQueue.sync {
-                return storage[instance._id]?.hash
-            }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            return storage[instance._id]?.hash
         }
         
         internal func updateHash(for instance: BaseModel, with newHash: Int?) {
-            // we don't return any value here, and the pool is accessed only from this queue, so this is a safe async operation
-            objectPoolMutationQueue.async {
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
                 self.storage[instance._id]?.hash = newHash
-            }
         }
         
         /// Invalidates the given ObjectId. Called when removing an object
         internal func invalidate(_ id: ObjectId) {
-            // we don't return any value here, and the pool is accessed only from this queue, so this is a safe async operation
-            objectPoolMutationQueue.async {
-                // remove the instance from the pool
-                self.storage[id] = nil
-                self.invalidatedObjectIds.insert(id)
-            }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            // remove the instance from the pool
+            self.storage[id] = nil
+            self.invalidatedObjectIds.insert(id)
         }
         
         /// Frees an objectId fromthe unsavedObjectIds
         public func free(_ id: ObjectId) {
-            // we don't return any value here, and the pool is accessed only from this queue, so this is a safe async operation
-            objectPoolMutationQueue.async {
-                if let index = self.unsavedObjectIds.index(of: id) {
-                    Meow.log("Unregistering ObjectId \(id)")
-                    self.unsavedObjectIds.remove(at: index)
-                }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            if let index = self.unsavedObjectIds.index(of: id) {
+                Meow.log("Unregistering ObjectId \(id)")
+                self.unsavedObjectIds.remove(at: index)
             }
         }
         
         /// Returns if `instance` is currently in the pool
         public func isPooled<M: BaseModel>(_ instance: M) -> Bool {
-            return objectPoolMutationQueue.sync {
-                return storage[instance._id] != nil
-            }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            return storage[instance._id] != nil
         }
         
         /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
             defer {
-                objectPoolMutationQueue.async {
-                    self.ghosts.remove(ObjectIdentifier(instance))
-                }
+                self.ghosts.remove(ObjectIdentifier(instance))
             }
             
             do {
@@ -418,47 +400,55 @@ public enum Meow {
             
             Meow.log("Unpooling \(instance)")
             
-            objectPoolMutationQueue.sync {
-                storage[instance._id] = nil
-                
-                // remove if invalidated to free up memory:
-                invalidatedObjectIds.remove(instance._id)
-            }
+            storage[instance._id] = nil
+            
+            // remove if invalidated to free up memory:
+            invalidatedObjectIds.remove(instance._id)
         }
         
         /// The amount of pooled objects
         public var count: Int {
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
             self.clean()
-            return objectPoolMutationQueue.sync {
-                return storage.count
-            }
+            return storage.count
         }
         
         /// Removes deallocated entries from the pool
         @discardableResult
         public func clean() -> Int {
-            return objectPoolMutationQueue.sync {
-                var cleanedCount = 0
-                
-                for (id, val) in storage {
-                    if val.instance.value == nil {
-                        storage[id] = nil
-                        cleanedCount += 1
-                    }
+            objectPoolMutationLock.lock()
+            defer { objectPoolMutationLock.unlock() }
+            
+            var cleanedCount = 0
+            
+            for (id, val) in storage {
+                if val.instance.value == nil {
+                    storage[id] = nil
+                    cleanedCount += 1
                 }
-                
-                return cleanedCount
             }
+            
+            return cleanedCount
         }
         
         /// Handles automatically saving models so they don't get lost when the server randomly crashes/shuts down
-        fileprivate func autoSave() throws {
-            let oldObjects = objectPoolMutationQueue.sync {
-                return storage.filter({ $0.value.instantiation.timeIntervalSinceNow < -(minimumAutosaveAge) })
-            }
+        fileprivate func maintenance() {
+            objectPoolMutationLock.lock()
+            let oldObjects = storage.filter({ $0.value.instantiation.timeIntervalSinceNow < -(minimumAutosaveAge) })
+            objectPoolMutationLock.unlock()
             
             for (_, val) in oldObjects {
-                try (val.instance.value as? BaseModel)?.save()
+//                Meow.maintenanceQueue.async {
+                    do {
+                        try (val.instance.value as? BaseModel)?.save()
+                    } catch {
+                        Meow.log("❗ Error while performing autosave")
+                        Meow.log(error)
+                        assertionFailure("\(error)")
+                    }
+//                }
             }
         }
     }
