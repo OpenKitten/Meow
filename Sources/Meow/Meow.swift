@@ -158,6 +158,7 @@ public enum Meow {
                     return m
                 } catch {
                     result = .error(error)
+                    lock.unlock()
                     throw error
                 }
             }
