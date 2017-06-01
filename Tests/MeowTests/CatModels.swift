@@ -47,6 +47,7 @@ public class Tiger : Model, CatLike {
 		self.singleBreeds = (try document.unpack(Key.singleBreeds.keyString)) 
 		self.sameBreed = (try document.unpack(Key.sameBreed.keyString)) 
 		self.breed = (try document.unpack(Key.breed.keyString)) 
+		try self.save()
 	}
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
@@ -80,6 +81,7 @@ public class CatReferencing : Model {
 		}
 		
 		self.cat = (try document.unpack(Key.cat.keyString)) 
+		try self.save()
 	}
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
@@ -155,6 +157,7 @@ public class Breed : Model, ExpressibleByStringLiteral {
 		self.origin = (try? document.unpack(Key.origin.keyString)) 
 		self.country = (try? document.unpack(Key.country.keyString)) 
 		self.name = (try document.unpack(Key.name.keyString)) 
+		try self.save()
 	}
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
@@ -217,6 +220,7 @@ class Cat : Model, CatLike {
 		self.social = (try? document.unpack(Key.social.keyString)) 
 		self.breed = (try document.unpack(Key.breed.keyString)) 
 		self.name = (try document.unpack(Key.name.keyString)) 
+		try self.save()
 	}
 	public var _id = Meow.pool.newObjectId() { didSet { Meow.pool.free(oldValue) } }
 
