@@ -245,11 +245,15 @@ public enum Meow {
         
         /// Turns the `instance` into a ghost. It will not be saved again.
         public func ghost(_ instance: BaseModel) {
-            ghosts.insert(ObjectIdentifier(instance))
+            objectPoolMutationQueue.async {
+                self.ghosts.insert(ObjectIdentifier(instance))
+            }
         }
         
         public func isGhost(_ instance: BaseModel) -> Bool {
-            return ghosts.contains(ObjectIdentifier(instance))
+            return objectPoolMutationQueue.sync {
+                return ghosts.contains(ObjectIdentifier(instance))
+            }
         }
         
         /// Instantiates a model from a Document unless the model is alraedy in-memory
@@ -361,24 +365,29 @@ public enum Meow {
         }
         
         internal func updateHash(for instance: BaseModel, with newHash: Int?) {
-            storage[instance._id]?.hash = newHash
+            // we don't return any value here, and the pool is accessed only from this queue, so this is a safe async operation
+            objectPoolMutationQueue.async {
+                self.storage[instance._id]?.hash = newHash
+            }
         }
         
         /// Invalidates the given ObjectId. Called when removing an object
         internal func invalidate(_ id: ObjectId) {
-            objectPoolMutationQueue.sync {
+            // we don't return any value here, and the pool is accessed only from this queue, so this is a safe async operation
+            objectPoolMutationQueue.async {
                 // remove the instance from the pool
-                storage[id] = nil
-                invalidatedObjectIds.insert(id)
+                self.storage[id] = nil
+                self.invalidatedObjectIds.insert(id)
             }
         }
         
         /// Frees an objectId fromthe unsavedObjectIds
         public func free(_ id: ObjectId) {
-            objectPoolMutationQueue.sync {
-                if let index = unsavedObjectIds.index(of: id) {
+            // we don't return any value here, and the pool is accessed only from this queue, so this is a safe async operation
+            objectPoolMutationQueue.async {
+                if let index = self.unsavedObjectIds.index(of: id) {
                     Meow.log("Unregistering ObjectId \(id)")
-                    unsavedObjectIds.remove(at: index)
+                    self.unsavedObjectIds.remove(at: index)
                 }
             }
         }
@@ -392,10 +401,12 @@ public enum Meow {
         
         /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
-            ghosts.remove(ObjectIdentifier(instance))
+            objectPoolMutationQueue.async {
+                self.ghosts.remove(ObjectIdentifier(instance))
+            }
             
             do {
-                if !invalidatedObjectIds.contains(instance._id) {
+                if objectPoolMutationQueue.sync(execute: { !invalidatedObjectIds.contains(instance._id) }) {
                     try instance.save()
                 }
             } catch {
@@ -440,7 +451,10 @@ public enum Meow {
         
         /// Handles automatically saving models so they don't get lost when the server randomly crashes/shuts down
         fileprivate func autoSave() throws {
-            let oldObjects = storage.filter({ $0.value.instantiation.timeIntervalSinceNow < -(minimumAutosaveAge) })
+            let oldObjects = objectPoolMutationQueue.sync {
+                return storage.filter({ $0.value.instantiation.timeIntervalSinceNow < -(minimumAutosaveAge) })
+            }
+            
             for (_, val) in oldObjects {
                 try (val.instance.value as? BaseModel)?.save()
             }
