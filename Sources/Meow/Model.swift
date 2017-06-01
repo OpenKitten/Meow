@@ -180,8 +180,8 @@ extension Model {
     /// Performs a findOne operation using a type-safe query.
     ///
     /// For more information about type safe queries, see the guide and the documentation on the types whose name start with `Virtual`.
-    public static func findOne(_ query: QueryBuilder) throws -> Self? {
-        return try findOne(makeQuery(query))
+    public static func findOne(sortedBy sort: [Key : SortOrder]? = nil, _ query: QueryBuilder) throws -> Self? {
+        return try findOne(makeQuery(query), sortedBy: sort?.makeSort())
     }
     
     /// Performs a findOne operation using a type-safe query.
@@ -262,9 +262,9 @@ extension BaseModel {
     }
     
     /// Returns the first object matching the query
-    public static func findOne(_ query: Query? = nil) throws -> Self? {
+    public static func findOne(_ query: Query? = nil, sortedBy sort: Sort? = nil) throws -> Self? {
         // We don't reuse find here because that one does not have proper error reporting
-        return try Self.find(query, limitedTo: 1, withBatchSize: 1).makeIterator().next()
+        return try Self.find(query, sortedBy: sort, limitedTo: 1, withBatchSize: 1).makeIterator().next()
     }
     
     /// Saves this object to the database
