@@ -23,6 +23,12 @@ class CRUDTests : XCTestCase {
         try! Meow.database.drop()
     }
     
+    override func tearDown() {
+        if Meow.pool.count != 0 {
+            XCTFail("After the tests the pool count must be 0, else there is a reference loop somewhere.")
+        }
+    }
+    
     func testDatabaseValidation() throws {
         _ = Breed(name: "test")
         
