@@ -921,12 +921,17 @@ extension Breed.Thing : SerializableToDocument {
         	}
 
 	public init(newFrom source: BSON.Primitive) throws {
-		guard let document = source as? BSON.Document else {
-			throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self)
+		do {
+			guard let document = source as? BSON.Document else {
+				throw Meow.Error.cannotDeserialize(type: Breed.Thing.self, source: source, expectedPrimitive: BSON.Document.self)
+			}
+			
+			self.fred = (try document.unpack(Key.fred.keyString)) 
+			self.henk = (try document.unpack(Key.henk.keyString)) 
+		} catch {
+			
+			throw error
 		}
-		
-		self.fred = (try document.unpack(Key.fred.keyString)) 
-		self.henk = (try document.unpack(Key.henk.keyString)) 
 	}
 
 

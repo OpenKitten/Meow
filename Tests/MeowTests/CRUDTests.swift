@@ -311,6 +311,14 @@ class CRUDTests : XCTestCase {
         
         XCTAssertEqual(try Tiger.recursiveKeysWithReferences(chainedFrom: []).map { $0.0 }, [Tiger.Key.breed.keyString])
     }
+    
+    func testNewFrom() throws {
+        let document: Document = ["name": "OpenKitten-unittest-breed-\(Date().timeIntervalSince1970)", "kaas": ["kaas", "kaas", "kaas"]]
+        let breed = try Breed(newFrom: document)
+        
+        // after newFrom, the object should be saved already
+        XCTAssert(try Breed.findOne("name" == document["name"]) === breed)
+    }
 }
 
 extension Breed {
