@@ -101,7 +101,7 @@ public enum Meow {
     }
     
     /// The Object Pool instance. For more information, look at the `ObjectPool` documentation.
-    public static var pool = ObjectPool()
+    public static let pool = ObjectPool()
     
     internal static let maintenanceQueue = DispatchQueue(label: "org.openkitten.meow.maintenance", qos: .background)
     
@@ -401,12 +401,14 @@ public enum Meow {
         
         /// Saves an object after being deinitialized
         public func handleDeinit<M: BaseModel>(_ instance: M) {
-            objectPoolMutationQueue.async {
-                self.ghosts.remove(ObjectIdentifier(instance))
+            defer {
+                objectPoolMutationQueue.async {
+                    self.ghosts.remove(ObjectIdentifier(instance))
+                }
             }
             
             do {
-                if objectPoolMutationQueue.sync(execute: { !invalidatedObjectIds.contains(instance._id) }) {
+                if !invalidatedObjectIds.contains(instance._id) {
                     try instance.save()
                 }
             } catch {
