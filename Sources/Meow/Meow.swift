@@ -210,7 +210,9 @@ public enum Meow {
             }
             
             for id in unsavedObjectIds {
-                Meow.log("WARNING: An ObjectId \(id) was generated, but the object was not saved. This is probably because the object was not deallocated by ARC before program exit. The data has been lost, as Meow does not have access to it. To solve this, do not use models as global or top level variables. If you do use models as global or top level objects, make sure to call save() manually or add it to the object pool yourself using Meow.pool.pool(instance), for example in the initializer of the model.")
+                let message = "WARNING: An ObjectId \(id.hexString) was generated, but the object was not saved. This is probably because the object was not deallocated by ARC before program exit. The data has been lost, as Meow does not have access to it. To solve this, do not use models as global or top level variables. If you do use models as global or top level objects, make sure to call save() manually or add it to the object pool yourself using Meow.pool.pool(instance), for example in the initializer of the model."
+                Meow.log(message)
+                assertionFailure(message)
                 assertionFailure("This will crash on debug, but not on release builds.")
             }
         }
