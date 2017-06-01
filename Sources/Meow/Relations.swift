@@ -60,6 +60,12 @@ public struct Reference<M: BaseModel> : Serializable, Hashable, Identifyable {
     /// Creates a reference from an entity
     public init(to entity: M) {
         reference = entity._id
+        
+        /// We have to make sure the object exists in the database, so we'll try to save it silencing errors
+        /// if we have no existing hash for it, which means it is a new object.
+        if Meow.pool.existingHash(for: entity) == nil {
+            try? entity.save()
+        }
     }
     
     /// Deserializes a reference

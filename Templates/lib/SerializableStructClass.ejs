@@ -44,6 +44,9 @@ extension <%- serializable.name %> : SerializableToDocument {
 			%>
 		self.<%- variable.name %> = (try<%- variable.isOptional || variable.defaultValue ? '?' : '' %> document.unpack(Key.<%- variable.name %>.keyString)) <%- variable.defaultValue ? '?? self.' + variable.name : '' %><%
 		});
+		
+		if (models.includes(serializable)) {%>
+		try self.save()<%}
 		%>
 	}
 	<%_ if (serializable.kind == "class") { -%>
