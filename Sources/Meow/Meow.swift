@@ -29,7 +29,6 @@ public enum Meow {
         Meow.log("Init")
         Meow.database = db
         Meow.types = types
-        Meow.pool = ObjectPool()
         
         scheduleMaintenance()
     }
@@ -102,7 +101,7 @@ public enum Meow {
     }
     
     /// The Object Pool instance. For more information, look at the `ObjectPool` documentation.
-    public static var pool: ObjectPool!
+    public static var pool = ObjectPool()
     
     internal static let maintenanceQueue = DispatchQueue(label: "org.openkitten.meow.maintenance", qos: .background)
     
@@ -354,7 +353,9 @@ public enum Meow {
         }
         
         internal func existingHash(for instance: BaseModel) -> Int? {
-            return storage[instance._id]?.hash
+            return objectPoolMutationQueue.sync {
+                return storage[instance._id]?.hash
+            }
         }
         
         internal func updateHash(for instance: BaseModel, with newHash: Int?) {
