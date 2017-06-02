@@ -19,10 +19,10 @@ extension <%- serializable.name %> : SerializableToDocument {
 
 			if (variable.isOptional) {
 			%>
-		self.<%- variable.name %> = try document.meowHasValue(Key.<%- variable.name %>) ? document.unpack(Key.<%- variable.name %>.keyString) : nil<%
+		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)<%
 			} else if (variable.defaultValue) {
 			%>
-		self.<%- variable.name %> = try document.meowHasValue(Key.<%- variable.name %>) ? document.unpack(Key.<%- variable.name %>.keyString) : self.<%- variable.name %><%
+		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString, default: self.<%- variable.name %>)<%
 			} else {
 			%>
 		self.<%- variable.name %> = try document.unpack(Key.<%- variable.name %>.keyString)<%

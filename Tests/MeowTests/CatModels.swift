@@ -153,10 +153,10 @@ public class Breed : Model, ExpressibleByStringLiteral {
         Meow.pool.free(self._id)
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
-		self.country = try document.meowHasValue(Key.country) ? document.unpack(Key.country.keyString) : nil
-		self.origin = try document.meowHasValue(Key.origin) ? document.unpack(Key.origin.keyString) : nil
+		self.country = try document.unpack(Key.country.keyString)
+		self.origin = try document.unpack(Key.origin.keyString)
 		self.kaas = try document.unpack(Key.kaas.keyString)
-		self.geval = try document.meowHasValue(Key.geval) ? document.unpack(Key.geval.keyString) : nil
+		self.geval = try document.unpack(Key.geval.keyString)
         	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
@@ -221,10 +221,10 @@ class Cat : Model, CatLike {
 		self._id = try document.unpack("_id")
 		self.name = try document.unpack(Key.name.keyString)
 		self.breed = try document.unpack(Key.breed.keyString)
-		self.social = try document.meowHasValue(Key.social) ? document.unpack(Key.social.keyString) : nil
-		self.bestFriend = try document.meowHasValue(Key.bestFriend) ? document.unpack(Key.bestFriend.keyString) : nil
+		self.social = try document.unpack(Key.social.keyString)
+		self.bestFriend = try document.unpack(Key.bestFriend.keyString)
 		self.family = try document.unpack(Key.family.keyString)
-		self.favouriteNumber = try document.meowHasValue(Key.favouriteNumber) ? document.unpack(Key.favouriteNumber.keyString) : nil
+		self.favouriteNumber = try document.unpack(Key.favouriteNumber.keyString)
         	}
 
 	public required init(newFrom source: BSON.Primitive) throws {
