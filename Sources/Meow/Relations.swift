@@ -64,7 +64,7 @@ public struct Reference<M: BaseModel> : Serializable, Hashable, Identifyable {
         /// We have to make sure the object exists in the database, so we'll try to save it silencing errors
         /// if we have no existing hash for it, which means it is a new object.
         if Meow.pool.existingHash(for: entity) == nil {
-            try? entity.save()
+            try? entity.save(reason: .referenced)
         }
     }
     

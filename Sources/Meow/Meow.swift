@@ -173,6 +173,11 @@ public enum Meow {
             }
         }
         
+        /// The amount of objects to keep strong references to
+        public var strongReferenceAmount = 0
+        
+        private var strongReferences = [BaseModel]()
+        
         /// The lock used to prevent crashes in mutations
         private var objectPoolMutationLock = NSRecursiveLock()
         
@@ -191,7 +196,7 @@ public enum Meow {
                 }
                 
                 do {
-                    try instance.save()
+                    try instance.save(reason: .exit)
                 } catch {
                     Meow.log("Error while performing pre-exit save on \(instance)")
                     assertionFailure()
@@ -280,7 +285,7 @@ public enum Meow {
                     currentlyInstantiating[id] = instantiation
                     return instantiation
                 }
-            }()
+                }()
             
             if instantiation.thread != Thread.current {
                 Meow.log("Waiting for instance from other thread")
@@ -317,6 +322,21 @@ public enum Meow {
             
             let current = storage[instance._id]?.instance.value
             
+            // remove old strong reference
+            if let current = current, let index = self.strongReferences.index(where: { $0 === current }) {
+                self.strongReferences.remove(at: index)
+            }
+            
+            // keep a strong reference
+            if self.strongReferenceAmount > 0 {
+                self.strongReferences.insert(instance, at: 0)
+            }
+            
+            // clean up strong references
+            if self.strongReferences.count > self.strongReferenceAmount {
+                self.strongReferences.removeLast(self.strongReferences.count - self.strongReferenceAmount)
+            }
+            
             if let current = current {
                 assert(current === instance.object, "two model instances with the same _id is invalid")
                 return
@@ -328,7 +348,6 @@ public enum Meow {
                 }
                 
             }
-            
             
             // Only pool it if the instance is not invalidated
             if !invalidatedObjectIds.contains(instance._id) {
@@ -348,7 +367,7 @@ public enum Meow {
             objectPoolMutationLock.lock()
             defer { objectPoolMutationLock.unlock() }
             
-                self.storage[instance._id]?.hash = newHash
+            self.storage[instance._id]?.hash = newHash
         }
         
         /// Invalidates the given ObjectId. Called when removing an object
@@ -391,7 +410,7 @@ public enum Meow {
             
             do {
                 if !invalidatedObjectIds.contains(instance._id) {
-                    try instance.save()
+                    try instance.save(reason: .deinit)
                 }
             } catch {
                 Meow.log("Error while saving \(type(of: instance)) \(instance._id) in deinit: \(error)")
@@ -440,15 +459,15 @@ public enum Meow {
             objectPoolMutationLock.unlock()
             
             for (_, val) in oldObjects {
-//                Meow.maintenanceQueue.async {
-                    do {
-                        try (val.instance.value as? BaseModel)?.save()
-                    } catch {
-                        Meow.log("❗ Error while performing autosave")
-                        Meow.log(error)
-                        assertionFailure("\(error)")
-                    }
-//                }
+                //                Meow.maintenanceQueue.async {
+                do {
+                    try (val.instance.value as? BaseModel)?.save(reason: .autosave)
+                } catch {
+                    Meow.log("❗ Error while performing autosave")
+                    Meow.log(error)
+                    assertionFailure("\(error)")
+                }
+                //                }
             }
         }
     }

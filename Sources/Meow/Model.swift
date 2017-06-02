@@ -53,6 +53,15 @@ public protocol Identifyable {
     var databaseIdentifier: ObjectId { get }
 }
 
+/// Indicates why a save was requested
+enum SaveReason {
+    case manual
+    case `deinit`
+    case autosave
+    case exit
+    case referenced
+}
+
 /// `BaseModel` is the base protocol that every model conforms to.
 ///
 /// Models are not expected to conform directly to `BaseModel`. They state conformance to `Model`, which inherits from
@@ -267,10 +276,7 @@ extension BaseModel {
         return try Self.find(query, sortedBy: sort, limitedTo: 1, withBatchSize: 1).makeIterator().next()
     }
     
-    /// Saves this object to the database
-    ///
-    /// - parameter force: Defaults to `false`. If set to true, the object is saved even if it has not been changed.
-    public func save(force: Bool = false) throws {
+    internal func save(force: Bool = false, reason: SaveReason) throws {
         guard force || !Meow.pool.isGhost(self) else {
             return
         }
@@ -278,7 +284,10 @@ extension BaseModel {
         try self.willSave()
         
         let document = self.serialize()
-        Meow.pool.pool(self)
+        
+        if reason != .deinit {
+            Meow.pool.pool(self)
+        }
         
         let hash = document.meowHash
         
@@ -287,7 +296,7 @@ extension BaseModel {
             try self.didSave(wasUpdated: false)
             return
         }
-                
+        
         Meow.log("Saving \(self)")
         
         try Self.collection.update("_id" == self._id,
@@ -298,6 +307,13 @@ extension BaseModel {
         Meow.pool.updateHash(for: self, with: hash)
         
         try self.didSave(wasUpdated: true)
+    }
+    
+    /// Saves this object to the database
+    ///
+    /// - parameter force: Defaults to `false`. If set to true, the object is saved even if it has not been changed.
+    public func save(force: Bool = false) throws {
+        try self.save(force: force, reason: .manual)
     }
     
     /// Removes all entities matching the query
