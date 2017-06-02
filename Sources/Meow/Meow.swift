@@ -125,6 +125,8 @@ public enum Meow {
         maintenanceQueue.asyncAfter(deadline: DispatchTime(secondsFromNow: maintenanceInterval), flags: .barrier, execute: Meow.maintenance)
     }
     
+    public static var middleware = [TransactionMiddleware]()
+    
     /// The ObjectPool is used to hold references to models to link them in-memory
     ///
     /// It also functions as the intelligent brain behind autosaving, manages ObjectId's amongst other functions.

@@ -258,6 +258,7 @@ extension BaseModel {
             
             return count
         case .find(let query, _, let skip, let limit, _):
+            print(query!.aqt)
             return try collection.count(query, limitedTo: limit, skipping: skip)
         }
     }
@@ -268,9 +269,11 @@ extension BaseModel {
     /// When the deletion is complete, `didDelete()` is called.
     public func delete() throws {
         try self.willDelete()
+        try Meow.middleware.forEach { try $0.willDelete(instance: self) }
         Meow.pool.invalidate(self._id)
         try Self.collection.remove("_id" == self._id)
         try self.didDelete()
+        try Meow.middleware.forEach { try $0.didDelete(instance: self) }
     }
     
     /// Returns the first object matching the query
@@ -285,6 +288,7 @@ extension BaseModel {
         }
         
         try self.willSave()
+        try Meow.middleware.forEach { try $0.willSave(instance: self) }
         
         let document = self.serialize()
         
@@ -297,6 +301,7 @@ extension BaseModel {
         guard force || hash != Meow.pool.existingHash(for: self) else {
             Meow.log("Not saving \(self) because it is unchanged")
             try self.didSave(wasUpdated: false)
+            try Meow.middleware.forEach { try $0.didSave(instance: self, wasUpdated: false) }
             return
         }
         
@@ -312,6 +317,7 @@ extension BaseModel {
         Meow.pool.updateHash(for: self, with: hash)
         
         try self.didSave(wasUpdated: true)
+        try Meow.middleware.forEach { try $0.didSave(instance: self, wasUpdated: true) }
     }
     
     /// Saves this object to the database
