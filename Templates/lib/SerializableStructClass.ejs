@@ -114,6 +114,12 @@ extension <%- serializable.name %> : SerializableToDocument {
 	<%   if (!serializable.staticVariables.find(v => v.name == "collection")) { %>
 	<%- acl %> static let collection: MongoKitten.Collection = Meow.database["<%- underscoreCase(uncamel(pluralize(serializable.name))) %>"]
 	<%   } %>
+	
+	<%- acl %> func saveReferences() throws {
+		<% serializable.variables.filter(v => models.includes(v.type)).forEach(variable => { %>
+		try <%- variable.name %><%- variable.isOptional ? '?' : '' %>.save()
+		<% }) %>
+	}
 
 	<%- include('ModelResolvingFunctions', {serializable}); %>
 	<% } %>

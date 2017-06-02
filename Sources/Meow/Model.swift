@@ -111,6 +111,9 @@ public protocol BaseModel : class, SerializableToDocument, Convertible, Identify
     
     /// All keys present in this model. Implemented in a protocol extension
     static var allRawKeys: [(String, Any.Type)] { get }
+    
+    /// Forwards the save operation to all directly referenced objects
+    func saveReferences() throws
 }
 
 extension BaseModel {
@@ -296,6 +299,8 @@ extension BaseModel {
             try self.didSave(wasUpdated: false)
             return
         }
+        
+        try self.saveReferences()
         
         Meow.log("Saving \(self)")
         

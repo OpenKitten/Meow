@@ -82,6 +82,10 @@ extension Breed : SerializableToDocument {
 	
 	public static let collection: MongoKitten.Collection = Meow.database["breeds"]
 	
+	
+	public func saveReferences() throws {
+		
+	}
 
 	// MARK: ModelResolvingFunctions.ejs
 
@@ -303,6 +307,12 @@ extension Cat : SerializableToDocument {
 	
 	public static let collection: MongoKitten.Collection = Meow.database["cats"]
 	
+	
+	public func saveReferences() throws {
+		
+		try breed.save()
+		
+	}
 
 	// MARK: ModelResolvingFunctions.ejs
 
@@ -502,6 +512,10 @@ extension CatReferencing : SerializableToDocument {
 	
 	public static let collection: MongoKitten.Collection = Meow.database["cat_referencings"]
 	
+	
+	public func saveReferences() throws {
+		
+	}
 
 	// MARK: ModelResolvingFunctions.ejs
 
@@ -675,6 +689,12 @@ extension Tiger : SerializableToDocument {
 	
 	public static let collection: MongoKitten.Collection = Meow.database["tigers"]
 	
+	
+	public func saveReferences() throws {
+		
+		try breed.save()
+		
+	}
 
 	// MARK: ModelResolvingFunctions.ejs
 
