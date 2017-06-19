@@ -4,6 +4,8 @@ Meow is a **boilerplate-free** object persistence framework for Swift and MongoD
 
 It manages your database for you, so you can focus on writing your application.
 
+⚠️ We are currently reviewing the possibility of building Meow on top of the Swift 4 Codable protocols. A final, stable release of Meow will probably not be available before the final release of Swift 4.
+
 ## ⭐️ Features
 
 - [x] Boilerplate-free
