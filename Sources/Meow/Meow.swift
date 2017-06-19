@@ -46,7 +46,7 @@ public enum Meow {
     
     /// Generic errors thrown by the generator
     public enum Error : Swift.Error {
-        case infiniteRecursiveReference(from: Model.Type, to: Model.Type)
+        case infiniteRecursiveReference(from: _Model.Type, to: _Model.Type)
         
         /// The value for the given key is missing, or invalid
         case missingOrInvalidValue(key: String, expected: Any.Type, got: Any?)
@@ -55,7 +55,7 @@ public enum Meow {
         case invalidValue(key: String, reason: String)
         
         /// A reference to `type` with id `id` cannot be resolved
-        case referenceError(id: ObjectId, type: Model.Type)
+        case referenceError(id: ObjectId, type: _Model.Type)
         
         /// An object cannot be deleted, because of `reason`
         case undeletableObject(reason: String)
@@ -82,7 +82,7 @@ public enum Meow {
         /// You can solve the infinite reference loop by making one of the references lazy, by
         /// using the `Reference` type. So instead of `var myReference: MyModel`, you would use
         /// `var myReference: Reference<MyModel>`.
-        case infiniteReferenceLoop(type: Model.Type, id: ObjectId)
+        case infiniteReferenceLoop(type: _Model.Type, id: ObjectId)
         
         /// The file cannot be found in GridFS
         case brokenFileReference(ObjectId)
@@ -99,7 +99,7 @@ public enum Meow {
     public class ObjectPool {
         private class RunningInstantiation {
             enum Result {
-                case success(Model)
+                case success(_Model)
                 case error(Swift.Error)
             }
             
@@ -124,7 +124,7 @@ public enum Meow {
                 }
             }
             
-            func await() throws -> Model {
+            func await() throws -> _Model {
                 lock.lock()
                 lock.unlock()
                 
@@ -144,7 +144,7 @@ public enum Meow {
         /// The amount of objects to keep strong references to
         public var strongReferenceAmount = 0
         
-        private var strongReferences = [Model]()
+        private var strongReferences = [_Model]()
         
         /// The lock used to prevent crashes in mutations
         private var objectPoolMutationLock = NSRecursiveLock()
@@ -162,7 +162,7 @@ public enum Meow {
         private var ghosts = Set<ObjectIdentifier>()
         
         /// Turns the `instance` into a ghost. It will not be saved again.
-        public func ghost(_ instance: Model) {
+        public func ghost(_ instance: _Model) {
             objectPoolMutationLock.lock()
             defer { objectPoolMutationLock.unlock() }
             
@@ -170,7 +170,7 @@ public enum Meow {
             self.ghosts.insert(id)
         }
         
-        public func isGhost(_ instance: Model) -> Bool {
+        public func isGhost(_ instance: _Model) -> Bool {
             objectPoolMutationLock.lock()
             defer { objectPoolMutationLock.unlock() }
             

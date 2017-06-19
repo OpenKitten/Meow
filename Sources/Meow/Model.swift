@@ -9,7 +9,7 @@ import Foundation
 import MongoKitten
 
 /// Private base protocol for `Model` without Self or associated type requirements
-public protocol _Model : class {
+public protocol _Model : class, Codable {
     
     /// The `_id` of the model. *This property MUST be encoded with `_id` as key*
     var _id: ObjectId { get set }
@@ -24,7 +24,7 @@ public protocol _Model : class {
     static var encoder: BSONEncoder { get }
 }
 
-public protocol Model : _Model, Codable {}
+public protocol Model : _Model {}
 
 // MARK: - Default implementations
 public extension Model {
@@ -162,4 +162,20 @@ public enum PreparedQuery {
     
     /// A complex aggregation pipeline with joins/$lookup stages.
     case aggregate(AggregationPipeline)
+}
+
+// MARK: - Autocompleted Queries
+// TODO: Implement these when SR-5215 is fixed so we can make it a requirement in the Model protocol
+public extension Model {
+//    public func find(_ query: ModelQuery) {
+//        
+//    }
+}
+
+public struct ModelQuery<K : CodingKey> {
+    var query: MongoKitten.Query
+}
+
+public func ==<K>(lhs: K, rhs: BSON.Primitive?) -> ModelQuery<K> {
+    return ModelQuery<K>(query: lhs.stringValue == rhs)
 }
