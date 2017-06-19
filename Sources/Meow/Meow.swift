@@ -150,7 +150,7 @@ public enum Meow {
         private var objectPoolMutationLock = NSRecursiveLock()
         
         /// The internal storage that's used to hold metadata and references to objects
-        internal private(set) var storage = [ObjectId: (instance: Weak<AnyObject>, instantiation: Date, hash: Int?)](minimumCapacity: 1000)
+        internal private(set) var storage = [ObjectId: (instance: Weak<AnyObject>, instantiation: Date)](minimumCapacity: 1000)
         
         /// A set of entity's ObjectIds that are invalidated because they were removed
         private var invalidatedObjectIds = Set<ObjectId>()
@@ -239,7 +239,7 @@ public enum Meow {
         }
         
         /// Stored an entity in the pool
-        public func pool<M: Model>(_ instance: M, hash: Int? = nil) {
+        public func pool<M: Model>(_ instance: M) {
             objectPoolMutationLock.lock()
             defer { objectPoolMutationLock.unlock() }
             
@@ -269,23 +269,9 @@ public enum Meow {
             
             // Only pool it if the instance is not invalidated
             if !invalidatedObjectIds.contains(instance._id) {
-                storage[instance._id] = (instance: Weak(instance), instantiation: Date(), hash: hash ?? storage[instance._id]?.hash /* existing hash fallback */)
+                storage[instance._id] = (instance: Weak(instance), instantiation: Date())
             }
             
-        }
-        
-        internal func existingHash(for instance: Model) -> Int? {
-            objectPoolMutationLock.lock()
-            defer { objectPoolMutationLock.unlock() }
-            
-            return storage[instance._id]?.hash
-        }
-        
-        internal func updateHash(for instance: Model, with newHash: Int?) {
-            objectPoolMutationLock.lock()
-            defer { objectPoolMutationLock.unlock() }
-            
-            self.storage[instance._id]?.hash = newHash
         }
         
         /// Invalidates the given ObjectId. Called when removing an object
