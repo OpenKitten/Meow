@@ -179,3 +179,10 @@ public struct ModelQuery<K : CodingKey> {
 public func ==<K>(lhs: K, rhs: BSON.Primitive?) -> ModelQuery<K> {
     return ModelQuery<K>(query: lhs.stringValue == rhs)
 }
+
+// MARK: - Internal Helpers
+extension _Model {
+    internal static func instantiateIfNeeded(document: Document) throws -> Self {
+        return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
+    }
+}

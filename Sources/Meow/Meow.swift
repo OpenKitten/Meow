@@ -111,7 +111,7 @@ public enum Meow {
                 lock.lock()
             }
             
-            func `do`<M : Model>(_ closure: () throws -> (M)) throws -> M {
+            func `do`<M : _Model>(_ closure: () throws -> (M)) throws -> M {
                 do {
                     let m = try closure()
                     result = .success(m)
@@ -178,8 +178,8 @@ public enum Meow {
             return ghosts.contains(id)
         }
         
-        /// Instantiates a model from a Document unless the model is alraedy in-memory
-        public func instantiateIfNeeded<M : Model>(type: M.Type, document: Document) throws -> M {
+        /// Instantiates a model from a Document unless the model is already in-memory
+        public func instantiateIfNeeded<M : _Model>(type: M.Type, document: Document) throws -> M {
             guard let id = ObjectId(document["_id"]) else {
                 throw Error.missingOrInvalidValue(key: "_id", expected: ObjectId.self, got: document["_id"])
             }
