@@ -91,7 +91,7 @@ public enum Meow {
     /// The Object Pool instance. For more information, look at the `ObjectPool` documentation.
     public static let pool = ObjectPool()
     
-//    public static var middleware = [TransactionMiddleware]()
+    public static var middleware = [TransactionMiddleware]()
     
     /// The ObjectPool is used to hold references to models to link them in-memory
     ///
@@ -231,7 +231,7 @@ public enum Meow {
             }
         }
         
-        public func getPooledInstance<M: Model>(withIdentifier id: ObjectId) -> M? {
+        public func getPooledInstance<M: _Model>(withIdentifier id: ObjectId) -> M? {
             objectPoolMutationLock.lock()
             defer { objectPoolMutationLock.unlock() }
             
@@ -239,7 +239,7 @@ public enum Meow {
         }
         
         /// Stored an entity in the pool
-        public func pool<M: Model>(_ instance: M) {
+        public func pool<M: _Model>(_ instance: M) {
             objectPoolMutationLock.lock()
             defer { objectPoolMutationLock.unlock() }
             

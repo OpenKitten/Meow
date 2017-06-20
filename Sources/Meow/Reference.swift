@@ -7,10 +7,14 @@
 
 import Foundation
 
+public protocol Referencing {
+    var reference: ObjectId { get }
+}
+
 /// Reference to a Model
-public struct Reference<M: Model> : Hashable {
+public struct Reference<M: Model> : Hashable, Referencing {
     /// The referenced id
-    let reference: ObjectId
+    public let reference: ObjectId
     
     /// Compares two references to be referring to the same entity
     public static func ==(lhs: Reference<M>, rhs: Reference<M>) -> Bool {
@@ -45,4 +49,14 @@ extension Reference : Codable {
     public init(from decoder: Decoder) throws {
         reference = try ObjectId(from: decoder)
     }
+}
+
+infix operator ==>
+public func ==><T>(lhs: Reference<T>, rhs: T) -> Bool {
+    return lhs.reference == rhs._id
+}
+
+infix operator =>
+public func =><T>(lhs: inout Reference<T>, rhs: T) {
+    lhs = Reference(to: rhs)
 }
