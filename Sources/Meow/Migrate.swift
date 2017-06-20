@@ -11,7 +11,7 @@ import Foundation
 
 extension Meow {
     /// The collection finished migrations will be stored in
-    fileprivate static var migrationsCollection: MongoKitten.Collection { return Meow.database["meow_migrations"] }
+    fileprivate static var migrationsCollection: MongoKitten.Collection { return Meow.database["MeowMigrations"] }
     
     /// Perform a migration
     public static func migrate<M>(_ description: String, on model: M.Type, migration: (Migrator<M>) throws -> ()) throws {
@@ -41,10 +41,13 @@ public final class Migrator<M : Model> {
     private enum Step {
         case update(Document)
         case map([(Document) throws -> Document]) // an array for minification purposes so maps can be chained
+        case updateWhere(Query, Document)
         
         /// Executes the migration step on the given model
         func execute(on model: _Model.Type) throws {
             switch self {
+            case .updateWhere(let query, let document):
+                try model.collection.update(query, to: document, multiple: true)
             case .update(let update):
                 try model.collection.update(to: update, multiple: true)
             case .map(let transforms):
@@ -179,6 +182,15 @@ public final class Migrator<M : Model> {
     /// - parameter property: The database name of the property to remove
     public func remove(_ property: String) {
         addStep(.update(["$unset": [property: ""]]))
+    }
+    
+    /// Add a property with a default value to the model.
+    /// If the field already exists, the existing values will not be touched.
+    ///
+    /// - parameter property: The database name of the property to remove
+    /// - parameter value: The default value of the property
+    public func add(_ property: String, value: Primitive) {
+        addStep(.updateWhere(property == nil, ["$set": [property: value]]))
     }
     
     /// Converts a certain property, which currently contains an ObjectId, to a reference (`DBRef`).
