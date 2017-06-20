@@ -130,7 +130,8 @@ public extension _Model {
                 return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
             } catch {
                 Meow.log("Initializing from document failed: \(error)")
-                assertionFailure("Could not initialize \(Self.self) from document\n_id: \(ObjectId(document["_id"])?.hexString ?? document["_id"] ?? "unknown")\nError: \(error)\n")
+                print("Could not initialize \(Self.self) from document\n_id: \(ObjectId(document["_id"])?.hexString ?? document["_id"] ?? "unknown")\nError: \(error)\n")
+                print("Place a breakpoint in Meow at \(#file):\(#line) to catch this error in the debugger")
                 return nil
             }
             })
