@@ -85,6 +85,32 @@ public extension _Model {
         try Meow.middleware.forEach { try $0.didSave(instance: self) }
     }
     
+    // TODO: Maybe this can be a Set<CodingKey> after SR-5215
+    public func update(fields: Set<String>) throws {
+        Meow.pool.pool(self)
+        
+        try self.willSave()
+        try Meow.middleware.forEach { try $0.willSave(instance: self) }
+        
+        let encoder = Self.encoder
+        let document = try encoder.encode(self)
+        
+        var update = Document()
+        for field in fields {
+            if let value = document[field] {
+                update["$set", field] = value
+            } else {
+                update["$unset", field] = ""
+            }
+        }
+        
+        try Self.collection.update("_id" == self._id,
+                                   to: update)
+        
+        try self.didSave()
+        try Meow.middleware.forEach { try $0.didSave(instance: self) }
+    }
+    
     /// Removes this object from the database
     ///
     /// Before deleting, `willDelete()` is called. `willDelete()` can throw to prevent the deletion.
