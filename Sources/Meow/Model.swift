@@ -111,6 +111,12 @@ public extension _Model {
         try Meow.middleware.forEach { try $0.didSave(instance: self) }
     }
     
+    /// Performs an update operation using the MongoDB $set and $unset operators for the
+    /// specified fields
+    public func update(fields: String...) throws {
+        try self.update(fields: Set(fields))
+    }
+    
     /// Removes this object from the database
     ///
     /// Before deleting, `willDelete()` is called. `willDelete()` can throw to prevent the deletion.

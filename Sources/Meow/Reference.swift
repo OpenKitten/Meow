@@ -11,8 +11,13 @@ public protocol Referencing {
     var reference: ObjectId { get }
 }
 
+public protocol Resolvable : Referencing {
+    associatedtype M
+    func resolve() throws -> M
+}
+
 /// Reference to a Model
-public struct Reference<M: Model> : Hashable, Referencing {
+public struct Reference<M: Model> : Hashable, Resolvable {
     /// The referenced id
     public let reference: ObjectId
     
