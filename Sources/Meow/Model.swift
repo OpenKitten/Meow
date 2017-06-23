@@ -188,7 +188,6 @@ public extension _Model {
             
             return count
         case .find(let query, _, let skip, let limit, _):
-            print(query!.aqt)
             return try collection.count(query, limitedTo: limit, skipping: skip)
         }
     }
