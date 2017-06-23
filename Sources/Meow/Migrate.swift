@@ -18,8 +18,27 @@ extension Meow {
         if let migrator = try Migrator("\(model.collection.name) - \(description)", on: model) {
             try migrator.execute(migration)
         } else {
-            Meow.log("Migration \"\(description)\" not needed")
+            Meow.log("Migration \(model) - \"\(description)\" not needed")
         }
+    }
+    
+    public static func migrateCustom(_ description: String, migration: () throws -> ()) throws {
+        if try Meow.migrationsCollection.count("_id" == description) > 0 {
+            Meow.log("Migration \"\(description)\" not needed")
+            return
+        }
+        
+        let start = Date()
+        try migration()
+        let end = Date()
+        
+        let duration = end.timeIntervalSince(start)
+        
+        try Meow.migrationsCollection.insert([
+            "_id": description,
+            "date": start,
+            "duration": duration
+        ])
     }
 }
 
@@ -110,7 +129,7 @@ public final class Migrator<M : Model> {
         
         try Meow.migrationsCollection.insert([
             "_id": description,
-            "date": Date(),
+            "date": start,
             "duration": duration
             ])
         

@@ -10,7 +10,7 @@ import Dispatch
 
 /// The main object, keeps track of the database
 public enum Meow {
-    public static var shouldLog = false
+    public static var shouldLog = true
     
     public static func log(_ item: @autoclosure () -> (Any)) {
         guard Meow.shouldLog else { return }
@@ -189,7 +189,7 @@ public enum Meow {
             objectPoolMutationLock.unlock()
             
             if let existingInstance = existingInstance {
-                Meow.log("Returning \(existingInstance) from pool")
+//                Meow.log("Returning \(existingInstance) from pool")
                 return existingInstance
             }
             
@@ -212,17 +212,17 @@ public enum Meow {
                 }()
             
             if instantiation.thread != Thread.current {
-                Meow.log("Waiting for instance from other thread")
+//                Meow.log("Waiting for instance from other thread")
                 let instance = try instantiation.await() as! M
-                Meow.log("Returning \(instance) from instantiation in other thread")
+//                Meow.log("Returning \(instance) from instantiation in other thread")
                 return instance
             }
             
             return try instantiation.do {
                 let decoder = M.decoder
                 let instance = try decoder.decode(M.self, from: document)
-                Meow.log("Returning fresh instance \(instance)")
- 
+//                Meow.log("Returning fresh instance \(instance)")
+                
                 objectPoolMutationLock.lock()
                 currentlyInstantiating[id] = nil
                 objectPoolMutationLock.unlock()
@@ -264,7 +264,7 @@ public enum Meow {
                 assert(current === instance, "two model instances with the same _id is invalid")
                 return
             } else {
-                Meow.log("Pooling \(instance)")
+//                Meow.log("Pooling \(instance)")
             }
             
             // Only pool it if the instance is not invalidated

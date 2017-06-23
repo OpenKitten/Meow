@@ -27,10 +27,14 @@ extension Meow {
         
         upperLoop: for M in types {
             Meow.log("Validating \(M)")
+            var count = 0
             for document in try M.collection.find() {
+                count += 1
                 do {
                     let instance = try M.instantiateIfNeeded(document: document)
                     Meow.pool.ghost(instance)
+                    
+                    _ = try M.encoder.encode(instance)
                 } catch {
                     problems.append((M, document["_id"], error))
                     
@@ -39,6 +43,7 @@ extension Meow {
                     }
                 }
             }
+            print("Validated \(count) entries of \(M)")
         }
         
         // The pool should be empty again!
