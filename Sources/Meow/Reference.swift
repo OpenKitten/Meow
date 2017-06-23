@@ -11,13 +11,15 @@ public protocol Referencing {
     var reference: ObjectId { get }
 }
 
-public protocol Resolvable : Referencing {
-    associatedtype M
+public protocol _UnassociatedReferenceProtocol : Referencing {}
+
+public protocol _ReferenceProtocol : Referencing {
+    associatedtype M : Model
     func resolve() throws -> M
 }
 
 /// Reference to a Model
-public struct Reference<M: Model> : Hashable, Resolvable {
+public struct Reference<M: Model> : Hashable, _ReferenceProtocol, _UnassociatedReferenceProtocol {
     /// The referenced id
     public let reference: ObjectId
     
@@ -31,9 +33,19 @@ public struct Reference<M: Model> : Hashable, Resolvable {
         return reference.hashValue
     }
     
-    /// Creates a reference from an entity
+    /// Creates a reference to an entity
     public init(to entity: M) {
         reference = entity._id
+    }
+    
+    /// Creates a reference to an entity with given identifier
+    /// The reference is checked and additional constraints for the check can be given
+    public init(to id: ObjectId, constraints: Query = Query()) throws {
+        guard try M.count("_id" == id && constraints) == 1 else {
+            throw Meow.Error.referenceError(id: id, type: M.self)
+        }
+        
+        self.reference = id
     }
     
     /// Resolves a reference
