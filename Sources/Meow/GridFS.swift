@@ -24,8 +24,9 @@ public struct FileReference : Codable, Referencing {
         try reference.encode(to: encoder)
     }
     
-    public func resolve() throws -> GridFS.File {
+    public func resolve(callingFile: String = #file, callingLine: Int = #line) throws -> GridFS.File {
         guard let file = try Meow.fs.findOne(byID: reference) else {
+            print("Could not resolve file reference - resolve requested from \(callingFile):\(callingLine)")
             throw Meow.Error.brokenFileReference(reference)
         }
         
