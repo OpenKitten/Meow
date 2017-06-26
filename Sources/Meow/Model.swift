@@ -137,7 +137,7 @@ public extension _Model {
     ///
     /// - parameter query: The query to compare the database entities with
     /// - parameter sort: The order to sort the entities by
-    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = 100, allowOptimizing: Bool = true) throws -> AnySequence<Self> {
+    public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = Meow.defaultBatchSize, allowOptimizing: Bool = true) throws -> AnySequence<Self> {
         
         // Query optimisations
         if allowOptimizing && sort == nil && skip == nil, let aqt = query?.aqt {
@@ -199,7 +199,7 @@ internal extension _Model {
     /// - parameter batchSize: The amount of documents to fetch per group/batch of entities
     /// - throws: Unable to run the query on the server due to connection issues, permission issues or an incompatible MongoDB server version for this operation
     /// - returns: A cursor containing the Document form of this BaseModel entity
-    static func runPreparedQuery(_ query: PreparedQuery, batchSize: Int = 100) throws -> Cursor<Document> {
+    static func runPreparedQuery(_ query: PreparedQuery, batchSize: Int = Meow.defaultBatchSize) throws -> Cursor<Document> {
         switch query {
         case .aggregate(let pipeline):
             return try Self.collection.aggregate(pipeline, options: [.cursorOptions(["batchSize": batchSize])])

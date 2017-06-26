@@ -10,6 +10,7 @@ import Dispatch
 
 /// The main object, keeps track of the database
 public enum Meow {
+    public static var defaultBatchSize = 100
     public static var shouldLog = true
     
     public static func log(_ item: @autoclosure () -> (Any)) {
