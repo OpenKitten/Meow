@@ -8,10 +8,6 @@
 import Foundation
 import MongoKitten
 
-public protocol KeyPathListable {
-    static var allKeyPaths: [String : AnyKeyPath] { get }
-}
-
 public func ==(lhs: String, rhs: Referencing) -> Query {
     return lhs == rhs.reference
 }
