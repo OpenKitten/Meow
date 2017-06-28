@@ -73,9 +73,19 @@ extension Optional : TypeUnwrappable {
     static var unwrappedType: Any.Type { return Wrapped.self }
 }
 
+fileprivate struct DecodingHelper<T : Decodable> : Decodable {
+    var value: T
+}
+
 extension Decodable {
     fileprivate static func from(document: Document, with decoder: BSONDecoder) throws -> Self {
         return try decoder.decode(Self.self, from: document)
+    }
+    
+    fileprivate static func from(primitive: Primitive?, with decoder: BSONDecoder) throws -> Self {
+        let helperDocument: Document = ["value": primitive]
+        let helper = try decoder.decode(DecodingHelper<Self>.self, from: helperDocument)
+        return helper.value
     }
 }
 
@@ -113,6 +123,11 @@ private func makeValue(from primitive: Primitive?, for keyPath: SettableKeyPath)
     // If the expected type is decodable and the value is a document, unwrap from the document
     if let document = primitive as? Document, let expectedType = expectedType as? Decodable.Type {
         return try expectedType.from(document: document, with: BSONDecoder())
+    }
+    
+    // For single value things like enums
+    if let expectedType = expectedType as? Decodable.Type {
+        return try expectedType.from(primitive: primitive, with: BSONDecoder())
     }
     
     // Numeric types
