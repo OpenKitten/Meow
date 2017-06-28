@@ -50,11 +50,16 @@ public struct Reference<M: Model> : Hashable, _ReferenceProtocol, _UnassociatedR
     
     /// Resolves a reference
     public func resolve() throws -> M {
-        guard let referenced = try M.findOne("_id" == reference) else {
+        guard let referenced = try resolveIfPresent() else {
             throw Meow.Error.referenceError(id: reference, type: M.self)
         }
         
         return referenced
+    }
+    
+    /// Resolves a reference, returning `nil` if the referenced object cannot be found
+    public func resolveIfPresent() throws -> M? {
+        return try M.findOne("_id" == reference)
     }
 }
 
