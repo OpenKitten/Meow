@@ -147,6 +147,11 @@ public enum Meow {
         
         private var strongReferences = [_Model]()
         
+        /// Removes strong references from the object pool, keeping at most `keep` instances
+        public func removeStrongReferences(keep: Int = 0) {
+            strongReferences = Array(strongReferences.suffix(keep))
+        }
+        
         /// The lock used to prevent crashes in mutations
         private var objectPoolMutationLock = NSRecursiveLock()
         
@@ -264,8 +269,6 @@ public enum Meow {
             if let current = current {
                 assert(current === instance, "two model instances with the same _id is invalid")
                 return
-            } else {
-//                Meow.log("Pooling \(instance)")
             }
             
             // Only pool it if the instance is not invalidated
