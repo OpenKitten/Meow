@@ -107,6 +107,10 @@ public extension _Model {
     public static func findOne(_ query: TypesafeQuery<Self>, sortedBy sort: Sort? = nil) throws -> Self? {
         return try Self.findOne(query.query, sortedBy: sort)
     }
+    
+    public static func count(_ filter: TypesafeQuery<Self>, limitedTo limit: Int? = nil, skipping skip: Int? = nil) throws -> Int {
+        return try Self.count(filter.query, limitedTo: limit, skipping: skip)
+    }
 }
 
 // MARK: - Typesafe Sort
@@ -114,3 +118,30 @@ public extension _Model {
 // TODO: Think of ideas?
 // try Foo.find(sortedBy: ascending(\.foo, \.bar))
 // Ascending: try Foo.find(sortedBy: \.foo > \.bar), Descending: try Foo.find(sortedBy: !(\.foo > \.bar))
+
+
+//public struct TypesafeSort<Root : KeyPathListable> : ExpressibleByDictionaryLiteral {
+//    var sort: Sort
+//
+//    public init(dictionaryLiteral elements: (PartialKeyPath<Root>, SortOrder)...) {
+//        self.sort = Sort()
+//
+//        for (path, value) in elements {
+//            do {
+//                let key = try path.makeIdentifier()
+//
+//                sort[key] = value
+//            } catch {}
+//        }
+//    }
+//}
+//
+//public extension _Model where Self : KeyPathListable {
+//    public static func find(_ query: TypesafeQuery<Self>? = nil, sortedBy sort: TypesafeSort<Self>, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = Meow.defaultBatchSize) throws -> AnySequence<Self> {
+//        return try Self.find(query?.query, sortedBy: sort.sort, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
+//    }
+//
+//    public static func findOne(_ query: TypesafeQuery<Self>? = nil, sortedBy sort: TypesafeSort<Self>) throws -> Self? {
+//        return try Self.findOne(query?.query, sortedBy: sort.sort)
+//    }
+//}

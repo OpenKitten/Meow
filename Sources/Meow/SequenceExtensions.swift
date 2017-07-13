@@ -9,3 +9,11 @@ extension Sequence where Element : _ReferenceProtocol {
         return try Element.M.find(query, sortedBy: sort, skipping: skip)
     }
 }
+
+extension Sequence where Element : Model {
+    public func makeReferences() -> [Reference<Element>] {
+        return self.flatMap {
+            Reference(to: $0)
+        }
+    }
+}

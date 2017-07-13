@@ -75,7 +75,9 @@ public extension _Model {
         try Meow.middleware.forEach { try $0.willSave(instance: self) }
         
         let encoder = Self.encoder
-        let document = try encoder.encode(self)
+        let document: Document = [
+            "$set": try encoder.encode(self)
+        ]
         
         try Self.collection.update("_id" == self._id,
                                    to: document,
@@ -133,10 +135,6 @@ public extension _Model {
 
 // MARK: - Querying
 public extension _Model {
-    /// Returns all objects matching the query
-    ///
-    /// - parameter query: The query to compare the database entities with
-    /// - parameter sort: The order to sort the entities by
     public static func find(_ query: Query? = nil, sortedBy sort: Sort? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil, withBatchSize batchSize: Int = Meow.defaultBatchSize, allowOptimizing: Bool = true) throws -> AnySequence<Self> {
         
         // Query optimisations
@@ -166,16 +164,14 @@ public extension _Model {
                 print("Place a breakpoint in Meow at \(#file):\(#line) to catch this error in the debugger")
                 return nil
             }
-            })
+        })
     }
     
-    /// Returns the first object matching the query
     public static func findOne(_ query: Query? = nil, sortedBy sort: Sort? = nil) throws -> Self? {
         // TODO: Don't reuse find here because that one does not have proper error reporting
         return try Self.find(query, sortedBy: sort, limitedTo: 1, withBatchSize: 1).makeIterator().next()
     }
     
-    /// Counts the amount of objects matching the query
     public static func count(_ filter: Query? = nil, limitedTo limit: Int? = nil, skipping skip: Int? = nil) throws -> Int {
         let prepared = try Self.prepareQuery(filter, skipping: skip, limitedTo: limit)
         
@@ -189,6 +185,47 @@ public extension _Model {
             return count
         case .find(let query, _, let skip, let limit, _):
             return try collection.count(query, limitedTo: limit, skipping: skip)
+        }
+    }
+    
+    @discardableResult
+    public static func remove(_ filter: Query? = nil, limitedTo limit: Int? = nil) throws -> Int {
+        let prepared = try Self.prepareQuery(filter, limitedTo: limit)
+        
+        switch prepared {
+        case .aggregate(let pipeline):
+            var count = 0
+            
+            let cursor = try Self.collection.aggregate(pipeline).flatMap { document -> Self? in
+                do {
+                    return try Meow.pool.instantiateIfNeeded(type: Self.self, document: document)
+                } catch {
+                    Meow.log("Initializing from document failed: \(error)")
+                    print("Could not initialize \(Self.self) from document\n_id: \(ObjectId(document["_id"])?.hexString ?? document["_id"] ?? "unknown")\nError: \(error)\n")
+                    print("The entity could not be removed")
+                    print("Place a breakpoint in Meow at \(#file):\(#line) to catch this error in the debugger")
+                    return nil
+                }
+            }
+            
+            for entity in cursor {
+                do {
+                    try entity.delete()
+                    count += 1
+                } catch {}
+            }
+            
+            return count
+        case .find(let query, _, _, let limit, _):
+            if let limit = limit {
+                for _ in 0..<limit {
+                    try self.collection.remove(query, limitedTo: .one)
+                }
+                
+                return limit
+            } else {
+                return try self.collection.remove(query, limitedTo: .all)
+            }
         }
     }
 }
@@ -217,33 +254,11 @@ internal extension _Model {
     /// - parameter limit: The maximum amount of entities to return, excluding those that were skipped
     /// - returns: A prepared query that is either a `find` or `aggregation` operation
     static func prepareQuery(_ query: Query? = nil, sortedBy sort: Sort? = nil, projecting projection: Projection? = nil, skipping skip: Int? = nil, limitedTo limit: Int? = nil) throws -> PreparedQuery {
-        var pipeline = AggregationPipeline()
-        let requirePipeline = false
-        let query = query?.makeDocument()
-        
-        // TODO: Optimize the query here.
-        
-        if !requirePipeline {
-            if let query = query {
-                return .find(query: Query(query), sort: sort, skip: skip, limit: limit, project: projection)
-            } else {
-                return .find(query: nil, sort: sort, skip: skip, limit: limit, project: projection)
-            }
+        if let query = query?.makeDocument() {
+            return .find(query: Query(query), sort: sort, skip: skip, limit: limit, project: projection)
+        } else {
+            return .find(query: nil, sort: sort, skip: skip, limit: limit, project: projection)
         }
-        
-        if let sort = sort {
-            pipeline.append(.sort(sort))
-        }
-        
-        if let skip = skip {
-            pipeline.append(.skip(skip))
-        }
-        
-        if let limit = limit {
-            pipeline.append(.limit(limit))
-        }
-        
-        return .aggregate(pipeline)
     }
 }
 
