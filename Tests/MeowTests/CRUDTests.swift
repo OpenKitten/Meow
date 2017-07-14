@@ -69,6 +69,39 @@ class CRUDTests : XCTestCase {
 //        }
 //    }
     
+    func testPreservingUnmodelledData() throws {
+        let _id = ObjectId()
+        
+        try Breed.collection.insert([
+            "_id": _id,
+            "name": "superbob",
+            "origin": "natural",
+            "geval": [
+                "henk": "bob",
+                "fred": 3
+            ],
+            "unmoddeledData": true
+        ])
+        
+        guard let breed = try Breed.findOne("name" == "superbob") else {
+            XCTFail()
+            return
+        }
+        
+        XCTAssertEqual(breed._id, _id)
+        XCTAssertEqual(breed.name, "superbob")
+        XCTAssertEqual(breed.origin, .natural)
+        XCTAssertEqual(breed.geval?.henk, "bob")
+        XCTAssertEqual(breed.geval?.fred, 3)
+        
+        guard let doc = try Breed.collection.findOne("name" == "superbob") else {
+            XCTFail()
+            return
+        }
+        
+        XCTAssertEqual(Bool(doc["unmoddeledData"]), true)
+    }
+    
     func testSave() throws {
         let tigerBreed = Breed(name: "Normal")
         try tigerBreed.save()
