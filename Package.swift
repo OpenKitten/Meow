@@ -10,7 +10,7 @@ let package = Package(
         .package(url: "https://github.com/OpenKitten/MongoKitten.git", .revision("async")),
         
         // For Swift 4.0-development-2017-06-19
-        .package(url: "https://github.com/OpenKitten/BSON.git", .revision("29e51865ce352e83351932fe41c65ddc3254a447")),
+        .package(url: "https://github.com/OpenKitten/BSON.git", .revision("framework")),
         .package(url: "https://github.com/OpenKitten/Cheetah.git", .branch("swift4")),
         
     ],
