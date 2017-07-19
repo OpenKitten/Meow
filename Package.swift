@@ -11,7 +11,7 @@ let package = Package(
         
         // For Swift 4.0-development-2017-06-19
         .package(url: "https://github.com/OpenKitten/BSON.git", .revision("framework")),
-        .package(url: "https://github.com/OpenKitten/Cheetah.git", .branch("swift4")),
+        .package(url: "https://github.com/OpenKitten/Cheetah.git", .branch("framework")),
         
     ],
     targets: [
