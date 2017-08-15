@@ -241,7 +241,7 @@ internal extension _Model {
         case .aggregate(let pipeline):
             return try Self.collection.aggregate(pipeline, options: [.cursorOptions(["batchSize": batchSize])])
         case .find(let query, let sort, let skip, let limit, let project):
-            return try Self.collection.find(query, sortedBy: sort, projecting: project, skipping: skip, limitedTo: limit, withBatchSize: batchSize).cursor
+            return try Self.collection.find(query, sortedBy: sort, projecting: project, skipping: skip, limitedTo: limit, withBatchSize: batchSize)
         }
     }
     
