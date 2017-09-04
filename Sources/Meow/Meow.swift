@@ -233,6 +233,8 @@ public enum Meow {
                 currentlyInstantiating[id] = nil
                 objectPoolMutationLock.unlock()
                 
+                self.pool(instance)
+                
                 return instance
             }
         }
