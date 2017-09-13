@@ -4,3 +4,4 @@
 /*.xcodeproj
 build
 Package.pins
+Package.resolved
