@@ -104,3 +104,7 @@ Meow.migrate("My migration description", on: MyModel.self) { migrate in
 ```
 
 From the given closure, Meow will create a migration plan. The plan is optimized into a minimum amount of database operations and then executed.
+
+## Learn more
+
+[We have a few guides here](Guides/Setup.md)
