@@ -90,3 +90,19 @@ And if necessary it's possible to remove (part of) the references from pool, too
 Meow.pool.removeStrongReferences()
 Meow.pool.removeStrongReferences(keep: 100)
 ```
+
+## Database Validation
+
+Database validation is important in a constantly changing environment.
+To help with this, we support Validation and [Migrations](Migrations.md).
+Validation is really simple but really helpful.
+
+```swift
+let problems = try Meow.validateDatabaseIntegrity(types: [
+    User.self,
+    OtherModel.self,
+    ...
+])
+```
+
+The types inputted are the models to be validated. The resulting problems can then be inspected and solved.
