@@ -1,12 +1,16 @@
+// swift-tools-version:4.0
 import PackageDescription
 
 let package = Package(
     name: "Meow",
-    targets: [
-        Target(name: "Meow"),
-        Target(name: "MeowSample", dependencies: ["Meow"])
+    products: [
+        .library(name: "Meow", targets: ["Meow"]),
     ],
     dependencies: [
-       .Package(url: "https://github.com/OpenKitten/MongoKitten.git", majorVersion: 4)
+       .package(url: "https://github.com/OpenKitten/MongoKitten.git", from: "4.1.0")
+    ],
+    targets: [
+        .target(name: "Meow", dependencies: ["MongoKitten"]),
+        .testTarget(name: "MeowTests", dependencies: ["Meow"]),
     ]
 )
