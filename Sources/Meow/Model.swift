@@ -77,9 +77,12 @@ public extension _Model {
         let encoder = Self.encoder
         let document = try encoder.encode(self)
         
-        try Self.collection.update("_id" == self._id,
-                                   to: document,
-                                   upserting: true)
+        try Self.collection.update(
+            "_id" == self._id,
+           to: document,
+           upserting: true,
+           stoppingOnError: true
+        )
         
         try self.didSave()
         try Meow.middleware.forEach { try $0.didSave(instance: self) }
