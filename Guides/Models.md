@@ -113,7 +113,7 @@ friends.append(Reference(to: friend))
 
 Resolving one or more references is done through the `.resolve()` function.
 
-If a single reference it broken, this will result in an error being thrown.
+If a single reference is broken, this will result in an error being thrown.
 For multiple references it will return all non-broken references.
 
 If you need to ensure all references are valid, check the result's `count` against the fetched `count`.
