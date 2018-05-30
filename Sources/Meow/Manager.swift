@@ -24,4 +24,8 @@ public final class Manager {
         return Context(self)
     }
     
+    public func collection<M: Model>(for model: M.Type) -> EventLoopFuture<MongoKitten.Collection> {
+        return database.map { $0[M.collectionName] }
+    }
+    
 }

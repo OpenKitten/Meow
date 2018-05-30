@@ -1,4 +1,6 @@
 import Foundation
+import MongoKitten
+import NIO
 
 // A 🐈 Context
 public final class Context {
@@ -21,7 +23,7 @@ public final class Context {
     private var invalidatedIdentifiers = Set<AnyInstanceIdentifier>()
     
     /// Instantiates a model from a Document unless the model is already in-memory
-    public func instantiateIfNeeded<M: Model>(type: M.Type, document: Document) throws -> M {
+    func instantiateIfNeeded<M: Model>(type: M.Type, document: Document) throws -> M {
         guard let id = document["_id"] as? M.Identifier else {
             throw MeowError.missingOrInvalidValue(key: "_id", expected: M.Identifier.self, got: document["_id"])
         }
@@ -73,6 +75,35 @@ public final class Context {
         // Only pool it if the instance is not invalidated
         if !invalidatedIdentifiers.contains(instanceIdentifier) {
             storage[instanceIdentifier] = (instance: Weak(instance), instantiation: Date())
+        }
+    }
+    
+    func getPooledInstance<M: Model>(withIdentifier id: M.Identifier) -> M? {
+        let instanceIdentifier = InstanceIdentifier<M>(id)
+        return storage[instanceIdentifier]?.instance.value as? M
+    }
+    
+    public func findOne<M: Model>(_ type: M.Type, query: Query = Query()) -> EventLoopFuture<M?> {
+        if case .valEquals("_id", let val) = query.aqt {
+            // Meow only supports on type as _id, so if it isn't an identifier we can safely return an empty result
+            guard let _id = val as? M.Identifier else {
+                return manager.eventLoop.newSucceededFuture(result: nil)
+            }
+            
+            // we have this id in memory, so return that
+            if let instance: M = getPooledInstance(withIdentifier: _id) {
+                return manager.eventLoop.newSucceededFuture(result: instance)
+            }
+        }
+        
+        return manager.collection(for: M.self)
+            .then { $0.findOne(query) }
+            .thenThrowing { document -> M? in
+                guard let document = document else {
+                    return nil
+                }
+                
+                return try self.instantiateIfNeeded(type: M.self, document: document)
         }
     }
     
