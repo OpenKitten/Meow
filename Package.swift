@@ -7,7 +7,7 @@ let package = Package(
         .library(name: "Meow", targets: ["Meow"]),
     ],
     dependencies: [
-       .package(url: "https://github.com/OpenKitten/MongoKitten.git", from: "4.1.0")
+       .package(url: "https://github.com/OpenKitten/MongoKitten.git", .branch("master/5.0"))
     ],
     targets: [
         .target(name: "Meow", dependencies: ["MongoKitten"]),
