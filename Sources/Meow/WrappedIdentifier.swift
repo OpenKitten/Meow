@@ -1,4 +1,4 @@
-internal class AnyInstanceIdentifier : Hashable {
+internal class AnyInstanceIdentifier: Hashable {
     
     fileprivate init() {}
     

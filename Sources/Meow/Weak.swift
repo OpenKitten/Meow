@@ -1,5 +1,5 @@
 /// Wraps a value weak
-struct Weak<Wrapped : AnyObject> {
+struct Weak<Wrapped: AnyObject> {
     /// The wrapped value
     weak var value: Wrapped?
     

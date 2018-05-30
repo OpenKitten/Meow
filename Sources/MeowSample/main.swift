@@ -2,7 +2,7 @@ import Meow
 
 try Meow.init("mongodb://localhost/MeowSample")
 
-class Cat : Model {
+class Cat: Model {
     var _id = ObjectId()
     
     var name: String

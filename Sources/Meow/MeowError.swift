@@ -1,5 +1,5 @@
 /// Generic errors thrown by the generator
-public enum MeowError : Swift.Error {
+public enum MeowError: Swift.Error {
     case infiniteRecursiveReference(from: _Model.Type, to: _Model.Type)
     
     /// The value for the given key is missing, or invalid

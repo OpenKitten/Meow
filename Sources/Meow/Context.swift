@@ -21,7 +21,7 @@ public final class Context {
     private var invalidatedIdentifiers = Set<AnyInstanceIdentifier>()
     
     /// Instantiates a model from a Document unless the model is already in-memory
-    public func instantiateIfNeeded<M : Model>(type: M.Type, document: Document) throws -> M {
+    public func instantiateIfNeeded<M: Model>(type: M.Type, document: Document) throws -> M {
         guard let id = document["_id"] as? M.Identifier else {
             throw MeowError.missingOrInvalidValue(key: "_id", expected: M.Identifier.self, got: document["_id"])
         }
