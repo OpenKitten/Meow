@@ -5,7 +5,7 @@ import NIO
 // A 🐈 Context
 public final class Context {
     
-    var manager: Manager
+    public let manager: Manager
     
     internal init(_ manager: Manager) {
         self.manager = manager
