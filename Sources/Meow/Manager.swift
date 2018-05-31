@@ -5,27 +5,29 @@ import NIO
 // TODO: Rename?
 public final class Manager {
     
-    let eventLoop: EventLoop
-    let connectionSettings: ConnectionSettings
+    var eventLoop: EventLoop {
+        return database.connection.eventLoop
+    }
     
-    public lazy var database: EventLoopFuture<Database> = {
-        let future = Database.connect(settings: connectionSettings, on: eventLoop)
-        self.database = future
-        
-        return future
-    }()
+    public let database: Database
     
-    public init(settings: ConnectionSettings, eventLoop: EventLoop) {
-        self.connectionSettings = settings
-        self.eventLoop = eventLoop
+    private init(database: Database) {
+        self.database = database
+    }
+    
+    public static func make(settings: ConnectionSettings, eventLoop: EventLoop) -> EventLoopFuture<Manager> {
+        // Connect to the database first, the construct the actual manager
+        return Database.connect(settings: settings, on: eventLoop).map { database in
+            return Manager(database: database)
+        }
     }
     
     public func makeContext() -> Context {
         return Context(self)
     }
     
-    public func collection<M: Model>(for model: M.Type) -> EventLoopFuture<MongoKitten.Collection> {
-        return database.map { $0[M.collectionName] }
+    public func collection<M: Model>(for model: M.Type) -> MongoKitten.Collection {
+        return database[M.collectionName]
     }
     
 }

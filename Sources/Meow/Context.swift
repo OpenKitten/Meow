@@ -19,7 +19,7 @@ public final class Context {
     /// The internal storage that's used to hold metadata and references to objects
     internal private(set) var storage = [AnyInstanceIdentifier: (instance: Weak<AnyObject>, instantiation: Date)](minimumCapacity: 10)
     
-    /// A set of entity's ObjectIds that are invalidated because they were removed
+    /// A set of entity's ids that are invalidated because they were removed
     private var invalidatedIdentifiers = Set<AnyInstanceIdentifier>()
     
     /// Instantiates a model from a Document unless the model is already in-memory
@@ -85,7 +85,7 @@ public final class Context {
     
     public func findOne<M: Model>(_ type: M.Type, query: Query = Query()) -> EventLoopFuture<M?> {
         if case .valEquals("_id", let val) = query.aqt {
-            // Meow only supports on type as _id, so if it isn't an identifier we can safely return an empty result
+            // Meow only supports one type as _id, so if it isn't an identifier we can safely return an empty result
             guard let _id = val as? M.Identifier else {
                 return manager.eventLoop.newSucceededFuture(result: nil)
             }
@@ -97,7 +97,7 @@ public final class Context {
         }
         
         return manager.collection(for: M.self)
-            .then { $0.findOne(query) }
+            .findOne(query)
             .thenThrowing { document -> M? in
                 guard let document = document else {
                     return nil
@@ -108,17 +108,18 @@ public final class Context {
     }
     
     public func count<M: Model>(_ type: M.Type, query: Query = Query()) throws -> EventLoopFuture<Int> {
-        return manager.collection(for: M.self)
-            .then { $0.count(query) }
+        return manager.collection(for: M.self).count(query)
     }
     
     public func save<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
         self.pool(instance)
-        return self.manager.collection(for: M.self).thenThrowing { collection in
+        
+        return manager.eventLoop.submit {
             try instance.willSave(with: self)
             
             let encoder = M.encoder
             let document = try encoder.encode(instance)
+            let collection = self.manager.collection(for: M.self)
             
             collection.upsert("_id" == instance._id, to: document)
             
