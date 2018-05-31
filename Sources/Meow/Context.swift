@@ -107,4 +107,23 @@ public final class Context {
         }
     }
     
+    public func count<M: Model>(_ type: M.Type, query: Query = Query()) throws -> EventLoopFuture<Int> {
+        return manager.collection(for: M.self)
+            .then { $0.count(query) }
+    }
+    
+    public func save<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
+        self.pool(instance)
+        return self.manager.collection(for: M.self).thenThrowing { collection in
+            try instance.willSave(with: self)
+            
+            let encoder = M.encoder
+            let document = try encoder.encode(instance)
+            
+            collection.upsert("_id" == instance._id, to: document)
+            
+            try instance.didSave(with: self)
+        }
+    }
+    
 }

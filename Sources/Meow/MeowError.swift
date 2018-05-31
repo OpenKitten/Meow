@@ -1,3 +1,5 @@
+import MongoKitten
+
 /// Generic errors thrown by the generator
 public enum MeowError: Swift.Error {
     case infiniteRecursiveReference(from: _Model.Type, to: _Model.Type)
@@ -9,7 +11,7 @@ public enum MeowError: Swift.Error {
     case invalidValue(key: String, reason: String)
     
     /// A reference to `type` with id `id` cannot be resolved
-    case referenceError(id: ObjectId, type: _Model.Type)
+    case referenceError(id: Any, type: _Model.Type)
     
     /// An object cannot be deleted, because of `reason`
     case undeletableObject(reason: String)
