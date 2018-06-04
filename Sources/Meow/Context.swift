@@ -83,6 +83,7 @@ public final class Context {
         return storage[instanceIdentifier]?.instance.value as? M
     }
     
+    // TODO: query -> where
     public func findOne<M: Model>(_ type: M.Type, query: Query = Query()) -> EventLoopFuture<M?> {
         if case .valEquals("_id", let val) = query.aqt {
             // Meow only supports one type as _id, so if it isn't an identifier we can safely return an empty result
