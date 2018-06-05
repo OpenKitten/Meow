@@ -7,6 +7,10 @@ public final class Context {
     
     public let manager: Manager
     
+    public var eventLoop: EventLoop {
+        return manager.eventLoop
+    }
+    
     internal init(_ manager: Manager) {
         self.manager = manager
     }

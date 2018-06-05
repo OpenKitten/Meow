@@ -22,7 +22,7 @@ public struct Reference<M: Model> : Hashable {
     }
     
     /// Resolves a reference
-    public func resolve(in context: Context) throws -> EventLoopFuture<M> {
+    public func resolve(in context: Context) -> EventLoopFuture<M> {
         return resolveIfPresent(in: context).thenThrowing { referenced in
             guard let referenced = referenced else {
                 throw MeowError.referenceError(id: self.reference, type: M.self)
