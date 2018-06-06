@@ -101,6 +101,10 @@ public final class Context {
             .map { _ in } // Count will always be 1 unless the object is already deleted
     }
     
+    public func findOne<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<M?> {
+        return self.findOne(type, where: query.query)
+    }
+    
     public func findOne<M: Model>(_ type: M.Type, where query: Query = Query()) -> EventLoopFuture<M?> {
         if case .valEquals("_id", let val) = query.aqt {
             // Meow only supports one type as _id, so if it isn't an identifier we can safely return an empty result

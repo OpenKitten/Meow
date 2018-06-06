@@ -21,6 +21,11 @@ public struct Reference<M: Model> : Hashable {
         reference = entity._id
     }
     
+    /// Creates an unchecked reference to an entity
+    public init(uncheckedTo target: M.Identifier) {
+        reference = target
+    }
+    
     /// Resolves a reference
     public func resolve(in context: Context) -> EventLoopFuture<M> {
         return resolveIfPresent(in: context).thenThrowing { referenced in
