@@ -89,17 +89,17 @@ public final class Context {
     
     public func deleteOne<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
         return manager.collection(for: M.self)
-            .deleteOne(query)
+            .then { $0.deleteOne(query) }
     }
     
     public func deleteAll<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
         return manager.collection(for: M.self)
-            .deleteAll(query)
+            .then { $0.deleteAll(query) }
     }
     
     public func delete<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
         return manager.collection(for: M.self)
-            .deleteOne("_id" == instance._id)
+            .then { $0.deleteOne("_id" == instance._id) }
             .map { _ in } // Count will always be 1 unless the object is already deleted
     }
     
@@ -117,7 +117,7 @@ public final class Context {
         }
         
         return manager.collection(for: M.self)
-            .findOne(query)
+            .then { $0.findOne(query) }
             .thenThrowing { document -> M? in
                 guard let document = document else {
                     return nil
@@ -128,7 +128,8 @@ public final class Context {
     }
     
     public func count<M: Model>(_ type: M.Type, query: Query = Query()) throws -> EventLoopFuture<Int> {
-        return manager.collection(for: M.self).count(query)
+        return manager.collection(for: M.self)
+            .then { $0.count(query) }
     }
     
     public func save<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
@@ -139,11 +140,12 @@ public final class Context {
             
             let encoder = M.encoder
             let document = try encoder.encode(instance)
-            let collection = self.manager.collection(for: M.self)
             
-            collection.upsert("_id" == instance._id, to: document)
-            
-            try instance.didSave(with: self)
+            self.manager.collection(for: M.self)
+                .then { $0.upsert("_id" == instance._id, to: document) }
+                .thenThrowing { _ in
+                    try instance.didSave(with: self)
+            }
         }
     }
     

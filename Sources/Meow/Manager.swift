@@ -2,32 +2,22 @@
 import NIO
 
 /// A Meow
-// TODO: Rename?
 public final class Manager {
     
-    var eventLoop: EventLoop {
-        return database.connection.eventLoop
-    }
+    public let eventLoop: EventLoop
+    public let database: EventLoopFuture<Database>
     
-    public let database: Database
-    
-    private init(database: Database) {
-        self.database = database
-    }
-    
-    public static func make(settings: ConnectionSettings, eventLoop: EventLoop) -> EventLoopFuture<Manager> {
-        // Connect to the database first, the construct the actual manager
-        return Database.connect(settings: settings, on: eventLoop).map { database in
-            return Manager(database: database)
-        }
+    public init(settings: ConnectionSettings, eventLoop: EventLoop) {
+        self.database = Database.connect(settings: settings, on: eventLoop)
+        self.eventLoop = eventLoop
     }
     
     public func makeContext() -> Context {
         return Context(self)
     }
     
-    public func collection<M: Model>(for model: M.Type) -> MongoKitten.Collection {
-        return database[M.collectionName]
+    public func collection<M: Model>(for model: M.Type) -> EventLoopFuture<MongoKitten.Collection> {
+        return database.map { $0[M.collectionName] }
     }
     
 }
