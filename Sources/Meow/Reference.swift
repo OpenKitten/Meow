@@ -34,7 +34,7 @@ public struct Reference<M: Model> : Hashable {
     
     /// Resolves a reference, returning `nil` if the referenced object cannot be found
     public func resolveIfPresent(in context: Context) -> EventLoopFuture<M?> {
-        return context.findOne(M.self, query: "_id" == reference)
+        return context.findOne(M.self, where: "_id" == reference)
     }
 }
 

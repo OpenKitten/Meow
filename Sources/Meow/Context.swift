@@ -87,8 +87,23 @@ public final class Context {
         return storage[instanceIdentifier]?.instance.value as? M
     }
     
-    // TODO: query -> where
-    public func findOne<M: Model>(_ type: M.Type, query: Query = Query()) -> EventLoopFuture<M?> {
+    public func deleteOne<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
+        return manager.collection(for: M.self)
+            .deleteOne(query)
+    }
+    
+    public func deleteAll<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
+        return manager.collection(for: M.self)
+            .deleteAll(query)
+    }
+    
+    public func delete<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
+        return manager.collection(for: M.self)
+            .deleteOne("_id" == instance._id)
+            .map { _ in } // Count will always be 1 unless the object is already deleted
+    }
+    
+    public func findOne<M: Model>(_ type: M.Type, where query: Query = Query()) -> EventLoopFuture<M?> {
         if case .valEquals("_id", let val) = query.aqt {
             // Meow only supports one type as _id, so if it isn't an identifier we can safely return an empty result
             guard let _id = val as? M.Identifier else {
