@@ -156,17 +156,19 @@ public final class Context {
     public func save<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
         self.pool(instance)
         
-        return manager.eventLoop.submit {
+        do {
             try instance.willSave(with: self)
             
             let encoder = M.encoder
             let document = try encoder.encode(instance)
             
-            self.manager.collection(for: M.self)
+            return self.manager.collection(for: M.self)
                 .upsert("_id" == instance._id, to: document)
                 .thenThrowing { _ in
                     try instance.didSave(with: self)
             }
+        } catch {
+            return self.eventLoop.newFailedFuture(error: error)
         }
     }
     
