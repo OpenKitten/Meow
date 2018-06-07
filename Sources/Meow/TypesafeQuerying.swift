@@ -65,6 +65,18 @@ public func == <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V?) th
     return ModelQuery(path == compareValue)
 }
 
+public func == <M: QueryableModel, T: Model>(lhs: KeyPath<M, Reference<T>>, rhs: T?) throws -> ModelQuery<M> {
+    let path = try lhs.makeQueryPath()
+    let compareValue: Primitive?
+    if let rhs = rhs {
+    compareValue = try M.encode(value: rhs._id)
+    } else {
+    compareValue = nil
+    }
+    
+    return ModelQuery(path == compareValue)
+}
+
 public func != <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V?) throws -> ModelQuery<M> {
     let path = try lhs.makeQueryPath()
     let compareValue: Primitive?
