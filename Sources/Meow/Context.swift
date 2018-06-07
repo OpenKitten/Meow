@@ -129,7 +129,27 @@ public final class Context {
         }
     }
     
-    public func count<M: Model>(_ type: M.Type, query: Query = Query()) throws -> EventLoopFuture<Int> {
+    // TODO: Examine other options. Returning an EventLoopFuture<MappedCursor<...>> here does not look like nice API.
+    public func find<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<MappedCursor<FindCursor, M>> {
+        return self.find(type, where: query.query)
+    }
+    
+    // TODO: Examine other options. Returning an EventLoopFuture<MappedCursor<...>> here does not look like nice API.
+    public func find<M: Model>(_ type: M.Type, where query: Query = Query()) -> EventLoopFuture<MappedCursor<FindCursor, M>> {
+        return manager.collection(for: M.self)
+            .map { $0.find(query) }
+            .map { cursor in
+                return cursor.map { document in
+                    return try self.instantiateIfNeeded(type: M.self, document: document)
+                }
+        }
+    }
+    
+    public func count<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<Int> {
+        return self.count(type, where: query.query)
+    }
+    
+    public func count<M: Model>(_ type: M.Type, where query: Query = Query()) -> EventLoopFuture<Int> {
         return manager.collection(for: M.self).count(query)
     }
     
