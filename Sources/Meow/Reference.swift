@@ -2,9 +2,11 @@ import Foundation
 import NIO
 
 /// Reference to a Model
-public struct Reference<M: Model> : Hashable {
+public struct Reference<M: Model>: Hashable, Resolvable {
     /// The referenced id
     public let reference: M.Identifier
+    
+    public typealias Result = M
     
     /// Compares two references to be referring to the same entity
     public static func == (lhs: Reference<M>, rhs: Reference<M>) -> Bool {
@@ -53,12 +55,38 @@ extension Reference: Codable {
     }
 }
 
-infix operator ==>
-public func ==> <T>(lhs: Reference<T>, rhs: T) -> Bool {
-    return lhs.reference == rhs._id
+public protocol Resolvable {
+    associatedtype Result
+    
+    func resolve(in context: Context) -> EventLoopFuture<Result>
 }
 
-infix operator =>
-public func => <T>(lhs: inout Reference<T>, rhs: T) {
-    lhs = Reference(to: rhs)
+extension Set: Resolvable where Element: Resolvable {}
+extension Array: Resolvable where Element: Resolvable {}
+extension Sequence where Element: Resolvable {
+    public typealias Result = [Element.Result]
+    
+    /// Resolves the contained references
+    ///
+    /// - parameter context: The context to use for resolving the references
+    /// - returns: An EventLoopFuture that completes with an array of
+    public func resolve(in context: Context) -> EventLoopFuture<[Element.Result]> {
+        let futures = self.map { $0.resolve(in: context) }
+        return EventLoopFuture.reduce(into: [], futures, eventLoop: context.eventLoop) { array, resolved in
+            array.append(resolved)
+        }
+    }
+}
+
+extension Dictionary: Resolvable where Value: Resolvable {
+    public typealias Result = [Key: Value.Result]
+    
+    public func resolve(in context: Context) -> EventLoopFuture<[Key: Value.Result]> {
+        let futures = self.map { $0.value.resolve(in: context).and(result: $0.key) }
+        return EventLoopFuture.reduce(into: [:], futures, eventLoop: context.eventLoop) { dictionary, pair in
+            let (value, key) = pair
+            
+            dictionary[key] = value
+        }
+    }
 }
