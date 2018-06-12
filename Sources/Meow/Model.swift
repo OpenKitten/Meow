@@ -59,3 +59,17 @@ public extension Model {
     func willDelete(with context: Meow.Context) throws {}
     func didDelete(with context: Meow.Context) throws {}
 }
+
+public extension Model where Self: Hashable {
+    
+    /// Provides a default implementation of Hashable for Models, that uses only the _id for Hashable conformance
+    public var hashValue: Int {
+        return _id.hashValue
+    }
+    
+    /// Compares the given models using the _id
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        return lhs._id == rhs._id
+    }
+    
+}
