@@ -36,6 +36,12 @@ public struct ModelQuery<M: QueryableModel> {
     
 }
 
+public extension AggregateCursor {
+    public func match<T>(_ query: ModelQuery<T>) -> AggregateCursor<Element> {
+        return self.match(query.query)
+    }
+}
+
 fileprivate struct TargetValueEncodingWrapper<V: Encodable>: Encodable {
     var value: V
 }
