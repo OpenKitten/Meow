@@ -95,6 +95,34 @@ public func != <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V?) th
     return ModelQuery(path != compareValue)
 }
 
+public func < <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V) throws -> ModelQuery<M> {
+    let path = try lhs.makeQueryPath()
+    let compareValue = try M.encode(value: rhs)
+    
+    return ModelQuery(path < compareValue)
+}
+
+public func > <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V) throws -> ModelQuery<M> {
+    let path = try lhs.makeQueryPath()
+    let compareValue = try M.encode(value: rhs)
+    
+    return ModelQuery(path > compareValue)
+}
+
+public func <= <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V) throws -> ModelQuery<M> {
+    let path = try lhs.makeQueryPath()
+    let compareValue = try M.encode(value: rhs)
+    
+    return ModelQuery(path <= compareValue)
+}
+
+public func >= <M: QueryableModel, V: Encodable>(lhs: KeyPath<M, V>, rhs: V) throws -> ModelQuery<M> {
+    let path = try lhs.makeQueryPath()
+    let compareValue = try M.encode(value: rhs)
+    
+    return ModelQuery(path >= compareValue)
+}
+
 public func || <M>(lhs: ModelQuery<M>, rhs: ModelQuery<M>) -> ModelQuery<M> {
     return ModelQuery(lhs.query || rhs.query)
 }
