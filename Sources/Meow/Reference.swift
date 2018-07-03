@@ -24,7 +24,7 @@ public struct Reference<M: Model>: Hashable, Resolvable {
     }
     
     /// Creates an unchecked reference to an entity
-    public init(uncheckedTo target: M.Identifier) {
+    public init(unsafeTo target: M.Identifier) {
         reference = target
     }
     
@@ -44,6 +44,12 @@ public struct Reference<M: Model>: Hashable, Resolvable {
         return context.findOne(M.self, where: "_id" == reference)
     }
 }
+
+public postfix func * <M>(instance: M) -> Reference<M> {
+    return Reference(to: instance)
+}
+
+postfix operator *
 
 extension Reference: Codable {
     public func encode(to encoder: Encoder) throws {

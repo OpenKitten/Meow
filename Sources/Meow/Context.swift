@@ -88,16 +88,16 @@ public final class Context {
     }
     
     public func deleteOne<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
-        return manager.collection(for: M.self).deleteOne(query)
+        return manager.collection(for: M.self).deleteOne(where: query)
     }
     
     public func deleteAll<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
-        return manager.collection(for: M.self).deleteAll(query)
+        return manager.collection(for: M.self).deleteAll(where: query)
     }
     
     public func delete<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
         return manager.collection(for: M.self)
-            .deleteOne("_id" == instance._id)
+            .deleteOne(where: "_id" == instance._id)
             .map { _ in } // Count will always be 1 unless the object is already deleted
     }
     
@@ -106,7 +106,7 @@ public final class Context {
     }
     
     public func findOne<M: Model>(_ type: M.Type, where query: Query = Query()) -> EventLoopFuture<M?> {
-        if case .valEquals("_id", let val) = query.aqt {
+        if case .valEquals("_id", let val) = query {
             // Meow only supports one type as _id, so if it isn't an identifier we can safely return an empty result
             guard let _id = val as? M.Identifier else {
                 return manager.eventLoop.newSucceededFuture(result: nil)
@@ -129,19 +129,15 @@ public final class Context {
         }
     }
     
-    // TODO: Examine other options. Returning an EventLoopFuture<MappedCursor<...>> here does not look like nice API.
-    public func find<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<MappedCursor<FindCursor, M>> {
+    public func find<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> MappedCursor<FindCursor, M> {
         return self.find(type, where: query.query)
     }
     
-    // TODO: Examine other options. Returning an EventLoopFuture<MappedCursor<...>> here does not look like nice API.
-    public func find<M: Model>(_ type: M.Type, where query: Query = Query()) -> EventLoopFuture<MappedCursor<FindCursor, M>> {
+    public func find<M: Model>(_ type: M.Type, where query: Query = Query()) -> MappedCursor<FindCursor, M> {
         return manager.collection(for: M.self)
-            .map { $0.find(query) }
-            .map { cursor in
-                return cursor.map { document in
-                    return try self.instantiateIfNeeded(type: M.self, document: document)
-                }
+            .find(query)
+            .map { document in
+                return try self.instantiateIfNeeded(type: M.self, document: document)
         }
     }
     
@@ -163,7 +159,7 @@ public final class Context {
             let document = try encoder.encode(instance)
             
             return self.manager.collection(for: M.self)
-                .upsert("_id" == instance._id, to: document)
+                .upsert(where: "_id" == instance._id, to: document)
                 .thenThrowing { _ in
                     try instance.didSave(with: self)
             }
@@ -171,5 +167,4 @@ public final class Context {
             return self.eventLoop.newFailedFuture(error: error)
         }
     }
-    
 }

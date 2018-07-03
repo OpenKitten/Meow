@@ -5,19 +5,19 @@ import NIO
 public final class Manager {
     
     public let eventLoop: EventLoop
-    public let database: EventLoopFuture<Database>
+    public let database: Database
     
-    public init(settings: ConnectionSettings, eventLoop: EventLoop) {
-        self.database = Database.connect(settings: settings, on: eventLoop)
-        self.eventLoop = eventLoop
+    public init(database: Database) {
+        self.database = database
+        self.eventLoop = database.connection.eventLoop
     }
     
     public func makeContext() -> Context {
         return Context(self)
     }
     
-    public func collection<M: Model>(for model: M.Type) -> EventLoopFuture<MongoKitten.Collection> {
-        return database.map { $0[M.collectionName] }
+    public func collection<M: Model>(for model: M.Type) -> MongoKitten.Collection {
+        return database[M.collectionName]
     }
     
 }

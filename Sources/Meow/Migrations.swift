@@ -23,32 +23,32 @@ public class Migrator<M: Model> {
     private var actions = [Action]()
     
     func execute() -> EventLoopFuture<Void> {
-        return context.manager.collection(for: M.self).then { collection in
-            let promise: EventLoopPromise<Void> = self.context.eventLoop.newPromise()
-            
-            var actions = self.actions
-            func doNextAction() {
-                do {
-                    guard actions.count > 0 else {
-                        promise.succeed(result: ())
-                        return
-                    }
-                    
-                    let action = actions.removeFirst()
-                    let actionResult = try action(collection)
-                    actionResult.cascadeFailure(promise: promise)
-                    actionResult.whenSuccess {
-                        doNextAction()
-                    }
-                } catch {
-                    promise.fail(error: error)
+        let collection = context.manager.collection(for: M.self)
+        
+        let promise: EventLoopPromise<Void> = self.context.eventLoop.newPromise()
+        
+        var actions = self.actions
+        func doNextAction() {
+            do {
+                guard actions.count > 0 else {
+                    promise.succeed(result: ())
+                    return
                 }
+                
+                let action = actions.removeFirst()
+                let actionResult = try action(collection)
+                actionResult.cascadeFailure(promise: promise)
+                actionResult.whenSuccess {
+                    doNextAction()
+                }
+            } catch {
+                promise.fail(error: error)
             }
-            
-            doNextAction()
-            
-            return promise.futureResult
         }
+        
+        doNextAction()
+        
+        return promise.futureResult
     }
     
     public func add(_ action: @escaping Action) {
@@ -70,7 +70,7 @@ public extension Migrator where M: QueryableModel {
                 throw MigrationError.noDefaultValueFound
             }
     
-            return collection.update(path == nil, setting: [path: encodedValue], multiple: true).map { _ in () }
+            return collection.update(where: path == nil, setting: [path: encodedValue], multiple: true).map { _ in () }
         }
     }
     
@@ -78,8 +78,8 @@ public extension Migrator where M: QueryableModel {
 
 extension Context {
     
-    fileprivate var migrationsCollection: EventLoopFuture<MongoKitten.Collection> {
-        return self.manager.database.map { $0["MeowMigrations"] }
+    fileprivate var migrationsCollection: MongoKitten.Collection {
+        return self.manager.database["MeowMigrations"]
     }
     
     /// Runs a migration closure that is not tied to a certain model
@@ -87,7 +87,7 @@ extension Context {
     public func migrateCustom(_ description: String, migration: @escaping () throws -> EventLoopFuture<Void>) -> EventLoopFuture<Void> {
         let fullDescription = "Custom - \(description)"
         return migrationsCollection
-            .then { $0.count("_id" == fullDescription) }
+            .count("_id" == fullDescription)
             .then { count in
                 if count > 0 {
                     // Migration not needed
@@ -102,13 +102,12 @@ extension Context {
                         
                         let duration = end.timeIntervalSince(start)
                         
-                        return self.migrationsCollection.then {
-                            return $0.insert([
+                        return self.migrationsCollection
+                            .insert([
                                 "_id": fullDescription,
                                 "date": start,
                                 "duration": duration
                                 ]).map { _ in () }
-                            }
                     }
                 } catch {
                     return self.manager.eventLoop.newFailedFuture(error: error)
@@ -120,7 +119,7 @@ extension Context {
         let fullDescription = "\(M.self) - \(description)"
         
         return migrationsCollection
-            .then { $0.count("_id" == fullDescription) }
+            .count("_id" == fullDescription)
             .then { count in
                 if count > 0 {
                     // Migration not needed
@@ -138,13 +137,12 @@ extension Context {
                         
                         let duration = end.timeIntervalSince(start)
                         
-                        return self.migrationsCollection.then {
-                            return $0.insert([
+                        return self.migrationsCollection
+                            .insert([
                                 "_id": fullDescription,
                                 "date": start,
                                 "duration": duration
                                 ]).map { _ in () }
-                        }
                     }
                 } catch {
                     return self.manager.eventLoop.newFailedFuture(error: error)
