@@ -10,9 +10,11 @@
 import MongoKitten
 import NIO
 
-public protocol QueryableModel: Model {
+public protocol KeyPathQueryable {
     static func makeQueryPath<T>(for key: KeyPath<Self, T>) throws -> String
 }
+
+public protocol QueryableModel: KeyPathQueryable, Model {}
 
 extension KeyPath where Root: QueryableModel {
 
