@@ -32,7 +32,7 @@ public struct ModelQuery<M: QueryableModel> {
     
     public var query: MongoKitten.Query
     
-    public init(_ query: MongoKitten.Query) {
+    public init(_ query: MongoKitten.Query = .init()) {
         self.query = query
     }
     

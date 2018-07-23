@@ -158,10 +158,13 @@ public final class Context {
             let encoder = M.encoder
             let document = try encoder.encode(instance)
             
-            return self.manager.collection(for: M.self)
-                .upsert(where: "_id" == instance._id, to: document)
-                .thenThrowing { _ in
-                    try instance.didSave(with: self)
+            
+            return MeowHooks.callPresaveHooks(on: instance, context: self).then {
+                return self.manager.collection(for: M.self)
+                    .upsert(where: "_id" == instance._id, to: document)
+                    .thenThrowing { _ in
+                        try instance.didSave(with: self)
+                }
             }
         } catch {
             return self.eventLoop.newFailedFuture(error: error)
