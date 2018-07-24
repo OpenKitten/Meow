@@ -95,6 +95,8 @@ extension Context {
                     return self.manager.eventLoop.newSucceededFuture(result: ())
                 }
                 
+                print("🐈 Running migration \(description)")
+                
                 do {
                     let start = Date()
                     return try migration().then {
@@ -126,6 +128,8 @@ extension Context {
                     // TODO: Log?
                     return self.manager.eventLoop.newSucceededFuture(result: ())
                 }
+                
+                print("🐈 Running migration \(description) on \(M.self)")
                 
                 do {
                     let start = Date()
