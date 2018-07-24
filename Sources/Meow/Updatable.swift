@@ -20,7 +20,7 @@ public struct UpdateCodingKey: CodingKey {
         self.stringValue = stringValue
     }
     
-    init(_ value: String) {
+    public init(_ value: String) {
         self.stringValue = value
     }
     
