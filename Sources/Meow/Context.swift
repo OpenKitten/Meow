@@ -149,22 +149,68 @@ public final class Context {
         return manager.collection(for: M.self).count(query)
     }
     
+    /// Saves the `instance` to the database. If the collection already
+    /// contains a value with the same `_id`, it is replaced by `instance`.
+    ///
+    /// Internally, this uses an `upsert`.
+    ///
+    /// ## Hooks
+    ///
+    /// Before saving, `willSave` is called on the `instance.` Then, any
+    /// registered presave hooks for the type (`M`) are called.
+    ///
+    /// When all presave hooks succeed, the actual `upsert` takes place.
     public func save<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
         self.pool(instance)
         
         do {
             try instance.willSave(with: self)
             
-            let encoder = M.encoder
-            let document = try encoder.encode(instance)
-            
             return MeowHooks.callPresaveHooks(on: instance, context: self).then {
-                return self.manager.collection(for: M.self)
-                    .upsert(where: "_id" == instance._id, to: document)
-                    .thenThrowing { _ in
-                        try instance.didSave(with: self)
+                do {
+                    let encoder = M.encoder
+                    let document = try encoder.encode(instance)
+                    
+                    return self.manager.collection(for: M.self)
+                        .upsert(where: "_id" == instance._id, to: document)
+                        .thenThrowing { _ in
+                            try instance.didSave(with: self)
+                    }
+                } catch {
+                    return self.manager.eventLoop.newFailedFuture(error: error)
                 }
             }
+        } catch {
+            return self.eventLoop.newFailedFuture(error: error)
+        }
+    }
+    
+    /// Updates the given `fields` on the `instance`. This requires that
+    /// the instance is already present in the database, because it internally
+    /// uses an update operation with a `$set` command.
+    ///
+    /// No hooks are called for an `update` operation.
+    ///
+    /// - parameter instance: The instance to update
+    /// - parameter fields: A list of fields to update. Field names need to match with the database keys. Only top level fields can be updated.
+    public func update<M: Model>(_ instance: M, fields: String...) -> EventLoopFuture<Void> {
+        self.pool(instance)
+        
+        assert(fields.allSatisfy { !$0.contains(".") }, "Updating nested fields is not supported")
+
+        do {
+            let encoder = M.encoder
+            var document = try encoder.encode(instance)
+            
+            var set = [String: Primitive?]()
+            
+            for key in document.keys where fields.contains(key) {
+                set[key] = document[key]
+            }
+            
+            return self.manager.collection(for: M.self)
+                .update(where: "_id" == instance._id, setting: set)
+                .map { _ in }
         } catch {
             return self.eventLoop.newFailedFuture(error: error)
         }
