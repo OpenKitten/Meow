@@ -132,3 +132,11 @@ public func || <M>(lhs: ModelQuery<M>, rhs: ModelQuery<M>) -> ModelQuery<M> {
 public func && <M>(lhs: ModelQuery<M>, rhs: ModelQuery<M>) -> ModelQuery<M> {
     return ModelQuery(lhs.query && rhs.query)
 }
+
+extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: Encodable  {
+    public func contains(_ element: Value.Element) throws -> ModelQuery<Root> {
+        let path = try self.makeQueryPath()
+        let compareValue = try Root.encode(value: element)
+        return ModelQuery(path == compareValue) // MongoDB allows matching array contains with "$eq"
+    }
+}
