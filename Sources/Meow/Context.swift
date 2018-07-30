@@ -141,6 +141,23 @@ public final class Context {
         }
     }
     
+    public func findAllowingDecodeErrors<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> MappedCursor<FindCursor, DecodeResult<M>> {
+        return self.findAllowingDecodeErrors(type, where: query.query)
+    }
+    
+    public func findAllowingDecodeErrors<M: Model>(_ type: M.Type, where query: Query = Query()) -> MappedCursor<FindCursor, DecodeResult<M>> {
+        return manager.collection(for: M.self)
+            .find(query)
+            .map { document in
+                do {
+                    let instance = try self.instantiateIfNeeded(type: M.self, document: document)
+                    return .success(instance)
+                } catch {
+                    return .failure(error, document)
+                }
+        }
+    }
+    
     public func count<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<Int> {
         return self.count(type, where: query.query)
     }
@@ -215,4 +232,9 @@ public final class Context {
             return self.eventLoop.newFailedFuture(error: error)
         }
     }
+}
+
+public enum DecodeResult<M> {
+    case success(M)
+    case failure(Error, Document)
 }
