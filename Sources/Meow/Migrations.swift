@@ -4,6 +4,7 @@ import NIO
 
 enum MigrationError: Error {
     case noDefaultValueFound
+    case unknownId
 }
 
 fileprivate struct EncodingHelper<V: Encodable>: Encodable {
@@ -71,6 +72,26 @@ public extension Migrator where M: QueryableModel {
             }
     
             return collection.update(where: path == nil, setting: [path: encodedValue], multiple: true).map { _ in () }
+        }
+    }
+    
+    /// Transform the entire model, on Document level.
+    ///
+    /// You may use this function to make any adaptions you like on the actual stored documents of your Model.
+    /// This provides maximum flexibility.
+    ///
+    /// - parameter transform: A closure that will be executed on every model document in the database. The returned document from this closure replaces the existing document in the database.
+    public func map(_ transform: @escaping (Document) throws -> (Document)) {
+        add { collection in
+            return collection.find().forEachAsync { original in
+                let replacement = try transform(original)
+                
+                guard let id = original["_id"] else {
+                    throw MigrationError.unknownId
+                }
+                
+                return collection.update(where: "_id" == id, to: replacement).map { _ in () }
+            }
         }
     }
     
