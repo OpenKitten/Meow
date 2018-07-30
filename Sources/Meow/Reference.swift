@@ -29,8 +29,8 @@ public struct Reference<M: Model>: Hashable, Resolvable {
     }
     
     /// Resolves a reference
-    public func resolve(in context: Context) -> EventLoopFuture<M> {
-        return resolveIfPresent(in: context).thenThrowing { referenced in
+    public func resolve(in context: Context, where query: Query = Query()) -> EventLoopFuture<M> {
+        return resolveIfPresent(in: context, where: query).thenThrowing { referenced in
             guard let referenced = referenced else {
                 throw MeowError.referenceError(id: self.reference, type: M.self)
             }
@@ -40,8 +40,8 @@ public struct Reference<M: Model>: Hashable, Resolvable {
     }
     
     /// Resolves a reference, returning `nil` if the referenced object cannot be found
-    public func resolveIfPresent(in context: Context) -> EventLoopFuture<M?> {
-        return context.findOne(M.self, where: "_id" == reference)
+    public func resolveIfPresent(in context: Context, where query: Query = Query()) -> EventLoopFuture<M?> {
+        return context.findOne(M.self, where: "_id" == reference && query)
     }
 }
 
@@ -63,21 +63,28 @@ extension Reference: Codable {
 
 public protocol Resolvable {
     associatedtype Result
+    associatedtype IfPresentResult
     
-    func resolve(in context: Context) -> EventLoopFuture<Result>
+    func resolve(in context: Context, where query: Query) -> EventLoopFuture<Result>
+    func resolveIfPresent(in context: Context, where query: Query) -> EventLoopFuture<IfPresentResult>
 }
 
 extension Set: Resolvable where Element: Resolvable {}
 extension Array: Resolvable where Element: Resolvable {}
 extension Sequence where Element: Resolvable {
-    public typealias Result = [Element.Result]
-    
     /// Resolves the contained references
     ///
     /// - parameter context: The context to use for resolving the references
     /// - returns: An EventLoopFuture that completes with an array of
-    public func resolve(in context: Context) -> EventLoopFuture<[Element.Result]> {
-        let futures = self.map { $0.resolve(in: context) }
+    public func resolve(in context: Context, where query: Query = Query()) -> EventLoopFuture<[Element.Result]> {
+        let futures = self.map { $0.resolve(in: context, where: query) }
+        return EventLoopFuture.reduce(into: [], futures, eventLoop: context.eventLoop) { array, resolved in
+            array.append(resolved)
+        }
+    }
+    
+    public func resolveIfPresent(in context: Context, where query: Query = Query()) -> EventLoopFuture<[Element.IfPresentResult]> {
+        let futures = self.map { $0.resolveIfPresent(in: context, where: query) }
         return EventLoopFuture.reduce(into: [], futures, eventLoop: context.eventLoop) { array, resolved in
             array.append(resolved)
         }
@@ -86,9 +93,19 @@ extension Sequence where Element: Resolvable {
 
 extension Dictionary: Resolvable where Value: Resolvable {
     public typealias Result = [Key: Value.Result]
+    public typealias IfPresentResult = [Key: Value.IfPresentResult]
     
-    public func resolve(in context: Context) -> EventLoopFuture<[Key: Value.Result]> {
-        let futures = self.map { $0.value.resolve(in: context).and(result: $0.key) }
+    public func resolve(in context: Context, where query: Query = Query()) -> EventLoopFuture<[Key: Value.Result]> {
+        let futures = self.map { $0.value.resolve(in: context, where: query).and(result: $0.key) }
+        return EventLoopFuture.reduce(into: [:], futures, eventLoop: context.eventLoop) { dictionary, pair in
+            let (value, key) = pair
+            
+            dictionary[key] = value
+        }
+    }
+    
+    public func resolveIfPresent(in context: Context, where query: Query = Query()) -> EventLoopFuture<[Key: Value.IfPresentResult]> {
+        let futures = self.map { $0.value.resolveIfPresent(in: context, where: query).and(result: $0.key) }
         return EventLoopFuture.reduce(into: [:], futures, eventLoop: context.eventLoop) { dictionary, pair in
             let (value, key) = pair
             
