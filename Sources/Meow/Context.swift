@@ -87,8 +87,16 @@ public final class Context {
         return storage[instanceIdentifier]?.instance.value as? M
     }
     
+    public func deleteOne<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<Int> {
+        return self.deleteOne(type, where: query.query)
+    }
+    
     public func deleteOne<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
         return manager.collection(for: M.self).deleteOne(where: query)
+    }
+    
+    public func deleteAll<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<Int> {
+        return self.deleteAll(type, where: query.query)
     }
     
     public func deleteAll<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
