@@ -69,6 +69,26 @@ public protocol Resolvable {
     func resolveIfPresent(in context: Context, where query: Query) -> EventLoopFuture<IfPresentResult>
 }
 
+public extension Resolvable where Result: QueryableModel {
+    public func resolve(in context: Context, where query: ModelQuery<Result>) -> EventLoopFuture<Result> {
+        return self.resolve(in: context, where: query.query)
+    }
+    
+    public func resolveIfPresent(in context: Context, where query: ModelQuery<Result>) -> EventLoopFuture<IfPresentResult> {
+        return self.resolveIfPresent(in: context, where: query.query)
+    }
+}
+
+public extension Resolvable where Result: Sequence, Result.Element: QueryableModel {
+    public func resolve(in context: Context, where query: ModelQuery<Result.Element>) -> EventLoopFuture<Result> {
+        return self.resolve(in: context, where: query.query)
+    }
+    
+    public func resolveIfPresent(in context: Context, where query: ModelQuery<Result.Element>) -> EventLoopFuture<IfPresentResult> {
+        return self.resolveIfPresent(in: context, where: query.query)
+    }
+}
+
 extension Set: Resolvable where Element: Resolvable {}
 extension Array: Resolvable where Element: Resolvable {}
 extension Sequence where Element: Resolvable {
