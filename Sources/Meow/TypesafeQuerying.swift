@@ -133,6 +133,10 @@ public func && <M>(lhs: ModelQuery<M>, rhs: ModelQuery<M>) -> ModelQuery<M> {
     return ModelQuery(lhs.query && rhs.query)
 }
 
+public prefix func ! <M>(query: ModelQuery<M>) -> ModelQuery<M> {
+    return ModelQuery(!query.query)
+}
+
 extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: Encodable  {
     public func contains(_ element: Value.Element) throws -> ModelQuery<Root> {
         let path = try self.makeQueryPath()
@@ -140,3 +144,20 @@ extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: En
         return ModelQuery(path == compareValue) // MongoDB allows matching array contains with "$eq"
     }
 }
+
+extension KeyPath where Root: QueryableModel, Value: Encodable {
+    public func `in`(_ options: [Value]) throws -> ModelQuery<Root> {
+        let path = try self.makeQueryPath()
+        let compareValue = try options.map { try Root.encode(value: $0) }
+        return ModelQuery(.in(field: path, in: compareValue))
+    }
+}
+
+extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: Encodable {
+    public func `in`(_ options: [Value.Element]) throws -> ModelQuery<Root> {
+        let path = try self.makeQueryPath()
+        let compareValue = try options.map { try Root.encode(value: $0) }
+        return ModelQuery(.in(field: path, in: compareValue))
+    }
+}
+
