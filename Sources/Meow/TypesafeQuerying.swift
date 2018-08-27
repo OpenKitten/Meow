@@ -137,7 +137,7 @@ public prefix func ! <M>(query: ModelQuery<M>) -> ModelQuery<M> {
     return ModelQuery(!query.query)
 }
 
-extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: Encodable  {
+extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: Encodable {
     public func contains(_ element: Value.Element) throws -> ModelQuery<Root> {
         let path = try self.makeQueryPath()
         let compareValue = try Root.encode(value: element)
@@ -160,4 +160,3 @@ extension KeyPath where Root: QueryableModel, Value: Sequence, Value.Element: En
         return ModelQuery(.in(field: path, in: compareValue))
     }
 }
-
