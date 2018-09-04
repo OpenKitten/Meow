@@ -87,26 +87,87 @@ public final class Context {
         return storage[instanceIdentifier]?.instance.value as? M
     }
     
+    /// Deletes the model resulting from the given query
+    ///
+    /// When the model has no registered pre- or postdelete hooks, the delete
+    /// operation is forwarded 1:1 to the underlying collection.
+    ///
+    /// If the model has one or more pre- or postdelete hooks, a find operation
+    /// is executed, and hooks are called while handling the delete operation.
+    /// See `MeowHooks` for documentation on hooks.
     public func deleteOne<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<Int> {
         return self.deleteOne(type, where: query.query)
     }
     
+    /// Deletes the model resulting from the given query
+    ///
+    /// When the model has no registered pre- or postdelete hooks, the delete
+    /// operation is forwarded 1:1 to the underlying collection.
+    ///
+    /// If the model has one or more pre- or postdelete hooks, a find operation
+    /// is executed, and hooks are called while handling the delete operation.
+    /// See `MeowHooks` for documentation on hooks.
     public func deleteOne<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
-        return manager.collection(for: M.self).deleteOne(where: query)
+        if MeowHooks.hasDeleteHooks(forType: type) {
+            return self.findOne(type, where: query)
+                .then { instance in
+                    // Nothing to do if the instance does not exist
+                    guard let instance = instance else {
+                        return self.eventLoop.newSucceededFuture(result: 0)
+                    }
+                    
+                    return self.delete(instance).map { 1 }
+            }
+        } else {
+            return manager.collection(for: M.self).deleteOne(where: query)
+        }
     }
     
+    /// Deletes the models resulting from the given query
+    ///
+    /// When the model has no registered pre- or postdelete hooks, the delete
+    /// operation is forwarded 1:1 to the underlying collection.
+    ///
+    /// If the model has one or more pre- or postdelete hooks, a find operation
+    /// is executed, and hooks are called while handling the delete operation.
+    /// See `MeowHooks` for documentation on hooks.
     public func deleteAll<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<Int> {
         return self.deleteAll(type, where: query.query)
     }
     
+    /// Deletes the models resulting from the given query
+    ///
+    /// When the model has no registered pre- or postdelete hooks, the delete
+    /// operation is forwarded 1:1 to the underlying collection.
+    ///
+    /// If the model has one or more pre- or postdelete hooks, a find operation
+    /// is executed, and hooks are called while handling the delete operation.
+    /// See `MeowHooks` for documentation on hooks.
     public func deleteAll<M: Model>(_ type: M.Type, where query: Query) -> EventLoopFuture<Int> {
-        return manager.collection(for: M.self).deleteAll(where: query)
+        if MeowHooks.hasDeleteHooks(forType: type) {
+            var count = 0
+            return self.find(type, where: query)
+                .forEachAsync { instance in
+                    count += 1
+                    return self.delete(instance)
+                }
+                .map { count }
+        } else {
+            return manager.collection(for: M.self).deleteAll(where: query)
+        }
     }
     
+    /// Deletes the given model, calling any registered pre- or postdelete hooks
     public func delete<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
-        return manager.collection(for: M.self)
-            .deleteOne(where: "_id" == instance._id)
-            .map { _ in } // Count will always be 1 unless the object is already deleted
+        return MeowHooks.callPredeleteHooks(on: instance, context: self)
+            .then {
+                return self.manager.collection(for: M.self)
+                    .deleteOne(where: "_id" == instance._id)
+                    .map { _ in } // Count will always be 1 unless the object is already deleted
+            }
+            .then {
+                MeowHooks.callPostdeleteHooks(on: instance, context: self)
+        }
     }
     
     public func findOne<M: Model>(_ type: M.Type, where query: ModelQuery<M>) -> EventLoopFuture<M?> {
@@ -188,25 +249,19 @@ public final class Context {
     public func save<M: Model>(_ instance: M) -> EventLoopFuture<Void> {
         self.pool(instance)
         
-        do {
-            try instance.willSave(with: self)
-            
-            return MeowHooks.callPresaveHooks(on: instance, context: self).then {
-                do {
-                    let encoder = M.encoder
-                    let document = try encoder.encode(instance)
-                    
-                    return self.manager.collection(for: M.self)
-                        .upsert(where: "_id" == instance._id, to: document)
-                        .thenThrowing { _ in
-                            try instance.didSave(with: self)
-                    }
-                } catch {
-                    return self.manager.eventLoop.newFailedFuture(error: error)
+        return MeowHooks.callPresaveHooks(on: instance, context: self).then {
+            do {
+                let encoder = M.encoder
+                let document = try encoder.encode(instance)
+                
+                return self.manager.collection(for: M.self)
+                    .upsert(where: "_id" == instance._id, to: document)
+                    .then { _ in
+                        return MeowHooks.callPostsaveHooks(on: instance, context: self)
                 }
+            } catch {
+                return self.manager.eventLoop.newFailedFuture(error: error)
             }
-        } catch {
-            return self.eventLoop.newFailedFuture(error: error)
         }
     }
     
