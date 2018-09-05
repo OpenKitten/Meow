@@ -15,10 +15,13 @@ public protocol KeyPathQueryable {
 }
 
 public protocol QueryableModel: KeyPathQueryable, Model {}
+public protocol ConvertibleToQueryPath {
+    func makeQueryPath() throws -> String
+}
 
-extension KeyPath where Root: QueryableModel {
+extension KeyPath: ConvertibleToQueryPath where Root: QueryableModel {
 
-    func makeQueryPath() throws -> String {
+    public func makeQueryPath() throws -> String {
         return try Root.makeQueryPath(for: self)
     }
 
