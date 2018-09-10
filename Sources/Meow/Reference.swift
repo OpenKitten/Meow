@@ -43,6 +43,11 @@ public struct Reference<M: Model>: Hashable, Resolvable {
     public func resolveIfPresent(in context: Context, where query: Query = Query()) -> EventLoopFuture<M?> {
         return context.findOne(M.self, where: "_id" == reference && query)
     }
+    
+    /// Deletes the target of the reference (making it invalid)
+    public func deleteTarget(in context: Context) -> EventLoopFuture<Void> {
+        return context.deleteOne(M.self, where: "_id" == reference).map { _ in }
+    }
 }
 
 public postfix func * <M>(instance: M) -> Reference<M> {
