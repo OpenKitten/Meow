@@ -284,8 +284,15 @@ public final class Context {
             
             var set = [String: Primitive?]()
             
+            var unsetKeys = Set(fields)
+            
             for key in document.keys where fields.contains(key) {
                 set[key] = document[key]
+                unsetKeys.remove(key)
+            }
+            
+            for key in unsetKeys {
+                set[key] = .some(nil)
             }
             
             return self.manager.collection(for: M.self)
