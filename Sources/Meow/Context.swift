@@ -302,6 +302,31 @@ public final class Context {
             return self.eventLoop.newFailedFuture(error: error)
         }
     }
+    
+    /// Finds the distinct values for a specified field across a single collection. distinct returns a document that contains an array of the distinct values.
+    ///
+    /// - see: https://docs.mongodb.com/manual/reference/command/distinct/index.html
+    ///
+    /// - parameter type: The model to perform the operation on
+    /// - parameter key: The field for which to return distinct values.
+    /// - parameter query: A query that specifies the documents from which to retrieve the distinct values.
+    public func distinct<M: QueryableModel, D: Decodable>(
+        _ type: M.Type,
+        on key: KeyPath<M, D>,
+        where query: ModelQuery<M>? = nil
+        ) -> EventLoopFuture<[D]> {
+        do {
+            return try self.manager.collection(for: M.self)
+                .distinct(onKey: key.makeQueryPath(), where: query?.query)
+                .thenThrowing { distinctValues in
+                    return try distinctValues.map { value in
+                        return try M.decoder.decode(D.self, fromPrimitive: value)
+                    }
+            }
+        } catch {
+            return self.eventLoop.newFailedFuture(error: error)
+        }
+    }
 }
 
 public enum DecodeResult<M> {
