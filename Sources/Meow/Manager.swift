@@ -4,12 +4,11 @@ import NIO
 /// A Meow
 public final class Manager {
     
-    public let eventLoop: EventLoop
+    public var eventLoop: EventLoop { return database.eventLoop }
     public let database: Database
     
     public init(database: Database) {
         self.database = database
-        self.eventLoop = database.connection.eventLoop
     }
     
     public func makeContext() -> Context {
