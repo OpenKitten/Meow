@@ -49,6 +49,8 @@ extension WritableKeyPath: MeowWritableKeyPath where Root: KeyPathQueryable, Val
         if let newValue = try container.decodeIfPresent(Value.self, forKey: key) {
             root[keyPath: self] = newValue
             didUpdate = true
+        } else if let optionalKeyPath = self as? OptionalKeyPath, let isNull = try? container.decodeNil(forKey: key), isNull {
+            try optionalKeyPath.writeNil(to: &root)
         }
         // TODO: decode null
         
@@ -57,6 +59,22 @@ extension WritableKeyPath: MeowWritableKeyPath where Root: KeyPathQueryable, Val
         to = root as! T
         
         return didUpdate
+    }
+}
+
+fileprivate protocol OptionalKeyPath {
+    func writeNil<T>(to: inout T) throws
+}
+
+extension WritableKeyPath: OptionalKeyPath where Value: ExpressibleByNilLiteral {
+    func writeNil<T>(to: inout T) throws {
+        guard var root = to as? Root else {
+            throw KeyPathUpdateError.invalidRootOrValue
+        }
+        
+        root[keyPath: self] = nil
+        
+        to = root as! T
     }
 }
 
