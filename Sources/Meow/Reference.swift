@@ -138,3 +138,22 @@ extension Dictionary: Resolvable where Value: Resolvable {
         }
     }
 }
+
+extension Optional: Resolvable where Wrapped: Resolvable {
+    public typealias Result = Wrapped.Result?
+    public typealias IfPresentResult = Wrapped.IfPresentResult?
+    
+    public func resolve(in context: Context, where query: Query) -> EventLoopFuture<Wrapped.Result?> {
+        switch self {
+        case .none: return context.eventLoop.newSucceededFuture(result: nil)
+        case .some(let value): return value.resolve(in: context, where: query).map { $0 }
+        }
+    }
+    
+    public func resolveIfPresent(in context: Context, where query: Query) -> EventLoopFuture<Wrapped.IfPresentResult?> {
+        switch self {
+        case .none: return context.eventLoop.newSucceededFuture(result: nil)
+        case .some(let value): return value.resolveIfPresent(in: context, where: query).map { $0 }
+        }
+    }
+}
