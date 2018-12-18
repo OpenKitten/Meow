@@ -83,7 +83,7 @@ public extension Migrator where M: QueryableModel {
     /// - parameter transform: A closure that will be executed on every model document in the database. The returned document from this closure replaces the existing document in the database.
     public func map(_ transform: @escaping (Document) throws -> (Document)) {
         add { collection in
-            return collection.find().forEachAsync { original in
+            return collection.find().sequentialForEach { original in
                 let replacement = try transform(original)
                 
                 guard let id = original["_id"] else {

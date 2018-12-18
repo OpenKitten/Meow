@@ -147,7 +147,7 @@ public final class Context {
         if MeowHooks.hasDeleteHooks(forType: type) {
             var count = 0
             return self.find(type, where: query)
-                .forEachAsync { instance in
+                .sequentialForEach { instance in
                     count += 1
                     return self.delete(instance)
                 }
