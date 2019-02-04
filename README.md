@@ -86,6 +86,14 @@ The result in this case is an `EventLoopFuture<User>`, but if you wish to resolv
 
 You're also able to delete the target of the reference using `reference.deleteTarget(in: context)`. This implies that resolving the normal way (not with `ifPresent`) will result in a failure.
 
+### Unsupported MongoDB features
+
+If a feature is unsupported by Meow, for example when it can't be type-safe, you can always fall back to [MongoKitten](https://github.com/OpenKitten/MongoKitten.git).
+
+```swift
+let database: MongoKitten.Database = context.manager.database
+```
+
 ## ⭐️ Features
 
 - [x] Boilerplate-free
