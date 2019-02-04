@@ -94,6 +94,10 @@ If a feature is unsupported by Meow, for example when it can't be type-safe, you
 let database: MongoKitten.Database = context.manager.database
 ```
 
+# 🐈 Community
+
+[Join our slack here](https://slackpass.io/openkitten) and become a part of the welcoming community.
+
 ## ⭐️ Features
 
 - [x] Boilerplate-free
