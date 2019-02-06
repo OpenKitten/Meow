@@ -1,6 +1,7 @@
 import Foundation
 import MongoKitten
 import NIO
+import Dispatch
 
 // A 🐈 Context
 public final class Context {
