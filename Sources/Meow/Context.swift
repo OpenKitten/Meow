@@ -1,6 +1,7 @@
 import Foundation
 import MongoKitten
 import NIO
+import Dispatch
 
 // A 🐈 Context
 public final class Context {
@@ -326,6 +327,16 @@ public final class Context {
         } catch {
             return self.eventLoop.newFailedFuture(error: error)
         }
+    }
+}
+
+extension Context: EventLoopGroup {
+    public func shutdownGracefully(queue: DispatchQueue, _ callback: @escaping (Error?) -> Void) {
+        eventLoop.shutdownGracefully(queue: queue, callback)
+    }
+    
+    public func next() -> EventLoop {
+        return self.eventLoop
     }
 }
 
