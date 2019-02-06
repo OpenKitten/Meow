@@ -3,6 +3,9 @@ import MongoKitten
 
 /// Private base protocol for `Model` without Self or associated type requirements
 public protocol _Model: class, Codable {
+    /// Saves the instance to the given context, calling `context.save(self)`
+    func save(to context: Context) -> EventLoopFuture<Void>
+    
     // MARK: - Serialization
     
     /// The collection name instances of the model live in. A default implementation is provided.
@@ -26,6 +29,10 @@ public protocol Model: _Model {
 
 // MARK: - Default implementations
 public extension Model {
+    public func save(to context: Context) -> EventLoopFuture<Void> {
+        return context.save(self)
+    }
+    
     static var collectionName: String {
         return String(describing: Self.self) // Will be the name of the type
     }
