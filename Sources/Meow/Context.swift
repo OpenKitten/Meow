@@ -329,6 +329,16 @@ public final class Context {
     }
 }
 
+extension Context: EventLoopGroup {
+    public func shutdownGracefully(queue: DispatchQueue, _ callback: @escaping (Error?) -> Void) {
+        eventLoop.shutdownGracefully(queue: queue, callback)
+    }
+    
+    public func next() -> EventLoop {
+        return self.eventLoop
+    }
+}
+
 public enum DecodeResult<M> {
     case success(M)
     case failure(Error, Document)
