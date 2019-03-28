@@ -80,7 +80,7 @@ extension WritableKeyPath: OptionalKeyPath where Value: ExpressibleByNilLiteral 
 
 public extension Decoder {
     /// - returns: An array containing the key paths that were updated
-    public func update<T: QueryableModel>(_ instance: T, withAllowedKeyPaths keyPaths: [MeowWritableKeyPath]) throws -> [PartialKeyPath<T>] {
+    public func update<T: KeyPathQueryable>(_ instance: T, withAllowedKeyPaths keyPaths: [MeowWritableKeyPath]) throws -> [PartialKeyPath<T>] {
         let container = try self.container(keyedBy: UpdateCodingKey.self)
         
         // must pass as inout to the KeyPath, hence the var
