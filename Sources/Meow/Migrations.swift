@@ -60,7 +60,7 @@ public class Migrator<M: Model> {
 
 public extension Migrator where M: QueryableModel {
     
-    public func ensureValue<V: Encodable>(for keyPath: KeyPath<M, V>, default value: V) {
+    func ensureValue<V: Encodable>(for keyPath: KeyPath<M, V>, default value: V) {
         add { collection in
             let path = try M.makeQueryPath(for: keyPath)
             
@@ -81,7 +81,7 @@ public extension Migrator where M: QueryableModel {
     /// This provides maximum flexibility.
     ///
     /// - parameter transform: A closure that will be executed on every model document in the database. The returned document from this closure replaces the existing document in the database.
-    public func map(_ transform: @escaping (Document) throws -> (Document)) {
+    func map(_ transform: @escaping (Document) throws -> (Document)) {
         add { collection in
             return collection.find().sequentialForEach { original in
                 let replacement = try transform(original)

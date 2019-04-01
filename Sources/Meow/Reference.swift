@@ -14,8 +14,8 @@ public struct Reference<M: Model>: Hashable, Resolvable {
     }
     
     /// Makes a reference hashable
-    public var hashValue: Int {
-        return reference.hashValue
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(reference)
     }
     
     /// Creates a reference to an entity
@@ -75,21 +75,21 @@ public protocol Resolvable {
 }
 
 public extension Resolvable where Result: QueryableModel {
-    public func resolve(in context: Context, where query: ModelQuery<Result>) -> EventLoopFuture<Result> {
+    func resolve(in context: Context, where query: ModelQuery<Result>) -> EventLoopFuture<Result> {
         return self.resolve(in: context, where: query.query)
     }
     
-    public func resolveIfPresent(in context: Context, where query: ModelQuery<Result>) -> EventLoopFuture<IfPresentResult> {
+    func resolveIfPresent(in context: Context, where query: ModelQuery<Result>) -> EventLoopFuture<IfPresentResult> {
         return self.resolveIfPresent(in: context, where: query.query)
     }
 }
 
 public extension Resolvable where Result: Sequence, Result.Element: QueryableModel {
-    public func resolve(in context: Context, where query: ModelQuery<Result.Element>) -> EventLoopFuture<Result> {
+    func resolve(in context: Context, where query: ModelQuery<Result.Element>) -> EventLoopFuture<Result> {
         return self.resolve(in: context, where: query.query)
     }
     
-    public func resolveIfPresent(in context: Context, where query: ModelQuery<Result.Element>) -> EventLoopFuture<IfPresentResult> {
+    func resolveIfPresent(in context: Context, where query: ModelQuery<Result.Element>) -> EventLoopFuture<IfPresentResult> {
         return self.resolveIfPresent(in: context, where: query.query)
     }
 }

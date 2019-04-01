@@ -2,9 +2,8 @@ internal class AnyInstanceIdentifier: Hashable {
     
     fileprivate init() {}
     
-    var hashValue: Int {
+    func hash(into hasher: inout Hasher) {
         assertionFailure("The HashValue implementation of AnyInstanceIdentifier should not be used")
-        return 0
     }
     
     static func == (lhs: AnyInstanceIdentifier, rhs: AnyInstanceIdentifier) -> Bool {
@@ -25,8 +24,9 @@ internal final class InstanceIdentifier<M: Model> : AnyInstanceIdentifier {
         super.init()
     }
     
-    override var hashValue: Int {
-        return ObjectIdentifier(M.self).hashValue ^ identifier.hashValue
+    override func hash(into hasher: inout Hasher) {
+        hasher.combine(ObjectIdentifier(M.self))
+        hasher.combine(identifier.hashValue)
     }
     
     override func equals(_ other: AnyInstanceIdentifier) -> Bool {

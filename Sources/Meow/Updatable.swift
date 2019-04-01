@@ -80,7 +80,7 @@ extension WritableKeyPath: OptionalKeyPath where Value: ExpressibleByNilLiteral 
 
 public extension Decoder {
     /// - returns: An array containing the key paths that were updated
-    public func update<T: KeyPathQueryable>(_ instance: T, withAllowedKeyPaths keyPaths: [MeowWritableKeyPath]) throws -> [PartialKeyPath<T>] {
+    func update<T: KeyPathQueryable>(_ instance: T, withAllowedKeyPaths keyPaths: [MeowWritableKeyPath]) throws -> [PartialKeyPath<T>] {
         let container = try self.container(keyedBy: UpdateCodingKey.self)
         
         // must pass as inout to the KeyPath, hence the var
@@ -108,7 +108,7 @@ public extension JSONDecoder {
     }
     
     /// - returns: An array containing the key paths that were updated
-    public func update<T: QueryableModel>(_ instance: T, from data: Data, withAllowedKeyPaths keyPaths: [MeowWritableKeyPath]) throws -> [PartialKeyPath<T>] {
+    func update<T: QueryableModel>(_ instance: T, from data: Data, withAllowedKeyPaths keyPaths: [MeowWritableKeyPath]) throws -> [PartialKeyPath<T>] {
         // It seems not ideal that MeowWritableKeyPath currently is not restricted to Root == T
         assert(keyPaths.allSatisfy { $0 as? PartialKeyPath<T> != nil }, "Calling update for a certain model with allowed key paths of a different type does not make sense")
         
