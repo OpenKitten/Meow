@@ -4,6 +4,10 @@ Meow is a **boilerplate-free** object persistence framework for Swift and MongoD
 
 It manages your database for you, so you can focus on writing your application.
 
+### Support
+
+For users of Vapor 4 and/or NIO 2.x, Meow is not available as a very lightweight layer as part of the [MongoKitten](https://github.com/OpenKitten/MongoKitten.git) repository.
+
 ## How it works
 
 Meow has a type `Manager` that manages the database for you. You'll need one per NIO event loop. The manager is a small wrapper around MongoKitten which takes care of connecting, discovery and reconnecting.
