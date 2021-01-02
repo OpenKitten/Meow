@@ -6,7 +6,7 @@ It manages your database for you, so you can focus on writing your application.
 
 ### Support
 
-For users of Vapor 4 and/or NIO 2.x, Meow is not available as a very lightweight layer as part of the [MongoKitten](https://github.com/OpenKitten/MongoKitten) repository.
+For users of Vapor 4 and/or NIO 2.x, Meow is now available as a very lightweight layer as part of the [MongoKitten](https://github.com/OpenKitten/MongoKitten) repository.
 
 ## How it works
 
