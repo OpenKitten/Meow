@@ -12,5 +12,6 @@ let package = Package(
     targets: [
         .target(name: "Meow", dependencies: ["MongoKitten"]),
         .testTarget(name: "MeowTests", dependencies: ["Meow"]),
-    ]
+    ],
+    swiftLanguageVersions: [.v4_2, .version("5")]
 )

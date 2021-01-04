@@ -42,7 +42,7 @@ public struct ModelQuery<M: QueryableModel> {
 }
 
 public extension AggregateCursor {
-    public func match<T>(_ query: ModelQuery<T>) -> AggregateCursor<Element> {
+    func match<T>(_ query: ModelQuery<T>) -> AggregateCursor<Element> {
         return self.match(query.query)
     }
 }

@@ -29,7 +29,7 @@ public protocol Model: _Model {
 
 // MARK: - Default implementations
 public extension Model {
-    public func save(to context: Context) -> EventLoopFuture<Void> {
+    func save(to context: Context) -> EventLoopFuture<Void> {
         return context.save(self)
     }
     
@@ -49,12 +49,12 @@ public extension Model {
 public extension Model where Self: Hashable {
     
     /// Provides a default implementation of Hashable for Models, that uses only the _id for Hashable conformance
-    public var hashValue: Int {
-        return _id.hashValue
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(_id)
     }
     
     /// Compares the given models using the _id
-    public static func == (lhs: Self, rhs: Self) -> Bool {
+    static func == (lhs: Self, rhs: Self) -> Bool {
         return lhs._id == rhs._id
     }
     
